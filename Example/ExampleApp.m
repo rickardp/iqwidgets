@@ -26,6 +26,28 @@ struct {
 	UITableViewCell* cell;
 } cells[NVIEWS];
 
+
+
+@implementation IQScheduleView (ControlExtensions)
+- (void) didSelectMode:(id) sender {
+    UISegmentedControl* ctl = sender;
+    switch(ctl.selectedSegmentIndex) {
+        case 0:
+            [self setStartDate:[NSDate date] numberOfDays:1];
+            break;
+        case 1:
+            [self setStartDate:[[NSDate date] dateByAddingTimeInterval:1440*60] numberOfDays:1];
+            break;
+        case 2:
+            [self setWeekWithDate:[NSDate date] workdays:YES];
+            break;
+        case 3:
+            [self setWeekWithDate:[NSDate date] workdays:NO];
+            break;
+    }
+}
+@end
+
 @implementation ExampleAppDelegate
 @synthesize window;
 @synthesize viewController;
@@ -70,11 +92,13 @@ static UIViewController* CreateViewController(int idx) {
 	switch(idx) {
 		case 0:
         {
-            UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Work week",@"Week",nil]] autorelease];
+            IQScheduleView* v = [[IQScheduleView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+            UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
             selector.segmentedControlStyle = UISegmentedControlStyleBar;
             selector.selectedSegmentIndex = 0;
+            [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
             UIBarButtonItem* itm = [[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease];
-            UIViewController* vc = WrapInController([[IQScheduleView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)]);
+            UIViewController* vc = WrapInController(v);
             vc.navigationItem.rightBarButtonItem = itm;
             return vc;
         }
