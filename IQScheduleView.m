@@ -22,6 +22,19 @@
 @interface IQScheduleView (PrivateMethods)
 - (void) reload;
 - (void) setupCalendarView;
+- (void) ensureCapacity:(int)capacity;
+@end
+
+@interface IQscheduleViewDay : NSObject {
+    int timeIndex;
+    UILabel* headerView;
+    IQScheduleDayView* contentView;
+}
+- (id) initWithHeaderView:(UILabel*)headerView contentView:(UIView*)contentView;
+- (void) setTimeIndex:(int)ti left:(CGFloat)left width:(CGFloat)width;
+@property (nonatomic, readonly) int timeIndex;
+@property (nonatomic, readonly) UILabel* headerView;
+@property (nonatomic, readonly) IQScheduleDayView* contentView;
 @end
 
 @implementation IQScheduleView
@@ -58,17 +71,14 @@
     [calendar release];
     [cornerFormatter release];
     [cornerHeader release];
-    for(int i=0; i<7; i++) {
-        [dayHeaders[i] release];
-        [days[i] release];
-    }
+    [days release];
     [blocks release];
     [timeLabels release];
     [calendarArea release];
     [super dealloc];
 }
 
-#pragma mark Time scaling
+#pragma mark Horizontal time scaling
 
 - (NSDate*) startDate
 {
@@ -126,7 +136,22 @@
     [self setStartDate:[calendar dateFromComponents:dc] numberOfDays:num];
 }
 
-#pragma mark Private methods
+#pragma mark Vertical time zooming
+
+- (void) setZoom:(NSRange)zoom
+{
+    
+}
+
+- (NSRange) zoom
+{
+    // TODO: Implement zooming
+    //CGPoint o = [calendarArea contentOffset];
+    //CGSize s = [calendarArea contentSize];
+    return NSMakeRange(0, 0);
+}
+
+#pragma mark Notifications
 
 - (void) didMoveToWindow
 {
@@ -135,18 +160,25 @@
     cornerHeader.textAlignment = UITextAlignmentCenter;
     cornerHeader.contentMode = UIViewContentModeCenter;
     [self addSubview:cornerHeader];
-    float x = 52, w = (self.bounds.size.width - 52)/kIQScheduleViewMaxDays;
-    for(int i=0; i<kIQScheduleViewMaxDays; i++) {
-        dayHeaders[i] = [[UILabel alloc] initWithFrame:CGRectMake(x, 0, w, 24)];
-        dayHeaders[i].autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-        dayHeaders[i].textAlignment = UITextAlignmentCenter;
-        dayHeaders[i].contentMode = UIViewContentModeCenter;
-        [self addSubview:dayHeaders[i]];
-        x += w;
-    }
     if(dirty) [self reload];
 }
 
+#pragma mark Layouting (private)
+
+- (void) ensureCapacity:(int)capacity
+{
+    if(days == nil) return;
+    while([days count] < capacity) {
+        UILabel* hdr = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 120, 24)];
+        hdr.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+        hdr.textAlignment = UITextAlignmentCenter;
+        hdr.contentMode = UIViewContentModeCenter;
+        hdr.hidden = YES;
+        [self addSubview:hdr];
+        IQscheduleViewDay* day = [[[IQscheduleViewDay alloc] initWithHeaderView:hdr contentView:nil] autorelease];
+        [days addObject:day];
+    }
+}
 
 - (void) reload
 {
@@ -155,37 +187,106 @@
     } else {
         dirty = NO;
         cornerHeader.text = [cornerFormatter stringFromDate:startDate];
+        [self ensureCapacity:numDays];
+        
         NSDateComponents* dc = [[NSDateComponents alloc] init];
-        BOOL taken[kIQScheduleViewMaxDays];
-        int newIndices[kIQScheduleViewMaxDays];
-        for(int i=0; i<kIQScheduleViewMaxDays; i++) {
-            taken[i] = NO;
-            if(i >= numDays) newIndices[i] = 0;
-            else {
-                dc.day = i;
-                NSDate* d = [calendar dateByAddingComponents:dc toDate:startDate options:0];
-                newIndices[i] = (int)[d timeIntervalSinceReferenceDate];
-            }
-        }
-        int startIndex = -1, startOldIndex = -1;
-        for(int i=0; i<kIQScheduleViewMaxDays; i++) {
-            for(int j=0; j<7; j++) {
-                if(indices[j] == newIndices[i]) {
-                    startIndex = i;
-                    startOldIndex = j;
+        
+        int tMin = 0;
+        int pivotPoint = -1;
+        
+        for(int i=0; i<numDays; i++) {
+            dc.day = i;
+            int t = (int)[[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
+            if(i == 0) tMin = t;
+            int j = 0;
+            for(IQScheduleViewDay* day in days) {
+                if([day timeIndex] == t) {
+                    pivotPoint = i;
                     break;
                 }
+                j++;
             }
+            if(pivotPoint >= 0) {
+                while(j > pivotPoint) {
+                    IQScheduleViewDay* day = [days objectAtIndex:0];
+                    [days addObject:day];
+                    [days removeObjectAtIndex:0];
+                    j--;
+                }
+                while(j < pivotPoint) {
+                    IQScheduleViewDay* day = [days lastObject];
+                    [days insertObject:day atIndex:0];
+                    [days removeLastObject];
+                    j++;
+                }
+            }
+        }
+        if(tMin == 0) return;
+        CGRect bnds = self.bounds;
+        CGFloat left = cornerHeader.bounds.size.width;
+        CGFloat width = bnds.size.width - left;
+        if(pivotPoint < 0) {
+            // We have no view in common, just swap the views
+            int i = 0;
+            for(IQscheduleViewDay* day in days) {
+                dc.day = i;
+                int t = 0;
+                if(i < numDays) {
+                    t = (int)[[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
+                }
+                [day setTimeIndex:t left:left width:width];
+                left += width;
+            }
+        } else {
+            
         }
     }
 }
 
 - (void) setupCalendarView
 {
+    days = [[NSMutableArray alloc] initWithCapacity:7];
     self.calendar = [NSCalendar currentCalendar];
     [self setWeekWithDate:nil workdays:YES];
     cornerFormatter = [[NSDateFormatter alloc] init];
     [cornerFormatter setDateFormat:@"YYYY"];
+    headerFormatter = [[NSDateFormatter alloc] init];
+    //[headerFormatter setDateStyle:NSDateFormatterMediumStyle];
+    //[headerFormatter setTimeStyle:NSDateFormatterNoStyle];
+    [headerFormatter setDateFormat:@"EEE MMM dd"];
+}
+
+@end
+
+@implementation IQscheduleViewDay
+@synthesize timeIndex;
+@synthesize headerView;
+@synthesize contentView;
+
+- (id) initWithHeaderView:(UILabel*)h contentView:(UIView*)c
+{
+    if((self = [super init])) {
+        headerView = [h retain];
+        contentView = [c retain];
+    }
+    return self;
+}
+
+- (void) dealloc
+{
+    [headerView release];
+    [contentView release];
+    [super dealloc];
+}
+
+- (void) setTimeIndex:(int)ti left:(CGFloat)left width:(CGFloat)width
+{
+    if(ti <= 0) {
+        headerView.hidden = YES;
+        //contentView.hidden = YES;
+    } else {
+        headerView.hidden = NO;
+    }
 }
 
 @end

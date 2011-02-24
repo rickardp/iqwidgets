@@ -22,24 +22,21 @@
 
 @class IQScheduleBlockView;
 @class IQScheduleDayView;
-
-#define kIQScheduleViewMaxDays 7
+@class IQScheduleViewDay;
 
 @interface IQScheduleView : UIView {
     id<IQCalendarDataSource> dataSource;
     NSDate* startDate;
     int numDays;
     UILabel* cornerHeader;
-    UILabel* dayHeaders[kIQScheduleViewMaxDays];
     UIScrollView* calendarArea;
-    IQScheduleDayView* days[kIQScheduleViewMaxDays];
-    int indices[kIQScheduleViewMaxDays];
+    NSMutableArray* days;
     NSMutableSet* blocks;
     NSMutableSet* timeLabels;
     UIView* nowTimeIndicator;
     NSCalendar* calendar;
     BOOL dirty;
-    NSDateFormatter* cornerFormatter;
+    NSDateFormatter* cornerFormatter, *headerFormatter;
 }
 
 //typedef UIView* (^CellDataPopulator)(NSUInteger index, UITableViewCell* cell);
@@ -50,6 +47,7 @@
 @property (nonatomic, readonly) NSDate* startDate;
 @property (nonatomic, readonly) NSDate* endDate;
 @property (nonatomic, readonly) int numberOfDays;
+@property (nonatomic) NSRange zoom;
 
 - (void) setStartDate:(NSDate*)startDate numberOfDays:(int)numberOfDays;
 
