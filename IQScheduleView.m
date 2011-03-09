@@ -35,6 +35,7 @@
 @property (nonatomic, readonly) int timeIndex;
 @property (nonatomic, readonly) UILabel* headerView;
 @property (nonatomic, readonly) IQScheduleDayView* contentView;
+@property (nonatomic, retain) NSString* title;
 @end
 
 @implementation IQScheduleView
@@ -153,14 +154,24 @@
 
 #pragma mark Notifications
 
-- (void) didMoveToWindow
+- (void) didMoveToSuperview
 {
-    cornerHeader = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 52, 24)];
-    cornerHeader.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-    cornerHeader.textAlignment = UITextAlignmentCenter;
-    cornerHeader.contentMode = UIViewContentModeCenter;
-    [self addSubview:cornerHeader];
-    if(dirty) [self reload];
+    if(cornerHeader == nil) {
+        cornerHeader = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 52, 24)];
+        cornerHeader.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
+        cornerHeader.textAlignment = UITextAlignmentCenter;
+        cornerHeader.contentMode = UIViewContentModeCenter;
+        [self addSubview:cornerHeader];
+        CGSize winSize = self.superview.bounds.size;
+        CGRect bnds = CGRectMake(0, 24, winSize.width, winSize.height - 24);
+        calendarArea = [[UIScrollView alloc] initWithFrame:bnds];
+        calendarArea.contentSize = CGSizeMake(bnds.size.width, bnds.size.height * 2);
+        calendarArea.contentOffset = CGPointMake(0, bnds.size.height * .5);
+        calendarArea.multipleTouchEnabled = YES;
+        [calendarArea flashScrollIndicators];
+        [self addSubview:calendarArea];
+        if(dirty) [self reload];
+    }
 }
 
 #pragma mark Layouting (private)
@@ -224,7 +235,7 @@
         if(tMin == 0) return;
         CGRect bnds = self.bounds;
         CGFloat left = cornerHeader.bounds.size.width;
-        CGFloat width = bnds.size.width - left;
+        CGFloat width = (bnds.size.width - left) / numDays;
         if(pivotPoint < 0) {
             // We have no view in common, just swap the views
             int i = 0;
@@ -232,10 +243,13 @@
                 dc.day = i;
                 int t = 0;
                 if(i < numDays) {
-                    t = (int)[[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
+                    NSDate* d = [calendar dateByAddingComponents:dc toDate:startDate options:0];
+                    t = (int)[d timeIntervalSinceReferenceDate];
+                    day.title = [headerFormatter stringFromDate:d];
                 }
-                [day setTimeIndex:t left:left width:width];
+                [day setTimeIndex:t left:left width:width ];
                 left += width;
+                i++;
             }
         } else {
             
@@ -279,8 +293,22 @@
     [super dealloc];
 }
 
+- (void) setTitle:(NSString *)title
+{
+    headerView.text = title;
+}
+
+- (NSString*) title
+{
+    return headerView.text;
+}
+
 - (void) setTimeIndex:(int)ti left:(CGFloat)left width:(CGFloat)width
 {
+    CGRect r = headerView.frame;
+    r.origin.x = left;
+    r.size.width = width;
+    headerView.frame = r;
     if(ti <= 0) {
         headerView.hidden = YES;
         //contentView.hidden = YES;

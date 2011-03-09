@@ -16,6 +16,7 @@
 			<string>IBUINavigationController</string>
 			<string>IBUIViewController</string>
 			<string>IBUICustomObject</string>
+			<string>IBUIToolbar</string>
 			<string>IBUIWindow</string>
 			<string>IBUINavigationBar</string>
 			<string>IBUINavigationItem</string>
@@ -79,13 +80,23 @@
 					<bool key="IBUIMultipleTouchEnabled">YES</bool>
 					<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 				</object>
+				<object class="IBUIToolbar" key="IBUIToolbar" id="1067322134">
+					<nil key="NSNextResponder"/>
+					<int key="NSvFlags">256</int>
+					<string key="NSFrame">{{0, 416}, {320, 44}}</string>
+					<bool key="IBUIOpaque">NO</bool>
+					<bool key="IBUIClipsSubviews">YES</bool>
+					<int key="IBUIContentMode">4</int>
+					<bool key="IBUIMultipleTouchEnabled">YES</bool>
+					<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
+				</object>
 				<object class="NSMutableArray" key="IBUIViewControllers">
 					<bool key="EncodedWithXMLCoder">YES</bool>
 					<object class="IBUIViewController" id="378423248">
 						<object class="IBUITableView" key="IBUIView" id="374752569">
 							<reference key="NSNextResponder"/>
 							<int key="NSvFlags">274</int>
-							<string key="NSFrame">{{0, 64}, {320, 416}}</string>
+							<string key="NSFrame">{{0, 64}, {320, 372}}</string>
 							<reference key="NSSuperview"/>
 							<reference key="NSWindow"/>
 							<object class="NSColor" key="IBUIBackgroundColor">
@@ -116,6 +127,7 @@
 						<bool key="IBUIHorizontal">NO</bool>
 					</object>
 				</object>
+				<bool key="IBUIToolbarHidden">NO</bool>
 			</object>
 		</object>
 		<object class="IBObjectContainer" key="IBDocument.Objects">
@@ -200,6 +212,7 @@
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<reference ref="378423248"/>
 							<reference ref="527092536"/>
+							<reference ref="1067322134"/>
 						</object>
 						<reference key="parent" ref="0"/>
 					</object>
@@ -230,6 +243,11 @@
 						<int key="objectID">13</int>
 						<reference key="object" ref="374752569"/>
 						<reference key="parent" ref="378423248"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">18</int>
+						<reference key="object" ref="1067322134"/>
+						<reference key="parent" ref="579885959"/>
 					</object>
 				</object>
 			</object>
@@ -286,7 +304,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">17</int>
+			<int key="maxID">18</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">

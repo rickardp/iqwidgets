@@ -95,11 +95,14 @@ static UIViewController* CreateViewController(int idx) {
             IQScheduleView* v = [[IQScheduleView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
             UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
             selector.segmentedControlStyle = UISegmentedControlStyleBar;
+            [v setStartDate:[NSDate date] numberOfDays:1];
             selector.selectedSegmentIndex = 0;
             [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
             UIBarButtonItem* itm = [[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease];
             UIViewController* vc = WrapInController(v);
-            vc.navigationItem.rightBarButtonItem = itm;
+            UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
+            vc.toolbarItems = [NSArray arrayWithObjects:sys,itm,sys,nil];
+            //vc.navigationItem.rightBarButtonItem = itm;
             return vc;
         }
 		case 1:
