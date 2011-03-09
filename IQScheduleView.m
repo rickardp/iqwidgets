@@ -17,21 +17,25 @@
 //
 
 #import "IQScheduleView.h"
-
+#import "IQCalendarDataSource.h"
+#import <QuartzCore/QuartzCore.h>
 
 @interface IQScheduleView (PrivateMethods)
-- (void) reload;
+- (void) reloadFull;
 - (void) setupCalendarView;
 - (void) ensureCapacity:(int)capacity;
+- (UIView*) createViewForBlockItem:(id)item;
 @end
 
-@interface IQscheduleViewDay : NSObject {
+@interface IQScheduleViewDay : NSObject {
     int timeIndex;
     UILabel* headerView;
+    NSMutableSet* blocks;
     IQScheduleDayView* contentView;
 }
 - (id) initWithHeaderView:(UILabel*)headerView contentView:(UIView*)contentView;
 - (void) setTimeIndex:(int)ti left:(CGFloat)left width:(CGFloat)width;
+- (void) reloadDataWithSource:(IQScheduleView*)dataSource;
 @property (nonatomic, readonly) int timeIndex;
 @property (nonatomic, readonly) UILabel* headerView;
 @property (nonatomic, readonly) IQScheduleDayView* contentView;
@@ -43,6 +47,9 @@
 @synthesize dataSource;
 @synthesize calendar;
 @synthesize numberOfDays = numDays;
+@synthesize tintColor;
+@synthesize darkLineColor;
+@synthesize lightLineColor;
 
 #pragma mark Initialization
 
@@ -68,12 +75,16 @@
 
 - (void)dealloc
 {
+    self.darkLineColor = nil;
+    self.lightLineColor = nil;
+    self.tintColor = nil;
     [startDate release];
     [calendar release];
     [cornerFormatter release];
+    [headerFormatter release];
+    [tightHeaderFormatter release];
     [cornerHeader release];
     [days release];
-    [blocks release];
     [timeLabels release];
     [calendarArea release];
     [super dealloc];
@@ -103,7 +114,7 @@
     if(n<1) n = 1;
     if(n>7) n = 7;
     numDays = n;
-    [self reload];
+    [self reloadFull];
 }
 - (void) setStartDate:(NSDate*)s endDate:(NSDate*)e
 {
@@ -170,11 +181,19 @@
         calendarArea.multipleTouchEnabled = YES;
         [calendarArea flashScrollIndicators];
         [self addSubview:calendarArea];
-        if(dirty) [self reload];
+        if(dirty) [self reloadFull];
     }
 }
 
 #pragma mark Layouting (private)
+
+- (void) recreateFromScratch
+{
+    dirty = TRUE;
+    for(IQScheduleViewDay* day in days) {
+        [day.contentView removeFromSuperview];
+    }
+}
 
 - (void) ensureCapacity:(int)capacity
 {
@@ -186,12 +205,29 @@
         hdr.contentMode = UIViewContentModeCenter;
         hdr.hidden = YES;
         [self addSubview:hdr];
-        IQscheduleViewDay* day = [[[IQscheduleViewDay alloc] initWithHeaderView:hdr contentView:nil] autorelease];
+        CGSize ca = calendarArea.contentSize;
+        IQScheduleDayView* dayContent = [[IQScheduleDayView alloc] initWithFrame:CGRectMake(0, 0, 120, ca.height)];
+        dayContent.opaque = YES;
+        dayContent.backgroundColor = self.backgroundColor;
+        dayContent.darkLineColor = self.darkLineColor;
+        dayContent.lightLineColor = self.lightLineColor;
+        dayContent.tintColor = self.tintColor;
+        IQScheduleViewDay* day = [[[IQScheduleViewDay alloc] initWithHeaderView:hdr contentView:dayContent] autorelease];
+        [calendarArea addSubview:dayContent];
         [days addObject:day];
     }
 }
 
-- (void) reload
+- (void) reloadData
+{
+    for(IQScheduleViewDay* day in days) {
+        if([day timeIndex] != 0) {
+            [day reloadDataWithSource:self];
+        }
+    }
+}
+
+- (void) reloadFull
 {
     if(cornerHeader == nil) {
         dirty = YES;  
@@ -239,15 +275,16 @@
         if(pivotPoint < 0) {
             // We have no view in common, just swap the views
             int i = 0;
-            for(IQscheduleViewDay* day in days) {
+            for(IQScheduleViewDay* day in days) {
                 dc.day = i;
                 int t = 0;
                 if(i < numDays) {
                     NSDate* d = [calendar dateByAddingComponents:dc toDate:startDate options:0];
                     t = (int)[d timeIntervalSinceReferenceDate];
-                    day.title = [headerFormatter stringFromDate:d];
+                    day.title = [((width < 100)?tightHeaderFormatter:headerFormatter) stringFromDate:d];
                 }
-                [day setTimeIndex:t left:left width:width ];
+                [day setTimeIndex:t left:left width:width];
+                [day reloadDataWithSource:self];
                 left += width;
                 i++;
             }
@@ -257,8 +294,23 @@
     }
 }
 
+- (UIView*) createViewForBlockItem:(id)item withFrame:(CGRect)frame
+{
+    return createBlock(self, item, frame);
+}
+
 - (void) setupCalendarView
 {
+    createBlock = Block_copy(^(IQScheduleView* parent, id item, CGRect frame) {
+        IQScheduleBlockView* view = [[IQScheduleBlockView alloc] initWithFrame:frame];
+        if([dataSource respondsToSelector:@selector(textForItem:)]) {
+            view.text = [dataSource textForItem:item];
+        }
+        return [view autorelease];
+    });
+    self.backgroundColor = [UIColor whiteColor];
+    self.darkLineColor = [UIColor grayColor];
+    self.lightLineColor = [UIColor lightGrayColor];
     days = [[NSMutableArray alloc] initWithCapacity:7];
     self.calendar = [NSCalendar currentCalendar];
     [self setWeekWithDate:nil workdays:YES];
@@ -268,11 +320,15 @@
     //[headerFormatter setDateStyle:NSDateFormatterMediumStyle];
     //[headerFormatter setTimeStyle:NSDateFormatterNoStyle];
     [headerFormatter setDateFormat:@"EEE MMM dd"];
+    tightHeaderFormatter = [[NSDateFormatter alloc] init];
+    //[headerFormatter setDateStyle:NSDateFormatterMediumStyle];
+    //[headerFormatter setTimeStyle:NSDateFormatterNoStyle];
+    [tightHeaderFormatter setDateFormat:@"EEE"];
 }
 
 @end
 
-@implementation IQscheduleViewDay
+@implementation IQScheduleViewDay
 @synthesize timeIndex;
 @synthesize headerView;
 @synthesize contentView;
@@ -282,12 +338,14 @@
     if((self = [super init])) {
         headerView = [h retain];
         contentView = [c retain];
+        blocks = [[NSMutableSet alloc] init];
     }
     return self;
 }
 
 - (void) dealloc
 {
+    [blocks release];
     [headerView release];
     [contentView release];
     [super dealloc];
@@ -306,15 +364,150 @@
 - (void) setTimeIndex:(int)ti left:(CGFloat)left width:(CGFloat)width
 {
     CGRect r = headerView.frame;
+    left = floor(left);
+    width = ceil(width);
     r.origin.x = left;
-    r.size.width = width;
+    r.size.width = ceil(width);
     headerView.frame = r;
+    r = contentView.frame;
+    r.origin.x = left;
+    if(r.size.width != ceil(width)) {
+        r.size.width = ceil(width);
+        [contentView setNeedsDisplay];
+    }
+    contentView.frame = r;
     if(ti <= 0) {
         headerView.hidden = YES;
-        //contentView.hidden = YES;
+        contentView.hidden = YES;
     } else {
         headerView.hidden = NO;
+        contentView.hidden = NO;
     }
+    timeIndex = ti;
 }
 
+- (void) reloadDataWithSource:(IQScheduleView*)dataSource
+{
+    NSLog(@"Reloading day");
+    for(UIView* view in blocks) {
+        [view removeFromSuperview];
+    }
+    [blocks removeAllObjects];
+    const CGFloat pad = 15.0;
+    
+    if(dataSource == nil) return;
+    CGRect bounds = contentView.bounds;
+    NSTimeInterval daySize = 24*3600; // DST correction?
+    CGFloat ht = bounds.size.height - 2 * pad;
+    NSLog(@"Bounds: %f x %f", bounds.size.width, bounds.size.height);
+    [[dataSource dataSource] enumerateEntriesUsing:^(id item, NSTimeInterval startDate, NSTimeInterval endDate) {
+        NSLog(@"Will create block for %f", (startDate-timeIndex)/3600.0f);
+        CGRect frame = CGRectMake(bounds.origin.x, floor(bounds.origin.y + ht * (startDate - timeIndex) / daySize), bounds.size.width, ceil(ht * (endDate - startDate) / daySize));
+        if(frame.size.height < 10) frame.size.height = 10;
+        NSLog(@"Frame is %f,%f,%f,%f", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+        UIView* view = [dataSource createViewForBlockItem:item withFrame:frame];
+        if(view != nil) {
+            [blocks addObject:view];
+            [contentView addSubview:view];
+            view.backgroundColor = [UIColor redColor];
+        }
+    } from:timeIndex to:timeIndex+daySize];
+}
+
+@end
+
+@implementation IQScheduleView (CallbackInterface)
+- (void) setBlockCreationCallback:(IQBlockViewCreationCallback)callback
+{
+    Block_release(createBlock);
+}
+@end
+@implementation IQScheduleDayView
+@synthesize darkLineColor, lightLineColor, tintColor;
+
+- (void) dealloc
+{
+    self.darkLineColor = nil;
+    self.lightLineColor = nil;
+    self.tintColor = nil;
+}
+
+- (void)drawRect:(CGRect)rect
+{
+    CGRect bnds = self.bounds;
+    
+    CGContextRef ctx = UIGraphicsGetCurrentContext();
+    CGContextSetLineWidth(ctx, 1.0);
+    CGContextSetShouldAntialias(ctx, NO);
+    CGContextSetFillColorWithColor(ctx, [self.backgroundColor CGColor]);
+    CGContextFillRect(ctx, rect);
+    const CGFloat pad = 15.0;
+    CGFloat hourSize = (bnds.size.height - 2 * pad) / 24.0f;
+    CGContextAddLines(ctx, (CGPoint[]){CGPointMake(0, pad), CGPointMake(0, (int)bnds.size.height-pad)}, 2);
+    for(int i=0; i<=24; i++) {
+        int y = (int)(i * hourSize + pad);
+        CGContextMoveToPoint(ctx, 0, y);
+        CGContextAddLineToPoint(ctx, bnds.size.width, y);
+        
+    }
+    CGContextSetStrokeColorWithColor(ctx, [self.lightLineColor CGColor]);
+    CGContextStrokePath(ctx);
+    for(int i=0; i<24; i++) {
+        int y = (int)((i+.5f) * hourSize + pad);
+        CGContextMoveToPoint(ctx, 0, y);
+        CGContextAddLineToPoint(ctx, bnds.size.width, y);
+        
+    }
+    CGContextSetStrokeColorWithColor(ctx, [self.lightLineColor CGColor]);
+    CGContextSaveGState(ctx);
+    CGContextSetLineDash(ctx, 0, (CGFloat[]){1,1}, 2);
+    CGContextStrokePath(ctx);
+    CGContextRestoreGState(ctx);
+    //CGContextMoveToPoint(ctx, 0, 20);
+    //CGContextAddLineToPoint(ctx, 100, 20);
+}
+
+@end
+
+@implementation IQScheduleBlockView
+@synthesize textLabel;
+- (id) initWithFrame:(CGRect)frame
+{
+    self = [super initWithFrame:frame];
+    if(self) {
+        self.layer.cornerRadius = 5.0f;
+        self.layer.borderWidth = 1.0;
+        self.backgroundColor = [UIColor blueColor];
+        CGRect b = self.bounds;
+        b.origin.x = 5;
+        b.origin.y = 5;
+        b.size.width -= 2 * b.origin.x;
+        b.size.height -= 2 * b.origin.y;
+        textLabel = [[UILabel alloc] initWithFrame:b];
+        textLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
+        textLabel.opaque = NO;
+        textLabel.backgroundColor = [UIColor clearColor];
+        textLabel.font = [UIFont systemFontOfSize:12];
+        [self addSubview:textLabel];
+    }
+    return self;
+}
+
+- (void) setBackgroundColor:(UIColor *)backgroundColor
+{
+    self.layer.borderColor = [[backgroundColor colorWithAlphaComponent:0.5] CGColor];
+    const CGFloat* ft = CGColorGetComponents([backgroundColor CGColor]);
+    textLabel.textColor = backgroundColor;
+    [super setBackgroundColor:[UIColor colorWithRed:ft[0]*.5+.5 green:ft[1]*.5+.5 blue:ft[2]*.5+.5 alpha:.75]];
+}
+
+- (void) setText:(NSString *)text
+{
+    textLabel.text = text;
+}
+
+- (NSString*) text
+{
+    return textLabel.text;
+}
 @end

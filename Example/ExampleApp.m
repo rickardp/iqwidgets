@@ -28,6 +28,41 @@ struct {
 
 
 
+@interface ExampleCalendarEntry : NSObject {
+    NSDate* start, *end;
+    NSString* text;
+}
+
++ (ExampleCalendarEntry*) exampleEntryWithText:(NSString*)text start:(NSDate*)s end:(NSDate*)end;
+- (NSString*) text;
+- (NSDate*) startDate;
+- (NSDate*) endDate;
+@end
+
+@implementation ExampleCalendarEntry
++ (ExampleCalendarEntry*) exampleEntryWithText:(NSString*)text start:(NSDate*)s end:(NSDate*)e
+{
+    ExampleCalendarEntry* ent = [[[ExampleCalendarEntry alloc] init] autorelease];
+    if(ent == nil) return nil;
+    ent->start = [s retain];
+    ent->end = [e retain];
+    ent->text = [text retain];
+    return ent;
+}
+- (NSString*) text {
+    return text;
+}
+- (NSDate*) startDate {
+    return start;
+}
+- (NSDate*) endDate {
+    return end;
+}
+- (UIColor*) color {
+    return [UIColor redColor];
+}
+@end
+
 @implementation IQScheduleView (ControlExtensions)
 - (void) didSelectMode:(id) sender {
     UISegmentedControl* ctl = sender;
@@ -96,12 +131,20 @@ static UIViewController* CreateViewController(int idx) {
             UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
             selector.segmentedControlStyle = UISegmentedControlStyleBar;
             [v setStartDate:[NSDate date] numberOfDays:1];
+            [v setZoom:NSMakeRange(18, 22)];
             selector.selectedSegmentIndex = 0;
             [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
             UIBarButtonItem* itm = [[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease];
             UIViewController* vc = WrapInController(v);
             UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
             vc.toolbarItems = [NSArray arrayWithObjects:sys,itm,sys,nil];
+            NSMutableSet* items = [NSMutableSet set];
+            NSTimeInterval t = 0;
+            for(int i=0; i<10; i++) {
+                t += 3600;
+                [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Test" start:[NSDate dateWithTimeIntervalSinceNow:t] end:[NSDate dateWithTimeIntervalSinceNow:t+3600]]];
+            }
+            v.dataSource = [IQCalendarSimpleDataSource dataSourceWithSet:items];
             //vc.navigationItem.rightBarButtonItem = itm;
             return vc;
         }

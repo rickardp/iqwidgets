@@ -21,8 +21,11 @@
 @protocol IQCalendarDataSource;
 
 @class IQScheduleBlockView;
-@class IQScheduleDayView;
 @class IQScheduleViewDay;
+@class IQScheduleView;
+
+
+typedef UIView* (^IQBlockViewCreationCallback)(IQScheduleView* parent, id item, CGRect frame);
 
 @interface IQScheduleView : UIView {
     id<IQCalendarDataSource> dataSource;
@@ -31,15 +34,14 @@
     UILabel* cornerHeader;
     UIScrollView* calendarArea;
     NSMutableArray* days;
-    NSMutableSet* blocks;
     NSMutableSet* timeLabels;
     UIView* nowTimeIndicator;
     NSCalendar* calendar;
     BOOL dirty;
-    NSDateFormatter* cornerFormatter, *headerFormatter;
+    NSDateFormatter* cornerFormatter, *headerFormatter, *tightHeaderFormatter;
+    IQBlockViewCreationCallback createBlock;
+    NSSet* items;
 }
-
-//typedef UIView* (^CellDataPopulator)(NSUInteger index, UITableViewCell* cell);
 
 @property (nonatomic, retain) id<IQCalendarDataSource> dataSource;
 @property (nonatomic, retain) NSCalendar* calendar;
@@ -48,6 +50,10 @@
 @property (nonatomic, readonly) NSDate* endDate;
 @property (nonatomic, readonly) int numberOfDays;
 @property (nonatomic) NSRange zoom;
+
+@property (nonatomic, retain) UIColor* tintColor;
+@property (nonatomic, retain) UIColor* darkLineColor;
+@property (nonatomic, retain) UIColor* lightLineColor;
 
 - (void) setStartDate:(NSDate*)startDate numberOfDays:(int)numberOfDays;
 
@@ -59,10 +65,31 @@
 
 - (void) setWeekWithDate:(NSDate*)dayInWeek workdays:(BOOL)workdays;
 
+- (void) reloadData;
+
 @end
 
+// This category uses blocks for defining a call-back interface. This
+// option performs better with large data sets and allows for more
+// customization than the simple interface.
+
+@interface IQScheduleView (CallbackInterface)
+- (void) setBlockCreationCallback:(IQBlockViewCreationCallback)callback;
+@end
+
+@interface IQScheduleDayView : UIView {
+@private
+}
+@property (nonatomic, retain) UIColor* tintColor;
+@property (nonatomic, retain) UIColor* darkLineColor;
+@property (nonatomic, retain) UIColor* lightLineColor;
+@end
 
 @interface IQScheduleBlockView : UIView {
 @private
+    UILabel* textLabel;
 }
+
+@property (nonatomic, readonly) UILabel* textLabel;
+@property (nonatomic, retain) NSString* text;
 @end

@@ -18,10 +18,11 @@
 
 #import <UIKit/UIKit.h>
 
-@protocol IQCalendarDataSource <NSObject>
 
-@end
+
 
 @interface IQCalendarView : UIView {
 }
 @end
+
+

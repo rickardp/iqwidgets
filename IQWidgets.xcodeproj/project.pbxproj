@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF24AF271327A0F300BE3723 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF24AF261327A0F300BE3723 /* CoreGraphics.framework */; };
 		FF3C054912E65A2A00CFB524 /* IQDrilldownController.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3C054712E65A2A00CFB524 /* IQDrilldownController.h */; };
 		FF3C054A12E65A2A00CFB524 /* IQDrilldownController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF3C054812E65A2A00CFB524 /* IQDrilldownController.m */; };
 		FF4553D112BAC48000B26A30 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF4553D012BAC48000B26A30 /* MapKit.framework */; };
@@ -26,6 +27,8 @@
 		FF8C3214130B136E00A10CF0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8C3213130B136E00A10CF0 /* CoreGraphics.framework */; };
 		FF8C3226130B138800A10CF0 /* CalendarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31F8130B111400A10CF0 /* CalendarTests.m */; };
 		FF8C3227130B150B00A10CF0 /* libIQWidgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC07E0554694100DB518D /* libIQWidgets.a */; };
+		FFC9646A1327DB4200B2EBA6 /* IQCalendarDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */; };
+		FFC9646B1327DB4200B2EBA6 /* IQCalendarDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */; };
 		FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF34130C69D10040F26E /* ScheduleTests.h */; };
 		FFD6CF38130C816A0040F26E /* ScheduleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD6CF35130C69D10040F26E /* ScheduleTests.m */; };
 		FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF39130C828B0040F26E /* TestUtil.h */; };
@@ -52,6 +55,7 @@
 /* Begin PBXFileReference section */
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2AAC07E0554694100DB518D /* libIQWidgets.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIQWidgets.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF24AF261327A0F300BE3723 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		FF3C054712E65A2A00CFB524 /* IQDrilldownController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQDrilldownController.h; sourceTree = "<group>"; };
 		FF3C054812E65A2A00CFB524 /* IQDrilldownController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQDrilldownController.m; sourceTree = "<group>"; };
 		FF4553D012BAC48000B26A30 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
@@ -73,6 +77,8 @@
 		FF8C3210130B136D00A10CF0 /* BasicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BasicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C3213130B136E00A10CF0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		FF8C322C130B175700A10CF0 /* Tests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Tests-Info.plist"; path = "Tests/Tests-Info.plist"; sourceTree = "<group>"; };
+		FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarDataSource.h; sourceTree = "<group>"; };
+		FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQCalendarDataSource.m; sourceTree = "<group>"; };
 		FFD6CF34130C69D10040F26E /* ScheduleTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleTests.h; path = Tests/ScheduleTests.h; sourceTree = "<group>"; };
 		FFD6CF35130C69D10040F26E /* ScheduleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleTests.m; path = Tests/ScheduleTests.m; sourceTree = "<group>"; };
 		FFD6CF39130C828B0040F26E /* TestUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtil.h; path = Tests/TestUtil.h; sourceTree = "<group>"; };
@@ -83,6 +89,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF24AF271327A0F300BE3723 /* CoreGraphics.framework in Frameworks */,
 				FF540ADB12A95ECA00C2C7A5 /* libIQWidgets.a in Frameworks */,
 				FF540AF512A95F1D00C2C7A5 /* UIKit.framework in Frameworks */,
 				FF540D6912A9913F00C2C7A5 /* QuartzCore.framework in Frameworks */,
@@ -118,6 +125,7 @@
 		0867D691FE84028FC02AAC07 /* IQTiledScrollView */ = {
 			isa = PBXGroup;
 			children = (
+				FF24AF261327A0F300BE3723 /* CoreGraphics.framework */,
 				FF540AEC12A95EDB00C2C7A5 /* Example */,
 				FF8C31F6130B10FB00A10CF0 /* Tests */,
 				08FB77AEFE84172EC02AAC07 /* Source */,
@@ -150,6 +158,8 @@
 				FF8C31DF130AFB7600A10CF0 /* IQScheduleView.m */,
 				FF8C31E2130AFBD800A10CF0 /* IQCalendarView.h */,
 				FF8C31E3130AFBD800A10CF0 /* IQCalendarView.m */,
+				FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */,
+				FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -192,6 +202,7 @@
 				FF8C31F9130B111400A10CF0 /* CalendarTests.h in Headers */,
 				FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */,
 				FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */,
+				FFC9646A1327DB4200B2EBA6 /* IQCalendarDataSource.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -321,6 +332,7 @@
 				FF3C054A12E65A2A00CFB524 /* IQDrilldownController.m in Sources */,
 				FF8C31E1130AFB7800A10CF0 /* IQScheduleView.m in Sources */,
 				FF8C31E5130AFBDB00A10CF0 /* IQCalendarView.m in Sources */,
+				FFC9646B1327DB4200B2EBA6 /* IQCalendarDataSource.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -399,6 +411,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -418,6 +431,7 @@
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
