@@ -20,6 +20,8 @@
 #import "IQCalendarDataSource.h"
 #import <QuartzCore/QuartzCore.h>
 
+const CGFloat kDayViewPadding = 15.0;
+
 @interface IQScheduleView (PrivateMethods)
 - (void) reloadFull;
 - (void) setupCalendarView;
@@ -29,6 +31,8 @@
 
 @interface IQScheduleViewDay : NSObject {
     int timeIndex;
+    NSTimeInterval dayOffset;
+    NSTimeInterval dayLength;
     UILabel* headerView;
     NSMutableSet* blocks;
     IQScheduleDayView* contentView;
@@ -40,6 +44,7 @@
 @property (nonatomic, readonly) UILabel* headerView;
 @property (nonatomic, readonly) IQScheduleDayView* contentView;
 @property (nonatomic, retain) NSString* title;
+@property (nonatomic) NSTimeInterval dayOffset, dayLength;
 @end
 
 @implementation IQScheduleView
@@ -181,6 +186,21 @@
         calendarArea.multipleTouchEnabled = YES;
         [calendarArea flashScrollIndicators];
         [self addSubview:calendarArea];
+        
+        timeLabels = [[NSMutableSet setWithCapacity:23] retain];
+        CGFloat ht = calendarArea.contentSize.height - 2 * kDayViewPadding;
+        NSLog(@"Height: %f", ht);
+        for(int i=1; i<= 23; i++) {
+            UILabel* hour = [[UILabel alloc] initWithFrame:CGRectMake(0, kDayViewPadding+i*ht/24-12, 46, 20)];
+            hour.text = [NSString stringWithFormat:@"%02d.00", i];
+            hour.textAlignment = UITextAlignmentRight;
+            hour.contentMode = UIViewContentModeCenter;
+            hour.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+            hour.backgroundColor = self.backgroundColor;
+            [hour setFont:[UIFont systemFontOfSize:14]];
+            [timeLabels addObject:hour];
+            [calendarArea addSubview:hour];
+        }
         if(dirty) [self reloadFull];
     }
 }
@@ -280,8 +300,13 @@
                 int t = 0;
                 if(i < numDays) {
                     NSDate* d = [calendar dateByAddingComponents:dc toDate:startDate options:0];
-                    t = (int)[d timeIntervalSinceReferenceDate];
+                    NSTimeInterval tt = [d timeIntervalSinceReferenceDate];
+                    dc.day = i+1;
+                    NSTimeInterval t2 = [[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
+                    t = (int)tt;
                     day.title = [((width < 100)?tightHeaderFormatter:headerFormatter) stringFromDate:d];
+                    day.dayOffset = tt - t;
+                    day.dayLength = t2 - tt;
                 }
                 [day setTimeIndex:t left:left width:width];
                 [day reloadDataWithSource:self];
@@ -332,6 +357,7 @@
 @synthesize timeIndex;
 @synthesize headerView;
 @synthesize contentView;
+@synthesize dayOffset, dayLength;
 
 - (id) initWithHeaderView:(UILabel*)h contentView:(UIView*)c
 {
@@ -393,25 +419,20 @@
         [view removeFromSuperview];
     }
     [blocks removeAllObjects];
-    const CGFloat pad = 15.0;
     
     if(dataSource == nil) return;
     CGRect bounds = contentView.bounds;
-    NSTimeInterval daySize = 24*3600; // DST correction?
-    CGFloat ht = bounds.size.height - 2 * pad;
-    NSLog(@"Bounds: %f x %f", bounds.size.width, bounds.size.height);
+    CGFloat ht = bounds.size.height - 2 * kDayViewPadding;
     [[dataSource dataSource] enumerateEntriesUsing:^(id item, NSTimeInterval startDate, NSTimeInterval endDate) {
-        NSLog(@"Will create block for %f", (startDate-timeIndex)/3600.0f);
-        CGRect frame = CGRectMake(bounds.origin.x, floor(bounds.origin.y + ht * (startDate - timeIndex) / daySize), bounds.size.width, ceil(ht * (endDate - startDate) / daySize));
+        CGRect frame = CGRectMake(bounds.origin.x, kDayViewPadding + floor(bounds.origin.y + ht * (startDate - timeIndex) / dayLength), bounds.size.width, ceil(ht * (endDate - startDate - dayOffset) / dayLength));
         if(frame.size.height < 10) frame.size.height = 10;
-        NSLog(@"Frame is %f,%f,%f,%f", frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
         UIView* view = [dataSource createViewForBlockItem:item withFrame:frame];
         if(view != nil) {
             [blocks addObject:view];
             [contentView addSubview:view];
             view.backgroundColor = [UIColor redColor];
         }
-    } from:timeIndex to:timeIndex+daySize];
+    } from:timeIndex+dayOffset to:timeIndex+dayOffset+dayLength];
 }
 
 @end
@@ -441,11 +462,10 @@
     CGContextSetShouldAntialias(ctx, NO);
     CGContextSetFillColorWithColor(ctx, [self.backgroundColor CGColor]);
     CGContextFillRect(ctx, rect);
-    const CGFloat pad = 15.0;
-    CGFloat hourSize = (bnds.size.height - 2 * pad) / 24.0f;
-    CGContextAddLines(ctx, (CGPoint[]){CGPointMake(0, pad), CGPointMake(0, (int)bnds.size.height-pad)}, 2);
+    CGFloat hourSize = (bnds.size.height - 2 * kDayViewPadding) / 24.0f;
+    CGContextAddLines(ctx, (CGPoint[]){CGPointMake(0, kDayViewPadding), CGPointMake(0, (int)bnds.size.height-kDayViewPadding)}, 2);
     for(int i=0; i<=24; i++) {
-        int y = (int)(i * hourSize + pad);
+        int y = (int)(i * hourSize + kDayViewPadding);
         CGContextMoveToPoint(ctx, 0, y);
         CGContextAddLineToPoint(ctx, bnds.size.width, y);
         
@@ -453,7 +473,7 @@
     CGContextSetStrokeColorWithColor(ctx, [self.lightLineColor CGColor]);
     CGContextStrokePath(ctx);
     for(int i=0; i<24; i++) {
-        int y = (int)((i+.5f) * hourSize + pad);
+        int y = (int)((i+.5f) * hourSize + kDayViewPadding);
         CGContextMoveToPoint(ctx, 0, y);
         CGContextAddLineToPoint(ctx, bnds.size.width, y);
         

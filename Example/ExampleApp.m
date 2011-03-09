@@ -139,7 +139,9 @@ static UIViewController* CreateViewController(int idx) {
             UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
             vc.toolbarItems = [NSArray arrayWithObjects:sys,itm,sys,nil];
             NSMutableSet* items = [NSMutableSet set];
+            NSTimeInterval t1 = [[NSDate date] timeIntervalSinceReferenceDate];
             NSTimeInterval t = 0;
+            [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Item 1" start:[NSDate dateWithTimeIntervalSinceReferenceDate:(int)t1 + 12*3600] end:[NSDate dateWithTimeIntervalSinceReferenceDate:(int)t1 + 15*3600]]];
             for(int i=0; i<10; i++) {
                 t += 3600;
                 [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Test" start:[NSDate dateWithTimeIntervalSinceNow:t] end:[NSDate dateWithTimeIntervalSinceNow:t+3600]]];
