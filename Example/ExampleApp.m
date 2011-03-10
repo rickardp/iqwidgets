@@ -130,7 +130,7 @@ static UIViewController* CreateViewController(int idx) {
             IQScheduleView* v = [[IQScheduleView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
             UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
             selector.segmentedControlStyle = UISegmentedControlStyleBar;
-            [v setStartDate:[NSDate date] numberOfDays:1];
+            //[v setStartDate:[NSDate date] numberOfDays:1];
             [v setZoom:NSMakeRange(18, 22)];
             selector.selectedSegmentIndex = 0;
             [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
@@ -139,12 +139,12 @@ static UIViewController* CreateViewController(int idx) {
             UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
             vc.toolbarItems = [NSArray arrayWithObjects:sys,itm,sys,nil];
             NSMutableSet* items = [NSMutableSet set];
-            NSTimeInterval t1 = [[NSDate date] timeIntervalSinceReferenceDate];
-            NSTimeInterval t = 0;
-            [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Item 1" start:[NSDate dateWithTimeIntervalSinceReferenceDate:(int)t1 + 12*3600] end:[NSDate dateWithTimeIntervalSinceReferenceDate:(int)t1 + 15*3600]]];
-            for(int i=0; i<10; i++) {
+            NSTimeInterval t = [[NSDate date] timeIntervalSinceReferenceDate];
+            t -= 10*3600;
+            for(int i=0; i<30; i++) {
                 t += 3600;
-                [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Test" start:[NSDate dateWithTimeIntervalSinceNow:t] end:[NSDate dateWithTimeIntervalSinceNow:t+3600]]];
+                t = floor(t/3600)*3600;
+                [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Test" start:[NSDate dateWithTimeIntervalSinceReferenceDate:t] end:[NSDate dateWithTimeIntervalSinceReferenceDate:t+3600]]];
             }
             v.dataSource = [IQCalendarSimpleDataSource dataSourceWithSet:items];
             //vc.navigationItem.rightBarButtonItem = itm;

@@ -181,7 +181,13 @@ const CGFloat kDayViewPadding = 15.0;
         CGSize winSize = self.superview.bounds.size;
         CGRect bnds = CGRectMake(0, 24, winSize.width, winSize.height - 24);
         calendarArea = [[UIScrollView alloc] initWithFrame:bnds];
-        calendarArea.contentSize = CGSizeMake(bnds.size.width, bnds.size.height * 2);
+        // Make sure an hour has an integral height
+        CGFloat height = bnds.size.height * 2;
+        height = (height - 2 * kDayViewPadding) / 24.0f;
+        NSLog(@"Item: %f", round(height));
+        height = round(height) * 24 + 2 * kDayViewPadding;
+        NSLog(@"Total: %f", height);
+        calendarArea.contentSize = CGSizeMake(bnds.size.width, height);
         calendarArea.contentOffset = CGPointMake(0, bnds.size.height * .5);
         calendarArea.multipleTouchEnabled = YES;
         [calendarArea flashScrollIndicators];
@@ -189,9 +195,8 @@ const CGFloat kDayViewPadding = 15.0;
         
         timeLabels = [[NSMutableSet setWithCapacity:23] retain];
         CGFloat ht = calendarArea.contentSize.height - 2 * kDayViewPadding;
-        NSLog(@"Height: %f", ht);
         for(int i=1; i<= 23; i++) {
-            UILabel* hour = [[UILabel alloc] initWithFrame:CGRectMake(0, kDayViewPadding+i*ht/24-12, 46, 20)];
+            UILabel* hour = [[UILabel alloc] initWithFrame:CGRectMake(0, kDayViewPadding+i*ht/24.0f-12, 46, 20)];
             hour.text = [NSString stringWithFormat:@"%02d.00", i];
             hour.textAlignment = UITextAlignmentRight;
             hour.contentMode = UIViewContentModeCenter;
@@ -334,8 +339,8 @@ const CGFloat kDayViewPadding = 15.0;
         return [view autorelease];
     });
     self.backgroundColor = [UIColor whiteColor];
-    self.darkLineColor = [UIColor grayColor];
-    self.lightLineColor = [UIColor lightGrayColor];
+    self.darkLineColor = [UIColor lightGrayColor];
+    self.lightLineColor = [UIColor colorWithWhite:0.8 alpha:1];
     days = [[NSMutableArray alloc] initWithCapacity:7];
     self.calendar = [NSCalendar currentCalendar];
     [self setWeekWithDate:nil workdays:YES];
@@ -423,8 +428,11 @@ const CGFloat kDayViewPadding = 15.0;
     if(dataSource == nil) return;
     CGRect bounds = contentView.bounds;
     CGFloat ht = bounds.size.height - 2 * kDayViewPadding;
+    NSLog(@"Rem: %f", ht);
     [[dataSource dataSource] enumerateEntriesUsing:^(id item, NSTimeInterval startDate, NSTimeInterval endDate) {
-        CGRect frame = CGRectMake(bounds.origin.x, kDayViewPadding + floor(bounds.origin.y + ht * (startDate - timeIndex) / dayLength), bounds.size.width, ceil(ht * (endDate - startDate - dayOffset) / dayLength));
+        CGFloat y1 = kDayViewPadding - 1 + bounds.origin.y + round(ht * (startDate - timeIndex) / dayLength);
+        CGFloat y2 = kDayViewPadding + bounds.origin.y + round(ht * (endDate - timeIndex) / dayLength);
+        CGRect frame = CGRectMake(bounds.origin.x, y1, bounds.size.width, y2 - y1);
         if(frame.size.height < 10) frame.size.height = 10;
         UIView* view = [dataSource createViewForBlockItem:item withFrame:frame];
         if(view != nil) {
@@ -462,7 +470,9 @@ const CGFloat kDayViewPadding = 15.0;
     CGContextSetShouldAntialias(ctx, NO);
     CGContextSetFillColorWithColor(ctx, [self.backgroundColor CGColor]);
     CGContextFillRect(ctx, rect);
+    NSLog(@"Bounds: %f", bnds.size.height);
     CGFloat hourSize = (bnds.size.height - 2 * kDayViewPadding) / 24.0f;
+    NSLog(@"Hour size: %f", hourSize);
     CGContextAddLines(ctx, (CGPoint[]){CGPointMake(0, kDayViewPadding), CGPointMake(0, (int)bnds.size.height-kDayViewPadding)}, 2);
     for(int i=0; i<=24; i++) {
         int y = (int)(i * hourSize + kDayViewPadding);
@@ -495,7 +505,7 @@ const CGFloat kDayViewPadding = 15.0;
 {
     self = [super initWithFrame:frame];
     if(self) {
-        self.layer.cornerRadius = 5.0f;
+        self.layer.cornerRadius = 8.0f;
         self.layer.borderWidth = 1.0;
         self.backgroundColor = [UIColor blueColor];
         CGRect b = self.bounds;
@@ -517,8 +527,9 @@ const CGFloat kDayViewPadding = 15.0;
 {
     self.layer.borderColor = [[backgroundColor colorWithAlphaComponent:0.5] CGColor];
     const CGFloat* ft = CGColorGetComponents([backgroundColor CGColor]);
-    textLabel.textColor = backgroundColor;
+    //textLabel.textColor = backgroundColor;
     [super setBackgroundColor:[UIColor colorWithRed:ft[0]*.5+.5 green:ft[1]*.5+.5 blue:ft[2]*.5+.5 alpha:.75]];
+    textLabel.textColor = [UIColor colorWithRed:ft[0]*.75 green:ft[1]*.75 blue:ft[2]*.75 alpha:1];
 }
 
 - (void) setText:(NSString *)text
