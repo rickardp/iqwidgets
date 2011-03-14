@@ -20,7 +20,7 @@
 #import "IQWidgets.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define NVIEWS 4
+#define NVIEWS 6
 struct {
 	UIView* view;
 	UITableViewCell* cell;
@@ -130,7 +130,7 @@ static UIViewController* CreateViewController(int idx) {
             IQScheduleView* v = [[IQScheduleView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
             UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
             selector.segmentedControlStyle = UISegmentedControlStyleBar;
-            //[v setStartDate:[NSDate date] numberOfDays:1];
+            [v setStartDate:[NSDate date] numberOfDays:1];
             [v setZoom:NSMakeRange(18, 22)];
             selector.selectedSegmentIndex = 0;
             [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
@@ -140,7 +140,7 @@ static UIViewController* CreateViewController(int idx) {
             vc.toolbarItems = [NSArray arrayWithObjects:sys,itm,sys,nil];
             NSMutableSet* items = [NSMutableSet set];
             NSTimeInterval t = [[NSDate date] timeIntervalSinceReferenceDate];
-            t -= 10*3600;
+            t -= 15*3600;
             for(int i=0; i<30; i++) {
                 t += 3600;
                 t = floor(t/3600)*3600;
@@ -175,6 +175,36 @@ static UIViewController* CreateViewController(int idx) {
 			drill.stopAtPartiallyVisibleNext = (idx == 2);
 			return drill;
 		}
+        case 4:
+        {
+            IQScrollView* scroll = [[IQScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+            
+            //UILabel* header = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 44, 44)] autorelease];
+            
+            UIView* rheader = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 44, 44)] autorelease];
+            rheader.backgroundColor = [UIColor redColor];
+            scroll.rowHeaderView = rheader;
+            
+            UIView* header = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 44, 44)] autorelease];
+            //[header setText:@"This is a header label"];
+            header.backgroundColor = [UIColor yellowColor];
+            scroll.columnHeaderView = header;
+            
+            UIView* corner = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 120, 120)] autorelease];
+            corner.backgroundColor = [UIColor blueColor];
+            scroll.cornerView = corner;
+            
+            UIImageView* imgv = [[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"test.png"]] autorelease];
+            scroll.contentSize = imgv.bounds.size;
+            [scroll addSubview:imgv];
+            
+            return WrapInController(scroll);
+        }
+        case 5:
+        {
+            IQGanttView* gantt = [[IQGanttView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+            return WrapInController(gantt);
+        }
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 			break;
@@ -197,6 +227,12 @@ static UITableViewCell* CreateCell(int idx) {
 		case 3:
 			title = @"IQDrilldownController (mode 2)";
 			break;
+        case 4:
+            title = @"IQScrollView";
+            break;
+        case 5:
+            title = @"IQGanttView";
+            break;
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 			break;
