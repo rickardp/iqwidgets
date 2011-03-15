@@ -27,6 +27,7 @@ typedef NSTimeInterval (^IQCalendarDataSourceTimeExtractor)(id item);
 - (void) enumerateEntriesUsing:(IQCalendarDataSourceEntryCallback)enumerator from:(NSTimeInterval)startTime to:(NSTimeInterval)endTime;
 @optional
 - (NSString*) textForItem:(id)item;
+- (NSString*) labelText;
 @end
 
 // IQCalendarDataSource implementation that uses a collection of objects
