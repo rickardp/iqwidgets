@@ -22,8 +22,7 @@
 
 @interface IQGanttView (PrivateMethods)
 - (void) setupGanttView;
-- (void) createViews;
-- (void) layoutOnPropertyChange;
+- (void) layoutOnPropertyChange:(BOOL)didChangeZoom;
 @end
 
 @implementation IQGanttView
@@ -50,76 +49,83 @@
 
 - (void)setupGanttView
 {
+    displayCalendarUnits = NSDayCalendarUnit | NSWeekCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit;
     NSDateComponents* cmpnts = [[NSCalendar currentCalendar] components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit fromDate:[NSDate date]];
-    cmpnts.day = 1;
+    cmpnts.day -= 3;
     scaleWindow.viewStart = [[[NSCalendar currentCalendar] dateFromComponents:cmpnts] timeIntervalSinceReferenceDate];
-    cmpnts.month += 1;
-    scaleWindow.viewEnd = [[[NSCalendar currentCalendar] dateFromComponents:cmpnts] timeIntervalSinceReferenceDate];
+    cmpnts.day += 7;
+    scaleWindow.viewSize = [[[NSCalendar currentCalendar] dateFromComponents:cmpnts] timeIntervalSinceReferenceDate] - scaleWindow.viewStart;
     cmpnts.month = 1;
     scaleWindow.windowStart = [[[NSCalendar currentCalendar] dateFromComponents:cmpnts] timeIntervalSinceReferenceDate];
     cmpnts.year += 1;
     scaleWindow.windowEnd = [[[NSCalendar currentCalendar] dateFromComponents:cmpnts] timeIntervalSinceReferenceDate];
-    NSLog(@"Date is %@ - %@", [NSDate dateWithTimeIntervalSinceReferenceDate:scaleWindow.viewStart], [NSDate dateWithTimeIntervalSinceReferenceDate:scaleWindow.viewEnd]);
+    NSLog(@"Date is %@ - %@", [NSDate dateWithTimeIntervalSinceReferenceDate:scaleWindow.viewStart], [NSDate dateWithTimeIntervalSinceReferenceDate:scaleWindow.viewSize+scaleWindow.viewStart]);
     NSLog(@"Date is %@ - %@", [NSDate dateWithTimeIntervalSinceReferenceDate:scaleWindow.windowStart], [NSDate dateWithTimeIntervalSinceReferenceDate:scaleWindow.windowEnd]);
-    [self setBackgroundColor:[UIColor whiteColor]];
-    [super setBackgroundColor:[UIColor scrollViewTexturedBackgroundColor]];
 }
 
 #pragma mark Layout
 
-- (void)createViews
-{
-    if(contentView == nil) {
-        contentView = [[UIScrollView alloc] initWithFrame:self.bounds];
-        contentView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        contentView.delegate = self;
-        contentPanel = [[UIView alloc] initWithFrame:self.bounds];
-        contentPanel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
-        contentPanel.layer.shadowOpacity = 0.9;
-        contentPanel.layer.shadowRadius = 17.0;
-        contentPanel.backgroundColor = self.backgroundColor;
-        contentPanel.layer.shadowPath = [UIBezierPath bezierPathWithRect:self.bounds].CGPath;
-        [contentView addSubview:contentPanel];
-        //contentView.frame = CGRectMake(0, sz, self.bounds.size.width, self.bounds.size.height - sz);
-        contentView.contentSize = CGSizeMake(120, 120);
-        contentView.scrollEnabled = YES;
-        contentView.backgroundColor = [UIColor clearColor];
-        //contentView.directionalLockEnabled = YES;
-        [self addSubview:contentView];
-    }
-    if(headerView == nil) {
-        self.headerView = [[[IQGanttHeaderView alloc] initWithFrame:CGRectMake(0, 0, self.bounds.size.width, 44)] autorelease];
-    }
-}
-
-- (void) layoutOnPropertyChange
-{
-    CGRect bds = self.bounds;
-    CGRect hdf = headerView.frame;
-    CGFloat offset = hdf.size.height;
-    CGFloat rel = (scaleWindow.windowEnd - scaleWindow.windowStart) / (scaleWindow.viewEnd - scaleWindow.viewStart);
-    contentView.contentSize = CGSizeMake(rel * bds.size.width, offset + bds.size.height);
-    hdf.size.width = contentView.contentSize.width;
-    headerView.frame = hdf;
-    if([headerView respondsToSelector:@selector(ganttView:didUpdateWindow:)]) {
-        [headerView ganttView:self didUpdateWindow:scaleWindow];
-    }
-}
 
 - (void) didMoveToWindow
 {
-    [self createViews];
+    UIView* view = [[self createTimeHeaderViewWithFrame:CGRectMake(0, 0, self.bounds.size.width, 44)] autorelease];
+    if(view != nil) {
+        if([view respondsToSelector:@selector(ganttView:shouldDisplayCalendarUnits:)]) {
+            [(id<IQGanttHeaderDelegate>)view ganttView:self shouldDisplayCalendarUnits:displayCalendarUnits];
+        }
+        self.columnHeaderView = view;
+    }
+    view = [[self createRowHeaderViewWithFrame:CGRectMake(0, 0, 100, self.bounds.size.height)] autorelease];
+    if(view != nil) self.rowHeaderView = view;
+    view = [[self createTimeHeaderViewWithFrame:CGRectMake(0, 0, self.bounds.size.width, 44)] autorelease];
+    if(view != nil) self.columnHeaderView = view;
+    [self layoutOnPropertyChange:YES];
+}
+
+- (void) layoutOnPropertyChange:(BOOL)didChangeZoom
+{
+    NSLog(@"Did layout on property change");
+    CGRect bds = self.bounds;
+    CGFloat rel = (scaleWindow.windowEnd - scaleWindow.windowStart) / (scaleWindow.viewSize);
+    
+    CGSize csz;
+    if(didChangeZoom) {
+        self.contentSize = csz = CGSizeMake(rel * bds.size.width, bds.size.height);
+    } else {
+        csz = self.contentSize;
+    }
+    self.contentOffset = CGPointMake(self.contentSize.width * (scaleWindow.viewStart-scaleWindow.windowStart) /(scaleWindow.windowEnd - scaleWindow.windowStart), 0);
+    if(didChangeZoom) {
+        if([self.columnHeaderView respondsToSelector:@selector(ganttView:didScaleWindow:)]) {
+            [(id<IQGanttHeaderDelegate>)self.columnHeaderView ganttView:self didScaleWindow:scaleWindow];
+        }
+    } else {
+        
+    }
 }
 
 #pragma mark Disposal
 
 - (void)dealloc
 {
-    self.headerView = nil;
     [super dealloc];
 }
 
 #pragma mark Properties
+
+- (NSCalendarUnit)displayCalendarUnits
+{
+    return displayCalendarUnits;
+}
+
+- (void)setDisplayCalendarUnits:(NSCalendarUnit)dcu
+{
+    displayCalendarUnits = dcu;
+    UIView* view = self.columnHeaderView;
+    if(view != nil && [view respondsToSelector:@selector(ganttView:shouldDisplayCalendarUnits:)]) {
+        [(id<IQGanttHeaderDelegate>)view ganttView:self shouldDisplayCalendarUnits:displayCalendarUnits];
+    }
+}
 
 - (IQGanttViewTimeWindow)scaleWindow
 {
@@ -128,12 +134,13 @@
 
 - (void)setScaleWindow:(IQGanttViewTimeWindow)win
 {
-    if(win.viewEnd - win.viewStart < 60) win.viewEnd = win.viewStart + 60;
+    if(win.viewSize < 60) win.viewSize = 60;
     if(win.windowStart > win.viewStart) win.windowStart = win.viewStart;
-    if(win.windowEnd < win.viewEnd) win.windowEnd = win.viewEnd;
+    if(win.windowEnd < win.viewStart + win.viewSize) win.windowEnd = win.viewStart + win.viewSize;
     if(win.windowEnd - win.windowStart < 60) win.windowEnd = win.windowStart + 60;
+    BOOL didChangeZoom = scaleWindow.windowStart != win.windowStart || scaleWindow.windowEnd != win.windowEnd || scaleWindow.viewSize != win.viewSize;
     scaleWindow = win;
-    [self layoutOnPropertyChange];
+    [self layoutOnPropertyChange:didChangeZoom];
 }
 
 - (UIColor*)backgroundColor
@@ -147,76 +154,20 @@
     [backgroundColor release];
     backgroundColor = [bg retain];
 }
-
-- (BOOL)isDirectionalLockEnabled
-{
-    return [contentView isDirectionalLockEnabled];
-}
-
-- (void)setDirectionalLockEnabled:(BOOL)directionalLockEnabled
-{
-    [contentView setDirectionalLockEnabled:directionalLockEnabled];
-}
-
 #pragma mark Scroll delegate
 
-- (void)scrollViewDidScroll:(UIScrollView *)scrollView
+- (void)scrollViewDidScroll:(UIScrollView *)sv
 {
-    if(scrollView == contentView) {
-        CGRect rc = headerView.frame;
-        CGRect cc = contentPanel.frame;
-        if(contentView.contentOffset.y < 0) {
-            rc.origin.y = 0;
-            cc.origin.y = 0;
-            contentView.scrollIndicatorInsets = UIEdgeInsetsMake(rc.size.height-contentView.contentOffset.y, 0, 0, 0);
-        } else if(contentView.contentOffset.y > contentView.contentSize.height-contentView.bounds.size.height) {
-            cc.origin.y = contentView.contentSize.height-contentView.bounds.size.height;
-        } else {
-            rc.origin.y = contentView.contentOffset.y;
-            cc.origin.y = contentView.contentOffset.y;
-            contentView.scrollIndicatorInsets = UIEdgeInsetsMake(rc.size.height, 0, 0, 0);            
+    [super scrollViewDidScroll:sv];
+    
+    CGFloat cw = self.contentSize.width;
+    if(cw > 0) {
+        UIView* view = self.columnHeaderView;
+        scaleWindow.viewStart = self.contentOffset.x / cw * (scaleWindow.windowEnd - scaleWindow.windowStart) + scaleWindow.windowStart;
+        if(view != nil && [view respondsToSelector:@selector(ganttView:didMoveWindow:)]) {
+            [(id<IQGanttHeaderDelegate>)view ganttView:self didMoveWindow:scaleWindow];
         }
-        if(contentView.contentOffset.x < 0) {
-            cc.origin.x = 0;
-        } else if(contentView.contentOffset.x > contentView.contentSize.width-contentView.bounds.size.width) {
-            cc.origin.x = contentView.contentSize.width-contentView.bounds.size.width;
-        } else {
-            cc.origin.x = contentView.contentOffset.x;
-            //rc.origin.x = -contentView.contentOffset.x;
-        }
-        /*rc.origin.x = -contentView.contentOffset.x;
-        if(contentView.contentOffset.y < 0) {
-            rc.origin.y = -contentView.contentOffset.y;
-            contentView.contentOffset = CGPointMake(contentView.contentOffset.x, 0);
-        } else {
-            rc.origin.y = 0;
-        }*/
-        contentPanel.frame = cc;
-        headerView.frame = rc;
     }
-}
-
-#pragma mark Header
-
-- (UIView<IQGanttHeaderDelegate>*) headerView
-{
-    [self createViews];
-    return headerView;
-}
-
-- (void) setHeaderView:(UIView<IQGanttHeaderDelegate> *)hdv
-{
-    if(headerView != nil) {
-        [headerView removeFromSuperview];
-        [headerView release];
-    }
-    headerView = [hdv retain];
-    CGFloat sz = headerView.bounds.size.height;
-    headerView.frame = CGRectMake(0, 0, 100, sz);
-    if(contentView != nil) {
-        [contentView addSubview:headerView];
-    }
-    [self layoutOnPropertyChange];
 }
 
 #pragma mark Data
@@ -229,21 +180,45 @@
 {
     
 }
+
+#pragma mark Default implementation of base methods
+
+- (UIView*) createCornerViewWithFrame:(CGRect)frame
+{
+    return nil;
+}
+
+- (UIView<IQGanttHeaderDelegate>*) createTimeHeaderViewWithFrame:(CGRect)frame
+{
+    return [[IQGanttHeaderView alloc] initWithFrame:frame];
+}
+
+- (UIView*) createRowHeaderViewWithFrame:(CGRect)frame
+{
+    return nil;
+}
+
 @end
 
+
 @implementation IQGanttHeaderView
+@synthesize tintColor;
 
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if(self != nil) {
-        self.backgroundColor = [UIColor whiteColor];
+        self.tintColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:209/255.0 alpha:1];
     }
     return self;
 }
 
 - (void)dealloc
 {
+    if(grad != nil) CGGradientRelease(grad);
+    [tintColor release];
+    [firstLineLabel release];
+    [secondLineLabel release];
     [super dealloc];
 }
 
@@ -253,28 +228,120 @@
 }
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
-    NSLog(@"Drawing layer: %@", layer);
     CGRect r = CGContextGetClipBoundingBox(ctx);
-    CGContextSetFillColorWithColor(ctx, [[UIColor whiteColor] CGColor]);
-    CGContextFillRect(ctx, r);
-    CGFloat r0 = r.origin.x;
-    CGFloat y0 = 60+60*sin(r0/60);
-    for(CGFloat r1 = r.origin.x+4; r1 <= r.origin.x + r.size.width; r1 += 4) {
-        CGFloat y1 = 60+60*sin(r1/60);
-        CGContextAddLines(ctx, (CGPoint[]){CGPointMake(r0, y0), CGPointMake(r1, y1)}, 2);
-        y0 = y1;
-        r0 = r1;
+    CGSize size = self.bounds.size;
+    if(grad != nil) {
+        CGContextSetFillColorWithColor(ctx, [[UIColor whiteColor] CGColor]);
+        CGContextDrawLinearGradient(ctx, grad, CGPointMake(r.origin.x, r.origin.y), CGPointMake(r.origin.x, r.origin.y + r.size.height), 0);
     }
+    if(border != nil) {
+        CGContextSetStrokeColorWithColor(ctx, border);
+    }
+    CGContextAddLines(ctx, (CGPoint[]){CGPointMake(r.origin.x, r.origin.y+r.size.height),
+        CGPointMake(r.origin.x+r.size.width, r.origin.y+r.size.height)}, 2);
     CGContextStrokePath(ctx);
-    NSLog(@"Drawing layer: %f,%f,%f,%f", r.origin.x, r.origin.y, r.size.width, r.size.height);
+    CGFloat r0 = r.origin.x;
+    CGFloat r1 = r.origin.x + r.size.width;
+    CGFloat scl = (scaleWindow.windowEnd-scaleWindow.windowStart) / size.width;
+    NSTimeInterval t0 = scaleWindow.windowStart + scl * r0;
+    NSTimeInterval t1 = scaleWindow.windowStart + scl * r1;
+    UIFont* textFont = [UIFont systemFontOfSize:8];
+    if(scaleWindow.windowEnd > scaleWindow.windowStart) {
+        NSCalendar* cal = [NSCalendar currentCalendar];
+        int fwd = [cal firstWeekday];
+        NSDate* d = [NSDate dateWithTimeIntervalSinceReferenceDate:t0];
+        // Days
+        NSDateComponents* cmpnts = [cal components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:d];
+        NSTimeInterval t = [[cal dateFromComponents:cmpnts] timeIntervalSinceReferenceDate];
+        while (t <= t1) {
+            NSDateComponents* c2 = [cal components:NSWeekdayCalendarUnit|NSDayCalendarUnit fromDate:d];
+            int wd = c2.weekday;
+            NSLog(@"Weekday = %d", wd);
+            CGFloat scale = 0.6;
+            if(wd == fwd) {
+                scale = 0.4;
+            }
+            
+            CGFloat x = round(r0 + (t-t0) / scl)+.5;
+            CGContextAddLines(ctx, (CGPoint[]){CGPointMake(x, r.origin.y+scale*r.size.height), CGPointMake(x, r.origin.y + r.size.height)}, 2);
+            
+            
+            /*[@"Apan" drawAtPoint:CGPointMake(x, r.origin.y + r.size.height - 18) forWidth:30 withFont:textFont minFontSize:6 actualFontSize:nil lineBreakMode:UILineBreakModeClip baselineAdjustment:UIBaselineAdjustmentNone];*/
+            CGContextSetFont(ctx, (CGFontRef)textFont);
+            CGContextSetFontSize(ctx, 8);
+            CGContextSetTextDrawingMode(ctx, kCGTextFill);
+            CGContextSetTextPosition(ctx, x, r.origin.y + r.size.height - 18);
+            CGContextShowText(ctx, "HejHopp", 7);
+            
+            cmpnts.day += 1;
+            d = [cal dateFromComponents:cmpnts];
+            t = [d timeIntervalSinceReferenceDate];
+        }
+        CGContextSetShadowWithColor(ctx, CGSizeMake(1, 0), 0, [[UIColor colorWithWhite:1 alpha:.5] CGColor]);
+        CGContextStrokePath(ctx);
+        NSLog(@"Drawing layer: %@", [NSDate dateWithTimeIntervalSinceReferenceDate:t0]);
+    }
 }
 
-- (void)ganttView:(IQGanttView *)view didUpdateWindow:(IQGanttViewTimeWindow)win
+- (void)moveLabels
+{
+    if(firstLineLabel == nil) {
+        firstLineLabel = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 16)];
+        firstLineLabel.text = @"Dummy";
+        firstLineLabel.backgroundColor = [UIColor clearColor];
+        [self addSubview:firstLineLabel];
+    }
+    firstLineLabel.center = CGPointMake(offset+100, 8);
+}
+
+- (void)ganttView:(IQGanttView *)view didScaleWindow:(IQGanttViewTimeWindow)win
 {
     NSLog(@"My window is %@", view);
     scaleWindow = win;
+    [self moveLabels];
+    [self setNeedsDisplay];
+}
+
+- (void)ganttView:(IQGanttView *)view didMoveWindow:(IQGanttViewTimeWindow)win
+{
+    scaleWindow = win;
+    offset = view.contentOffset.x;
+    [self moveLabels];
+}
+
+- (void)ganttView:(IQGanttView*)view shouldDisplayCalendarUnits:(NSCalendarUnit) dcu
+{
+    displayCalendarUnits = dcu;
+    [self setNeedsDisplay];
+}
+
+- (void)setTintColor:(UIColor *)tc
+{
+    [tintColor release];
+    tintColor = [tc retain];
+    CGColorRef tint = [tc CGColor];
+    const CGFloat* cmpnts = CGColorGetComponents(tint);
+    CGFloat colors[] = {
+        cmpnts[0]+.16, cmpnts[1]+.16, cmpnts[2]+.16, 1,
+        cmpnts[0], cmpnts[1], cmpnts[2], 1,
+        cmpnts[0]-.12, cmpnts[1]-.12, cmpnts[2]-.12, 1,
+    };
+    CGGradientRef gd = CGGradientCreateWithColorComponents(CGColorGetColorSpace(tint), colors, (CGFloat[]){0,1}, 2);
+    CGColorRef bd = CGColorCreate(CGColorGetColorSpace(tint), colors+8);
+    CGColorRef oldBorder = border;
+    CGGradientRef oldGrad = grad;
+    
+    grad = CGGradientRetain(gd);
+    border = CGColorRetain(bd);
+    
+    if(oldGrad != nil) {
+        CGGradientRelease(oldGrad);
+    }
+    if(oldBorder != nil) {
+        CGColorRelease(oldBorder);
+    }
+    
 }
 
 @end
-
 

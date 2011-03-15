@@ -20,46 +20,61 @@
 #import "IQScrollView.h"
 
 @protocol IQGanttHeaderDelegate;
-@protocol IQGanttRowDelegate
-@end
+@protocol IQGanttRowDelegate;
 @protocol IQCalendarDataSource;
 
 typedef struct _IQGanttViewTimeWindow {
     NSTimeInterval windowStart, windowEnd;
-    NSTimeInterval viewStart, viewEnd;
+    NSTimeInterval viewStart, viewSize;
 } IQGanttViewTimeWindow;
 
-@interface IQGanttView : UIView<UIScrollViewDelegate> {
+@interface IQGanttView : IQScrollView {
 @private
-    UIView<IQGanttHeaderDelegate>* headerView;
-    UIScrollView* contentView;
-    UIView* contentPanel;
     NSMutableArray* rows;
     NSMutableArray* rowViews;
-    UIColor* backgroundColor;
     IQGanttViewTimeWindow scaleWindow;
+    NSCalendarUnit displayCalendarUnits;
 }
 
-@property (nonatomic, retain) UIView<IQGanttHeaderDelegate>* headerView;
-@property (nonatomic, getter=isDirectionalLockEnabled) BOOL directionalLockEnabled;
-@property (nonatomic, retain) UIColor* backgroundColor;
 @property (nonatomic) IQGanttViewTimeWindow scaleWindow;
+@property (nonatomic) NSCalendarUnit displayCalendarUnits;
 
 - (void)removeAllRows;
 - (void)addRow:(id<IQCalendarDataSource>)row;
+
+// Overridable methods. Subclass IQGanttView and override the below methods
+// to achieve further customization of the user interface.
+- (UIView*) createCornerViewWithFrame:(CGRect)frame; // default implementation returns nil
+- (UIView<IQGanttHeaderDelegate>*) createTimeHeaderViewWithFrame:(CGRect)frame; // default implementation returns a IQGanttHeaderView
+- (UIView*) createRowHeaderViewWithFrame:(CGRect)frame; // default implementation returns nil
 
 @end
 
 
 @protocol IQGanttHeaderDelegate
 @optional
-- (void)ganttView:(IQGanttView*)view didUpdateWindow:(IQGanttViewTimeWindow)win;
+- (void)ganttView:(IQGanttView*)view didScaleWindow:(IQGanttViewTimeWindow)win;
+- (void)ganttView:(IQGanttView*)view didMoveWindow:(IQGanttViewTimeWindow)win;
+- (void)ganttView:(IQGanttView*)view shouldDisplayCalendarUnits:(NSCalendarUnit) displayCalendarUnits;
+@end
+
+@protocol IQGanttRowDelegate
+@optional
 @end
 
 @interface IQGanttHeaderView : UIView <IQGanttHeaderDelegate> {
 @private
     IQGanttViewTimeWindow scaleWindow;
+    UIColor* tintColor;
+    CGGradientRef grad;
+    CGColorRef border;
+    NSCalendarUnit displayCalendarUnits;
+    UILabel* firstLineLabel;
+    UILabel* secondLineLabel;
+    CGFloat offset;
 }
+
+@property (nonatomic, retain) UIColor* tintColor;
 @end
 
 @interface IQGanttRowView : UIView <IQGanttRowDelegate> {
