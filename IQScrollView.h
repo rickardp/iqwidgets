@@ -29,6 +29,7 @@ typedef enum _IQHeaderPlacement
     IQHeaderPlacement rowHeaderPlacement;
     IQHeaderPlacement columnHeaderPlacement;
     BOOL borderShadows;
+    BOOL scrollIndicatorsFollowContent;
     UIScrollView* scrollView;
     UIView* contentPanel;
     UIView* rowHeaderView;
@@ -37,9 +38,15 @@ typedef enum _IQHeaderPlacement
     UIColor* backgroundColor;
     CGSize ssize;
     CGSize headerSize;
+    CGSize contentSize;
 }
 
 @property (nonatomic) BOOL borderShadows;
+
+// If YES, scroll indicators stay within the content view. If NO, scroll indicators
+// occupy the full area of the IQScrollView. Default is YES.
+@property (nonatomic) BOOL scrollIndicatorsFollowContent;
+
 @property (nonatomic) IQHeaderPlacement rowHeaderPlacement;
 @property (nonatomic) IQHeaderPlacement columnHeaderPlacement;
 @property (nonatomic, retain) UIView* rowHeaderView;
@@ -47,5 +54,6 @@ typedef enum _IQHeaderPlacement
 @property (nonatomic, retain) UIView* cornerView;
 @property (nonatomic) CGPoint contentOffset;
 @property (nonatomic) CGSize contentSize;
+@property (nonatomic, getter=isDirectionalLockEnabled) BOOL directionalLockEnabled;
 
 @end

@@ -24,6 +24,7 @@
 @end
 
 @implementation IQScrollView
+@synthesize scrollIndicatorsFollowContent;
 
 
 #pragma mark Initialization
@@ -32,6 +33,7 @@
 {
     self = [super initWithFrame:frame];
     if(self != nil) {
+        scrollIndicatorsFollowContent = YES;
         backgroundColor = [UIColor whiteColor];
         columnHeaderPlacement = IQHeaderBegin;
         rowHeaderPlacement = IQHeaderBegin;
@@ -44,6 +46,7 @@
 {
     self = [super initWithCoder:aDecoder];
     if(self != nil) {
+        scrollIndicatorsFollowContent = YES;
         backgroundColor = [UIColor whiteColor];
         columnHeaderPlacement = IQHeaderBegin;
         rowHeaderPlacement = IQHeaderBegin;
@@ -75,6 +78,16 @@
 }
 
 #pragma mark Properties
+
+- (BOOL)isDirectionalLockEnabled
+{
+    return [scrollView isDirectionalLockEnabled];
+}
+
+- (void)setDirectionalLockEnabled:(BOOL)directionalLockEnabled
+{
+    [scrollView setDirectionalLockEnabled:directionalLockEnabled];
+}
 
 - (BOOL)borderShadows
 {
@@ -196,14 +209,18 @@
 
 - (CGSize) contentSize
 {
-    if(scrollView == nil) return self.bounds.size;
-    return scrollView.contentSize;
+    return contentSize;
 }
 
-- (void) setContentSize:(CGSize)contentSize
+- (void) setContentSize:(CGSize)csz
 {
+    contentSize = csz;
     if(scrollView == nil) [self performLayoutAnimated:NO];
-    scrollView.contentSize = CGSizeMake(contentSize.width + headerSize.width, contentSize.height + headerSize.height);
+    CGSize innerSize = CGSizeMake(contentSize.width + headerSize.width, contentSize.height + headerSize.height);
+    CGSize bsize = self.bounds.size;
+    if(innerSize.width < bsize.width) innerSize.width = bsize.width;
+    if(innerSize.height < bsize.height) innerSize.height = bsize.height;
+    scrollView.contentSize = innerSize;
 }
 
 
@@ -234,8 +251,12 @@
     if(animated) [UIView beginAnimations:nil context:nil];
     if(scrollView == nil) {
         scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
+        scrollView.bounces = YES;
+        scrollView.alwaysBounceHorizontal = YES;
+        scrollView.alwaysBounceVertical = YES;
         scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         scrollView.delegate = self;
+//        scrollView.zooming = YES;
         contentPanel = [[UIView alloc] initWithFrame:self.bounds];
         contentPanel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         contentPanel.layer.shadowOpacity = 0.9;
@@ -269,6 +290,7 @@
 - (void) layoutSubviews
 {
     [super layoutSubviews];
+    self.contentSize = self.contentSize;
     [self performLayoutAnimated:NO];
 }
 
@@ -281,6 +303,7 @@
         CGSize vsz = contentPanelBounds.size;
         CGPoint o = scrollView.contentOffset;
         CGSize sz = scrollView.contentSize;
+        UIEdgeInsets scrollIndicatorInsets = UIEdgeInsetsMake(0, 0, 0, 0);
         
         if(columnHeaderView != nil) {
             CGRect colhf = columnHeaderView.frame;
@@ -293,9 +316,12 @@
                 colhf.origin.y = o.y;
             }
             if(columnHeaderPlacement == IQHeaderEnd) {
+                scrollIndicatorInsets.bottom += colhf.size.height;
                 colhf.origin.y += sz.height - colhf.size.height;
             } else if(columnHeaderPlacement == IQHeaderNone) {
                 colhf.size.height = 0;
+            } else {
+                scrollIndicatorInsets.top += colhf.size.height;
             }
             columnHeaderView.frame = colhf;
         }
@@ -310,9 +336,12 @@
                 rowhf.origin.x = o.x;
             }
             if(rowHeaderPlacement == IQHeaderEnd) {
+                scrollIndicatorInsets.right += rowhf.size.width;
                 rowhf.origin.x += sz.width - rowhf.size.width;
             } else if(rowHeaderPlacement == IQHeaderNone) {
                 rowhf.size.width = 0;
+            } else {
+                scrollIndicatorInsets.left += rowhf.size.width;
             }
             rowHeaderView.frame = rowhf;
         }
@@ -320,15 +349,19 @@
             CGRect chf = cornerView.frame;
             chf.size = headerSize;
             if(o.y < 0) {
+                scrollIndicatorInsets.top -= o.y;
                 chf.origin.y = 0;
             } else if(o.y > sz.height - vsz.height) {
+                scrollIndicatorInsets.bottom -= sz.height - vsz.height - o.y;
                 chf.origin.y = sz.height - vsz.height;
             } else {
                 chf.origin.y = o.y;
             }
             if(o.x < 0) {
+                scrollIndicatorInsets.left -= o.x;
                 chf.origin.x = 0;
             } else if(o.x > sz.width - vsz.width) {
+                scrollIndicatorInsets.right -= sz.width - vsz.width - o.x;
                 chf.origin.x = sz.width - vsz.width;
             } else {
                 chf.origin.x = o.x;
@@ -348,6 +381,9 @@
             contentPanelBounds.origin.x = sz.width - vsz.width;
         } else {
             contentPanelBounds.origin.x = o.x;
+        }
+        if(scrollIndicatorsFollowContent) {
+            [scrollView setScrollIndicatorInsets:scrollIndicatorInsets];
         }
         if(vsz.width != ssize.width || vsz.height != ssize.height) {
             ssize = vsz;
