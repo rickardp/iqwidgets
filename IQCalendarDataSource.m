@@ -20,6 +20,20 @@
 
 
 @implementation IQCalendarSimpleDataSource
+@synthesize labelText;
+
++ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name set:(NSSet*)items
+{
+    IQCalendarSimpleDataSource* ds = [[IQCalendarSimpleDataSource alloc] initWithSet:items];
+    ds.labelText = name;
+    return [ds autorelease];
+}
++ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name array:(NSArray*)items
+{
+    IQCalendarSimpleDataSource* ds = [[IQCalendarSimpleDataSource alloc] initWithArray:items];
+    ds.labelText = name;
+    return [ds autorelease];
+}
 
 + (IQCalendarSimpleDataSource*) dataSourceWithSet:(NSSet*)items
 {

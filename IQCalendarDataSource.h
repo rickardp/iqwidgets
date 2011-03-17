@@ -41,8 +41,11 @@ typedef NSTimeInterval (^IQCalendarDataSourceTimeExtractor)(id item);
     NSObject<NSFastEnumeration>* data;
     IQCalendarDataSourceTimeExtractor startDateOfItem, endDateOfItem;
     IQCalendarDataSourceTextExtractor textOfItem;
+    NSString* labelText;
 }
 
++ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name set:(NSSet*)items;
++ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name array:(NSArray*)items;
 + (IQCalendarSimpleDataSource*) dataSourceWithSet:(NSSet*)items;
 + (IQCalendarSimpleDataSource*) dataSourceWithArray:(NSArray*)items;
 
@@ -63,4 +66,6 @@ typedef NSTimeInterval (^IQCalendarDataSourceTimeExtractor)(id item);
 - (void) setKeysForStartDate:(NSString*)startDateKey endDate:(NSString*)endDateKey;
 // - (NSString*)textSelector:(id)item;
 - (void) setKeyForText:(NSString*)textKey;
+
+@property (nonatomic, retain) NSString* labelText;
 @end

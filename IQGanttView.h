@@ -22,6 +22,10 @@
 @protocol IQGanttHeaderDelegate;
 @protocol IQGanttRowDelegate;
 @protocol IQCalendarDataSource;
+@class IQGanttView;
+
+typedef UIView* (^IQGanttBlockViewCreationCallback)(IQGanttView* gantt, UIView* rowView, id item, CGRect frame);
+typedef NSInteger (^IQGanttRowHeightCallback)(IQGanttView* gantt, UIView* rowView, id<IQCalendarDataSource> rowData);
 
 typedef struct _IQGanttViewTimeWindow {
     NSTimeInterval windowStart, windowEnd;
@@ -30,14 +34,20 @@ typedef struct _IQGanttViewTimeWindow {
 
 @interface IQGanttView : IQScrollView {
 @private
+    NSInteger defaultRowHeight;
     NSMutableArray* rows;
     NSMutableArray* rowViews;
     IQGanttViewTimeWindow scaleWindow;
     NSCalendarUnit displayCalendarUnits;
+    IQGanttBlockViewCreationCallback createBlock;
+    IQGanttRowHeightCallback rowHeight;
+    NSCalendar* calendar;
 }
 
 @property (nonatomic) IQGanttViewTimeWindow scaleWindow;
 @property (nonatomic) NSCalendarUnit displayCalendarUnits;
+@property (nonatomic) NSInteger defaultRowHeight;
+@property (nonatomic, retain) NSCalendar* calendar;
 
 - (void)removeAllRows;
 - (void)addRow:(id<IQCalendarDataSource>)row;
@@ -48,6 +58,17 @@ typedef struct _IQGanttViewTimeWindow {
 - (UIView<IQGanttHeaderDelegate>*) createTimeHeaderViewWithFrame:(CGRect)frame; // default implementation returns a IQGanttHeaderView
 - (UIView*) createRowHeaderViewWithFrame:(CGRect)frame; // default implementation returns nil
 
+- (UIView<IQGanttRowDelegate>*) createViewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame; // default implementation returns a IQGanttRowView 
+
+@end
+
+// This category uses blocks for defining a call-back interface. This
+// option performs better with large data sets and allows for more
+// customization than the simple interface.
+
+@interface IQGanttView (CallbackInterface)
+- (void) setBlockCreationCallback:(IQGanttBlockViewCreationCallback)callback;
+- (void) setRowHeightCallback:(IQGanttRowHeightCallback)callback;
 @end
 
 
@@ -56,28 +77,49 @@ typedef struct _IQGanttViewTimeWindow {
 - (void)ganttView:(IQGanttView*)view didScaleWindow:(IQGanttViewTimeWindow)win;
 - (void)ganttView:(IQGanttView*)view didMoveWindow:(IQGanttViewTimeWindow)win;
 - (void)ganttView:(IQGanttView*)view shouldDisplayCalendarUnits:(NSCalendarUnit) displayCalendarUnits;
+- (void)ganttView:(IQGanttView*)view didChangeCalendar:(NSCalendar*)calendar;
 @end
 
 @protocol IQGanttRowDelegate
 @optional
+- (void)ganttView:(IQGanttView*)view didChangeDataSource:(id<IQCalendarDataSource>)dataSource;
+- (void)ganttView:(IQGanttView*)view didChangeCalendar:(NSCalendar*)calendar;
+- (void)ganttView:(IQGanttView*)view didScaleWindow:(IQGanttViewTimeWindow)win;
+- (void)ganttView:(IQGanttView*)view didMoveWindow:(IQGanttViewTimeWindow)win;
 @end
 
 @interface IQGanttHeaderView : UIView <IQGanttHeaderDelegate> {
 @private
     IQGanttViewTimeWindow scaleWindow;
+    CGFloat offset;
     UIColor* tintColor;
     CGGradientRef grad;
     CGColorRef border;
     NSCalendarUnit displayCalendarUnits;
-    UILabel* firstLineLabel;
-    UILabel* secondLineLabel;
-    CGFloat offset;
+    NSMutableArray* floatingLabels;
+    char weekdayLetters[8];
+    char weekPrefixChar;
+    NSCalendar* cal;
+    NSDateFormatter* monthNameFormatter;
 }
 
 @property (nonatomic, retain) UIColor* tintColor;
+@property (nonatomic, readonly) NSDateFormatter* monthNameFormatter;
 @end
 
 @interface IQGanttRowView : UIView <IQGanttRowDelegate> {
 @private
+    NSCalendar* cal;
+    UIColor* gridColor;
+    IQGanttViewTimeWindow scaleWindow;
+    NSCalendarUnit primaryLineUnits;
+    NSCalendarUnit secondaryLineUnits;
+    NSCalendarUnit tertaryLineUnits;
 }
+
+@property (nonatomic, retain) id<IQCalendarDataSource> dataSource;
+@property (nonatomic, retain) UIColor* gridColor;
+
+// Overridable. Called to create and manage the subviews.
+- (void) layoutItems;
 @end

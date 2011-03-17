@@ -446,7 +446,7 @@ const CGFloat kDayViewPadding = 15.0;
 @end
 
 @implementation IQScheduleView (CallbackInterface)
-- (void) setBlockCreationCallback:(IQBlockViewCreationCallback)callback
+- (void) setBlockCreationCallback:(IQScheduleBlockViewCreationCallback)callback
 {
     Block_release(createBlock);
 }

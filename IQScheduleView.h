@@ -25,7 +25,7 @@
 @class IQScheduleView;
 
 
-typedef UIView* (^IQBlockViewCreationCallback)(IQScheduleView* parent, id item, CGRect frame);
+typedef UIView* (^IQScheduleBlockViewCreationCallback)(IQScheduleView* parent, id item, CGRect frame);
 
 @interface IQScheduleView : UIView {
     id<IQCalendarDataSource> dataSource;
@@ -39,7 +39,7 @@ typedef UIView* (^IQBlockViewCreationCallback)(IQScheduleView* parent, id item, 
     NSCalendar* calendar;
     BOOL dirty;
     NSDateFormatter* cornerFormatter, *headerFormatter, *tightHeaderFormatter;
-    IQBlockViewCreationCallback createBlock;
+    IQScheduleBlockViewCreationCallback createBlock;
     NSSet* items;
 }
 
@@ -74,7 +74,7 @@ typedef UIView* (^IQBlockViewCreationCallback)(IQScheduleView* parent, id item, 
 // customization than the simple interface.
 
 @interface IQScheduleView (CallbackInterface)
-- (void) setBlockCreationCallback:(IQBlockViewCreationCallback)callback;
+- (void) setBlockCreationCallback:(IQScheduleBlockViewCreationCallback)callback;
 @end
 
 @interface IQScheduleDayView : UIView {

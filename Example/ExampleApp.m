@@ -202,7 +202,21 @@ static UIViewController* CreateViewController(int idx) {
         }
         case 5:
         {
+            int modo = 3;
             IQGanttView* gantt = [[IQGanttView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+            for(NSString* resource in [NSArray arrayWithObjects:@"Alice",@"Bob",@"Cecil",@"David",nil]) {
+                modo++;
+                NSTimeInterval t = [[NSDate date] timeIntervalSinceReferenceDate];
+                t -= 18*3600;
+                NSMutableSet* items = [NSMutableSet set];
+                for(int i=0; i<100; i++) {
+                    t += 24*3600;
+                    if((i+7) % modo != 0) continue;
+                    t = floor(t/3600)*3600;
+                    [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Test" start:[NSDate dateWithTimeIntervalSinceReferenceDate:t] end:[NSDate dateWithTimeIntervalSinceReferenceDate:t+24*3600]]];
+                }
+                [gantt addRow:[IQCalendarSimpleDataSource dataSourceWithName:resource set:items]];
+            }
             return WrapInController(gantt);
         }
 		default:
