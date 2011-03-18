@@ -539,16 +539,19 @@
 @end
 
 @implementation IQGanttRowView
-@synthesize dataSource, gridColor;
+@synthesize dataSource, primaryGridColor, secondaryGridColor, tertaryGridColor, primaryGridDash, secondaryGridDash, tertaryGridDash;
 
 - (id) initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
     if(self) {
-        gridColor = [[UIColor grayColor] retain];
+        primaryGridColor = [[UIColor grayColor] retain];
+        secondaryGridColor = [[UIColor grayColor] retain];
+        tertaryGridColor = [[UIColor colorWithWhite:0.8 alpha:1] retain];
         primaryLineUnits = NSMonthCalendarUnit;
         secondaryLineUnits = NSWeekCalendarUnit;
         tertaryLineUnits = NSDayCalendarUnit;
+        secondaryGridDash = IQMakeGridDash(5, 5);
         self.backgroundColor = [UIColor whiteColor];
     }
     return self;
@@ -557,7 +560,9 @@
 - (void)dealloc
 {
     [cal release];
-    [gridColor release];
+    [primaryGridColor release];
+    [secondaryGridColor release];
+    [tertaryGridColor release];
     [super dealloc];
 }
 
@@ -606,23 +611,60 @@
     [self setNeedsDisplay];
 }
 
-- (void)setGridColor:(UIColor *)gcl
+#pragma Grid properties
+
+- (void)setPrimaryGridColor:(UIColor *)gcl
 {
-    UIColor* oldGridColor = gridColor;
-    gridColor = [gcl retain];
+    UIColor* oldGridColor = primaryGridColor;
+    primaryGridColor = [gcl retain];
     [oldGridColor release];
     [self setNeedsDisplay];
 }
+
+- (void)setSecondaryGridColor:(UIColor *)gcl
+{
+    UIColor* oldGridColor = secondaryGridColor;
+    secondaryGridColor = [gcl retain];
+    [oldGridColor release];
+    [self setNeedsDisplay];
+}
+
+- (void)setTertaryGridColor:(UIColor *)gcl
+{
+    UIColor* oldGridColor = tertaryGridColor;
+    tertaryGridColor = [gcl retain];
+    [oldGridColor release];
+    [self setNeedsDisplay];
+}
+
+- (void)setPrimaryGridDash:(IQGridDash)gd
+{
+    primaryGridDash = gd;
+    [self setNeedsDisplay];
+}
+
+- (void)setSecondaryGridDash:(IQGridDash)gd
+{
+    secondaryGridDash = gd;
+    [self setNeedsDisplay];
+}
+
+- (void)setTertaryGridDash:(IQGridDash)gd
+{
+    tertaryGridDash = gd;
+    [self setNeedsDisplay];
+}
+
+#pragma mark Drawing
 
 - (void)drawLayer:(CALayer *)layer inContext:(CGContextRef)ctx {
     CGRect r = CGContextGetClipBoundingBox(ctx);
     CGContextSetFillColorWithColor(ctx, [[self backgroundColor] CGColor]);
     CGContextFillRect(ctx, r);
-    CGContextSetStrokeColorWithColor(ctx, [[UIColor redColor] CGColor]);
     //CGRect r2 = CGRectMake(r.origin.x + 3, r.origin.y + 3, r.size.width-6, r.size.height-6);
     //CGContextStrokeRect(ctx, r2);
     CGSize size = self.bounds.size;
-    if(gridColor != nil) CGContextSetStrokeColorWithColor(ctx, [gridColor CGColor]);
+    //if(gridColor != nil) CGContextSetStrokeColorWithColor(ctx, [gridColor CGColor]);
     CGFloat r0 = r.origin.x;
     CGFloat r1 = r.origin.x + r.size.width;
     CGFloat scl = (scaleWindow.windowEnd-scaleWindow.windowStart) / size.width;
@@ -637,6 +679,8 @@
     CGContextSetTextDrawingMode(ctx, kCGTextFill);
     CGContextSetFillColorWithColor(ctx, [[UIColor blackColor] CGColor]);
     NSCalendar* calendar = [[cal copy] autorelease];
+    IQGridDash prevGridDash = IQMakeGridDash(0, 0);
+    UIColor* prevGridColor = nil;
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {
         int fwd = [calendar firstWeekday];
         NSDate* d = [NSDate dateWithTimeIntervalSinceReferenceDate:t0];
@@ -691,18 +735,31 @@
                 //text = NO;
             }*/
             CGContextAddLines(ctx, (CGPoint[]){CGPointMake(x, r.origin.y), CGPointMake(x, r.size.height + r.origin.y)}, 2);
-            BOOL skip = NO;
+            IQGridDash gd;
+            UIColor* color = nil;
             if(l1) {
-                CGContextSetLineDash(ctx, 0, nil, 0);
+                gd = primaryGridDash;
+                color = primaryGridColor;
             } else if(l2) {
-                CGContextSetLineDash(ctx, 0, (CGFloat[]){1,2}, 2);
+                gd = secondaryGridDash;
+                color = secondaryGridColor;
             } else if(l3) {
-                CGContextSetLineDash(ctx, 0, (CGFloat[]){1,5}, 2);
-            } else {
-                skip = YES;
+                gd = tertaryGridDash;
+                color = tertaryGridColor;
             }
-            if(!skip) {
-                CGContextStrokePath(ctx);
+            if(color != nil) {
+                if(YES || gd.a != prevGridDash.a || gd.b != prevGridDash.b || color != prevGridColor) {
+                    prevGridDash = gd;
+                    prevGridColor = color;
+                    if(gd.a != 0 || gd.b != 0) {
+                        NSLog(@"y: %f", r.origin.y+self.frame.origin.y);
+                        CGContextSetLineDash(ctx, r.origin.y+self.frame.origin.y, (CGFloat[]){gd.a, gd.b}, 2);
+                    } else {
+                        CGContextSetLineDash(ctx, 0, nil, 0);
+                    }
+                    CGContextSetStrokeColorWithColor(ctx, [color CGColor]);
+                    CGContextStrokePath(ctx);
+                }
             }
             cmpnts.day += 1;
             d = [calendar dateFromComponents:cmpnts];

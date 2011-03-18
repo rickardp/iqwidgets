@@ -107,10 +107,20 @@ typedef struct _IQGanttViewTimeWindow {
 @property (nonatomic, readonly) NSDateFormatter* monthNameFormatter;
 @end
 
+typedef struct _IQGridDash {
+    CGFloat a,b;
+} IQGridDash;
+
+static IQGridDash IQMakeGridDash(CGFloat a, CGFloat b) {
+    IQGridDash ret;
+    ret.a = a;
+    ret.b = b;
+    return ret;
+}
+
 @interface IQGanttRowView : UIView <IQGanttRowDelegate> {
 @private
     NSCalendar* cal;
-    UIColor* gridColor;
     IQGanttViewTimeWindow scaleWindow;
     NSCalendarUnit primaryLineUnits;
     NSCalendarUnit secondaryLineUnits;
@@ -118,7 +128,12 @@ typedef struct _IQGanttViewTimeWindow {
 }
 
 @property (nonatomic, retain) id<IQCalendarDataSource> dataSource;
-@property (nonatomic, retain) UIColor* gridColor;
+@property (nonatomic, retain) UIColor* primaryGridColor;
+@property (nonatomic, retain) UIColor* secondaryGridColor;
+@property (nonatomic, retain) UIColor* tertaryGridColor;
+@property (nonatomic) IQGridDash primaryGridDash;
+@property (nonatomic) IQGridDash secondaryGridDash;
+@property (nonatomic) IQGridDash tertaryGridDash;
 
 // Overridable. Called to create and manage the subviews.
 - (void) layoutItems;
