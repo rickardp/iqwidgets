@@ -136,5 +136,5 @@ static IQGridDash IQMakeGridDash(CGFloat a, CGFloat b) {
 @property (nonatomic) IQGridDash tertaryGridDash;
 
 // Overridable. Called to create and manage the subviews.
-- (void) layoutItems;
+- (void) layoutItems:(IQGanttView*)gantt;
 @end

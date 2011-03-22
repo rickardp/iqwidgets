@@ -20,27 +20,29 @@
 
 @protocol IQCalendarDataSource;
 
+@class CAGradientLayer;
 @class IQScheduleBlockView;
 @class IQScheduleViewDay;
 @class IQScheduleView;
+@class IQScheduleHeaderView;
 
+#import "IQScrollView.h"
 
 typedef UIView* (^IQScheduleBlockViewCreationCallback)(IQScheduleView* parent, id item, CGRect frame);
 
-@interface IQScheduleView : UIView {
+@interface IQScheduleView : IQScrollView {
     id<IQCalendarDataSource> dataSource;
     NSDate* startDate;
     int numDays;
-    UILabel* cornerHeader;
-    UIScrollView* calendarArea;
     NSMutableArray* days;
-    NSMutableSet* timeLabels;
+    UILabel* hours[24];
     UIView* nowTimeIndicator;
     NSCalendar* calendar;
     BOOL dirty;
     NSDateFormatter* cornerFormatter, *headerFormatter, *tightHeaderFormatter;
     IQScheduleBlockViewCreationCallback createBlock;
     NSSet* items;
+    UIColor* tintColor;
 }
 
 @property (nonatomic, retain) id<IQCalendarDataSource> dataSource;

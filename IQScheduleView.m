@@ -29,6 +29,12 @@ const CGFloat kDayViewPadding = 15.0;
 - (UIView*) createViewForBlockItem:(id)item;
 @end
 
+@interface IQScheduleHeaderView : UIView {
+@private
+}
+- (void)setTintColor:(UIColor*)tintColor;
+@end
+
 @interface IQScheduleViewDay : NSObject {
     int timeIndex;
     NSTimeInterval dayOffset;
@@ -83,16 +89,34 @@ const CGFloat kDayViewPadding = 15.0;
     self.darkLineColor = nil;
     self.lightLineColor = nil;
     self.tintColor = nil;
+    for(int i=0; i<24; i++) [hours[i] release];
     [startDate release];
     [calendar release];
     [cornerFormatter release];
     [headerFormatter release];
     [tightHeaderFormatter release];
-    [cornerHeader release];
     [days release];
-    [timeLabels release];
-    [calendarArea release];
     [super dealloc];
+}
+
+#pragma mark IQScrollView overrides
+
+
+#pragma mark Properties
+
+
+- (void)setTintColor:(UIColor *)tc
+{
+    if([self.columnHeaderView respondsToSelector:@selector(setTintColor:)]) {
+        [(id)self.columnHeaderView setTintColor:tc];
+    }
+    [tintColor release];
+    tintColor = [tc retain];
+}
+
+- (UIColor*)tintColor
+{
+    return tintColor;
 }
 
 #pragma mark Horizontal time scaling
@@ -170,44 +194,28 @@ const CGFloat kDayViewPadding = 15.0;
 
 #pragma mark Notifications
 
-- (void) didMoveToSuperview
+- (void) layoutSubviews
 {
-    if(cornerHeader == nil) {
-        cornerHeader = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 52, 24)];
-        cornerHeader.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
-        cornerHeader.textAlignment = UITextAlignmentCenter;
-        cornerHeader.contentMode = UIViewContentModeCenter;
-        [self addSubview:cornerHeader];
-        CGSize winSize = self.superview.bounds.size;
-        CGRect bnds = CGRectMake(0, 24, winSize.width, winSize.height - 24);
-        calendarArea = [[UIScrollView alloc] initWithFrame:bnds];
-        // Make sure an hour has an integral height
-        CGFloat height = bnds.size.height * 2;
-        height = (height - 2 * kDayViewPadding) / 24.0f;
-        NSLog(@"Item: %f", round(height));
-        height = round(height) * 24 + 2 * kDayViewPadding;
-        NSLog(@"Total: %f", height);
-        calendarArea.contentSize = CGSizeMake(bnds.size.width, height);
-        calendarArea.contentOffset = CGPointMake(0, bnds.size.height * .5);
-        calendarArea.multipleTouchEnabled = YES;
-        [calendarArea flashScrollIndicators];
-        [self addSubview:calendarArea];
-        
-        timeLabels = [[NSMutableSet setWithCapacity:23] retain];
-        CGFloat ht = calendarArea.contentSize.height - 2 * kDayViewPadding;
-        for(int i=1; i<= 23; i++) {
-            UILabel* hour = [[UILabel alloc] initWithFrame:CGRectMake(0, kDayViewPadding+i*ht/24.0f-12, 46, 20)];
-            hour.text = [NSString stringWithFormat:@"%02d.00", i];
-            hour.textAlignment = UITextAlignmentRight;
-            hour.contentMode = UIViewContentModeCenter;
-            hour.autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
-            hour.backgroundColor = self.backgroundColor;
-            [hour setFont:[UIFont systemFontOfSize:14]];
-            [timeLabels addObject:hour];
-            [calendarArea addSubview:hour];
-        }
-        if(dirty) [self reloadFull];
+    [super layoutSubviews];
+    CGRect bnds = self.bounds;
+    // Make sure an hour has an integral height
+    CGFloat height = bnds.size.height * 2;
+    height = (height - 2 * kDayViewPadding) / 24.0f;
+    height = round(height) * 24 + 2 * kDayViewPadding;
+    self.contentSize = CGSizeMake(bnds.size.width, height);
+    
+    CGFloat ht = self.contentSize.height - 2 * kDayViewPadding;
+    for(int i=1; i<= 23; i++) {
+        hours[i].frame = CGRectMake(0, kDayViewPadding+i*ht/24.0f-12, 46, 20);
     }
+}
+
+- (void)didMoveToSuperview
+{
+    [self layoutSubviews];
+    if(dirty) [self reloadFull];
+    self.contentOffset = CGPointMake(0, self.bounds.size.height * .5);
+    [self flashScrollbarIndicators];
 }
 
 #pragma mark Layouting (private)
@@ -225,12 +233,17 @@ const CGFloat kDayViewPadding = 15.0;
     if(days == nil) return;
     while([days count] < capacity) {
         UILabel* hdr = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 120, 24)];
+        hdr.font = [UIFont systemFontOfSize:14];
         hdr.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
         hdr.textAlignment = UITextAlignmentCenter;
         hdr.contentMode = UIViewContentModeCenter;
+        hdr.backgroundColor = [UIColor clearColor];
+        hdr.shadowColor = [UIColor whiteColor];
+        hdr.shadowOffset = CGSizeMake(0, 1);
         hdr.hidden = YES;
-        [self addSubview:hdr];
-        CGSize ca = calendarArea.contentSize;
+        [self.columnHeaderView addSubview:hdr];
+        CGSize ca = self.contentSize;
+        NSLog(@"Creating day with %f", ca.height);
         IQScheduleDayView* dayContent = [[IQScheduleDayView alloc] initWithFrame:CGRectMake(0, 0, 120, ca.height)];
         dayContent.opaque = YES;
         dayContent.backgroundColor = self.backgroundColor;
@@ -238,7 +251,7 @@ const CGFloat kDayViewPadding = 15.0;
         dayContent.lightLineColor = self.lightLineColor;
         dayContent.tintColor = self.tintColor;
         IQScheduleViewDay* day = [[[IQScheduleViewDay alloc] initWithHeaderView:hdr contentView:dayContent] autorelease];
-        [calendarArea addSubview:dayContent];
+        [self addSubview:dayContent];
         [days addObject:day];
     }
 }
@@ -254,73 +267,73 @@ const CGFloat kDayViewPadding = 15.0;
 
 - (void) reloadFull
 {
-    if(cornerHeader == nil) {
-        dirty = YES;  
-    } else {
-        dirty = NO;
-        cornerHeader.text = [cornerFormatter stringFromDate:startDate];
-        [self ensureCapacity:numDays];
-        
-        NSDateComponents* dc = [[NSDateComponents alloc] init];
-        
-        int tMin = 0;
-        int pivotPoint = -1;
-        
-        for(int i=0; i<numDays; i++) {
-            dc.day = i;
-            int t = (int)[[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
-            if(i == 0) tMin = t;
-            int j = 0;
-            for(IQScheduleViewDay* day in days) {
-                if([day timeIndex] == t) {
-                    pivotPoint = i;
-                    break;
-                }
+    if(self.superview == nil) {
+        dirty = YES;
+        return;
+    }
+    dirty = NO;
+    ((UILabel*)self.cornerView).text = [cornerFormatter stringFromDate:startDate];
+    [self ensureCapacity:numDays];
+    
+    NSDateComponents* dc = [[NSDateComponents alloc] init];
+    
+    int tMin = 0;
+    int pivotPoint = -1;
+    
+    for(int i=0; i<numDays; i++) {
+        dc.day = i;
+        int t = (int)[[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
+        if(i == 0) tMin = t;
+        int j = 0;
+        for(IQScheduleViewDay* day in days) {
+            if([day timeIndex] == t) {
+                pivotPoint = i;
+                break;
+            }
+            j++;
+        }
+        if(pivotPoint >= 0) {
+            while(j > pivotPoint) {
+                IQScheduleViewDay* day = [days objectAtIndex:0];
+                [days addObject:day];
+                [days removeObjectAtIndex:0];
+                j--;
+            }
+            while(j < pivotPoint) {
+                IQScheduleViewDay* day = [days lastObject];
+                [days insertObject:day atIndex:0];
+                [days removeLastObject];
                 j++;
             }
-            if(pivotPoint >= 0) {
-                while(j > pivotPoint) {
-                    IQScheduleViewDay* day = [days objectAtIndex:0];
-                    [days addObject:day];
-                    [days removeObjectAtIndex:0];
-                    j--;
-                }
-                while(j < pivotPoint) {
-                    IQScheduleViewDay* day = [days lastObject];
-                    [days insertObject:day atIndex:0];
-                    [days removeLastObject];
-                    j++;
-                }
-            }
         }
-        if(tMin == 0) return;
-        CGRect bnds = self.bounds;
-        CGFloat left = cornerHeader.bounds.size.width;
-        CGFloat width = (bnds.size.width - left) / numDays;
-        if(pivotPoint < 0) {
-            // We have no view in common, just swap the views
-            int i = 0;
-            for(IQScheduleViewDay* day in days) {
-                dc.day = i;
-                int t = 0;
-                if(i < numDays) {
-                    NSDate* d = [calendar dateByAddingComponents:dc toDate:startDate options:0];
-                    NSTimeInterval tt = [d timeIntervalSinceReferenceDate];
-                    dc.day = i+1;
-                    NSTimeInterval t2 = [[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
-                    t = (int)tt;
-                    day.title = [((width < 100)?tightHeaderFormatter:headerFormatter) stringFromDate:d];
-                    day.dayOffset = tt - t;
-                    day.dayLength = t2 - tt;
-                }
-                [day setTimeIndex:t left:left width:width];
-                [day reloadDataWithSource:self];
-                left += width;
-                i++;
+    }
+    if(tMin == 0) return;
+    CGRect bnds = self.bounds;
+    CGFloat left = 60;
+    CGFloat width = (bnds.size.width - left) / numDays;
+    if(pivotPoint < 0) {
+        // We have no view in common, just swap the views
+        int i = 0;
+        for(IQScheduleViewDay* day in days) {
+            dc.day = i;
+            int t = 0;
+            if(i < numDays) {
+                NSDate* d = [calendar dateByAddingComponents:dc toDate:startDate options:0];
+                NSTimeInterval tt = [d timeIntervalSinceReferenceDate];
+                dc.day = i+1;
+                NSTimeInterval t2 = [[calendar dateByAddingComponents:dc toDate:startDate options:0] timeIntervalSinceReferenceDate];
+                t = (int)tt;
+                day.title = [((width < 100)?tightHeaderFormatter:headerFormatter) stringFromDate:d];
+                day.dayOffset = tt - t;
+                day.dayLength = t2 - tt;
             }
-        } else {
-            
+            [day setTimeIndex:t left:left width:width];
+            [day reloadDataWithSource:self];
+            left += width;
+            i++;
         }
+    } else {
+        
     }
 }
 
@@ -331,6 +344,7 @@ const CGFloat kDayViewPadding = 15.0;
 
 - (void) setupCalendarView
 {
+    self.alwaysBounceHorizontal = NO;
     createBlock = Block_copy(^(IQScheduleView* parent, id item, CGRect frame) {
         IQScheduleBlockView* view = [[IQScheduleBlockView alloc] initWithFrame:frame];
         if([dataSource respondsToSelector:@selector(textForItem:)]) {
@@ -341,6 +355,7 @@ const CGFloat kDayViewPadding = 15.0;
     self.backgroundColor = [UIColor whiteColor];
     self.darkLineColor = [UIColor lightGrayColor];
     self.lightLineColor = [UIColor colorWithWhite:0.8 alpha:1];
+    self.tintColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:209/255.0 alpha:1];
     days = [[NSMutableArray alloc] initWithCapacity:7];
     self.calendar = [NSCalendar currentCalendar];
     [self setWeekWithDate:nil workdays:YES];
@@ -354,6 +369,22 @@ const CGFloat kDayViewPadding = 15.0;
     //[headerFormatter setDateStyle:NSDateFormatterMediumStyle];
     //[headerFormatter setTimeStyle:NSDateFormatterNoStyle];
     [tightHeaderFormatter setDateFormat:@"EEE"];
+    
+    IQScheduleHeaderView* hdr = [[IQScheduleHeaderView alloc] initWithFrame:CGRectMake(0, 0, 100, 24)];
+    [hdr setTintColor:tintColor];
+    self.columnHeaderView = hdr;
+    
+    
+    for(int i=1; i<= 23; i++) {
+        hours[i] = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 46, 20)];
+        hours[i].text = [NSString stringWithFormat:@"%02d.00", i];
+        hours[i].textAlignment = UITextAlignmentRight;
+        hours[i].contentMode = UIViewContentModeCenter;
+        hours[i].autoresizingMask = UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin;
+        hours[i].backgroundColor = self.backgroundColor;
+        [hours[i] setFont:[UIFont systemFontOfSize:14]];
+        [self addSubview:hours[i]];
+    }
 }
 
 @end
@@ -542,3 +573,26 @@ const CGFloat kDayViewPadding = 15.0;
     return textLabel.text;
 }
 @end
+
+@implementation IQScheduleHeaderView
+
++ (Class)layerClass
+{
+    return [CAGradientLayer class];
+}
+
+- (void)setTintColor:(UIColor *)tintColor
+{
+    CAGradientLayer* layer = (CAGradientLayer*)self.layer;
+    const CGFloat* cmpnts = CGColorGetComponents([tintColor CGColor]);
+    CGFloat colors[] = {
+        cmpnts[0]+.16, cmpnts[1]+.16, cmpnts[2]+.16, 1,
+        cmpnts[0], cmpnts[1], cmpnts[2], 1,
+        cmpnts[0]-.12, cmpnts[1]-.12, cmpnts[2]-.12, 1,
+    };
+    layer.colors = [NSArray arrayWithObjects:(id)CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors), (id)CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors+4), nil];
+}
+
+@end
+
+

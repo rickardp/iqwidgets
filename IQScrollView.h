@@ -39,6 +39,7 @@ typedef enum _IQHeaderPlacement
     CGSize ssize;
     CGSize headerSize;
     CGSize contentSize;
+    BOOL alwaysBounceHorizontal, alwaysBounceVertical;
 }
 
 @property (nonatomic) BOOL borderShadows;
@@ -54,6 +55,10 @@ typedef enum _IQHeaderPlacement
 @property (nonatomic, retain) UIView* cornerView;
 @property (nonatomic) CGPoint contentOffset;
 @property (nonatomic) CGSize contentSize;
+@property (nonatomic) BOOL alwaysBounceHorizontal;
+@property (nonatomic) BOOL alwaysBounceVertical;
 @property (nonatomic, getter=isDirectionalLockEnabled) BOOL directionalLockEnabled;
+
+- (void)flashScrollbarIndicators;
 
 @end

@@ -37,6 +37,7 @@
         backgroundColor = [UIColor whiteColor];
         columnHeaderPlacement = IQHeaderBegin;
         rowHeaderPlacement = IQHeaderBegin;
+        alwaysBounceVertical = alwaysBounceHorizontal = YES;
         [super setBackgroundColor:[UIColor scrollViewTexturedBackgroundColor]];
     }
     return self;
@@ -50,6 +51,7 @@
         backgroundColor = [UIColor whiteColor];
         columnHeaderPlacement = IQHeaderBegin;
         rowHeaderPlacement = IQHeaderBegin;
+        alwaysBounceVertical = alwaysBounceHorizontal = YES;
         [super setBackgroundColor:[UIColor scrollViewTexturedBackgroundColor]];
     }
     return self;
@@ -78,6 +80,28 @@
 }
 
 #pragma mark Properties
+
+- (BOOL)alwaysBounceHorizontal
+{
+    return [scrollView alwaysBounceHorizontal];
+}
+
+- (void)setAlwaysBounceHorizontal:(BOOL)a
+{
+    alwaysBounceHorizontal = a;
+    [scrollView setAlwaysBounceHorizontal:alwaysBounceHorizontal];
+}
+
+- (BOOL)alwaysBounceVertical
+{
+    return [scrollView alwaysBounceVertical];
+}
+
+- (void)setAlwaysBounceVertical:(BOOL)a
+{
+    alwaysBounceVertical = a;
+    [scrollView setAlwaysBounceVertical:alwaysBounceVertical];
+}
 
 - (BOOL)isDirectionalLockEnabled
 {
@@ -223,6 +247,10 @@
     scrollView.contentSize = innerSize;
 }
 
+- (void)flashScrollbarIndicators
+{
+    [scrollView flashScrollIndicators];
+}
 
 #pragma mark Layout
 
@@ -238,7 +266,6 @@
     };
     view.center = CGPointMake(view.center.x + headerSize.width, view.center.y + headerSize.height);
     if(firstSysView != nil) {
-        NSLog(@"Inserting before %@", firstSysView);
         [scrollView insertSubview:view belowSubview:firstSysView];
     } else {
         [scrollView addSubview:view];
@@ -252,8 +279,8 @@
     if(scrollView == nil) {
         scrollView = [[UIScrollView alloc] initWithFrame:self.bounds];
         scrollView.bounces = YES;
-        scrollView.alwaysBounceHorizontal = YES;
-        scrollView.alwaysBounceVertical = YES;
+        scrollView.alwaysBounceHorizontal = alwaysBounceHorizontal;
+        scrollView.alwaysBounceVertical = alwaysBounceVertical;
         scrollView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
         scrollView.delegate = self;
 //        scrollView.zooming = YES;
@@ -273,8 +300,8 @@
     }
     if(columnHeaderView != nil) {
         CGRect r = columnHeaderView.frame;
-        r.origin.x = headerSize.width;
-        r.size.width = scrollView.contentSize.width - headerSize.width;
+        r.origin.x = (cornerView == nil) ? 0 : headerSize.width;
+        r.size.width = scrollView.contentSize.width - r.origin.x;
         columnHeaderView.frame = r;
     }
     if(rowHeaderView != nil) {

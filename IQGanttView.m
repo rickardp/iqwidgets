@@ -17,6 +17,7 @@
 //
 
 #import "IQGanttView.h"
+#import "IQScheduleView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "IQCalendarDataSource.h"
 
@@ -24,6 +25,7 @@
 - (void) setupGanttView;
 - (void) layoutOnRowsChange;
 - (void) layoutOnPropertyChange:(BOOL)didChangeZoom;
+- (UIView*) createBlockWithRow:(UIView*)rowView item:(id)item frame:(CGRect)frame;
 @end
 
 @implementation IQGanttView
@@ -270,6 +272,17 @@
     return [[IQGanttRowView alloc] initWithFrame:frame];
 }
 
+- (UIView*) createBlockWithRow:(UIView*)rowView item:(id)item frame:(CGRect)frame
+{
+    if(createBlock == nil) {
+        IQScheduleBlockView* lbl = [[IQScheduleBlockView alloc] initWithFrame:frame];
+        lbl.contentMode = UIViewContentModeCenter;
+        lbl.backgroundColor = [UIColor redColor];
+        return lbl;
+    }
+    return createBlock(self, rowView, item, frame);
+}
+
 @end
 
 @implementation IQGanttView (CallbackInterface)
@@ -386,18 +399,18 @@
             }
             if(str[0] != 0) {
                 CGContextSetRGBFillColor (ctx, 1, 1, 1, 1);
-                CGContextShowTextAtPoint(ctx, x + 4, r.origin.y + r.size.height - 4, str, strlen(str));
+                CGContextShowTextAtPoint(ctx, round(x + 3), round(r.origin.y + r.size.height - 3), str, strlen(str));
                 if(wd == 1) {
                     CGContextSetRGBFillColor(ctx, 1, 0.05, 0, 1);
                 } else {
                     CGContextSetRGBFillColor(ctx, 0.1, 0.05, 0, 1);
                 }
-                CGContextShowTextAtPoint(ctx, x + 3, r.origin.y + r.size.height - 4, str, strlen(str));
+                CGContextShowTextAtPoint(ctx, round(x + 3), round(r.origin.y + r.size.height - 4), str, strlen(str));
             }
             if(wd == fwd && displayCalendarUnits & NSWeekCalendarUnit) {
                 CGContextSetRGBFillColor(ctx, 0, 0, 0, 0.7);
                 snprintf(str, sizeof(str), "%c%d", weekPrefixChar, wk);
-                CGContextShowTextAtPoint(ctx, x + 3, r.origin.y + 0.4*r.size.height + 10, str, strlen(str));
+                CGContextShowTextAtPoint(ctx, round(x + 3), round(r.origin.y + 0.4*r.size.height + 10), str, strlen(str));
             }
             
             cmpnts.day += 1;
@@ -423,7 +436,7 @@
         label.backgroundColor = [UIColor clearColor];
         label.textColor = [UIColor colorWithRed:.15 green:.1 blue:0 alpha:1];
         label.shadowColor = [UIColor whiteColor];
-        label.shadowOffset = CGSizeMake(2, 0);
+        label.shadowOffset = CGSizeMake(0, 1);
         //label.lineBreakMode = UILineBreakModeClip;
         [self addSubview:label];
         [floatingLabels addObject:label];
@@ -571,7 +584,7 @@
     return [CATiledLayer class];
 }
 
-- (void) layoutItems
+- (void) layoutItems:(IQGanttView*)gantt
 {
     while(self.subviews.count > 0) {
         [[self.subviews lastObject] removeFromSuperview];
@@ -587,10 +600,14 @@
          btn.frame = frame;
          btn.titleLabel.text = @"Apan";*/
         //btn.buttonType = UIButtonTypeRoundedRect;
-        UILabel* lbl = [[[UILabel alloc] initWithFrame:frame] autorelease];
-        lbl.backgroundColor = [UIColor redColor];
-        lbl.text = @"Apa";
-        [self addSubview:lbl];
+        UIView* blk = [[gantt createBlockWithRow:self item:item frame:frame] autorelease];
+        if([blk respondsToSelector:@selector(setText:)]) {
+            NSString* txt = [self.dataSource textForItem:item];
+            if(txt != nil) {
+                [(id)blk setText:txt];
+            }
+        }
+        [self addSubview:blk];
         //[self addSubview:btn];
     } from:scaleWindow.windowStart to:scaleWindow.windowEnd];
 }
@@ -599,7 +616,7 @@
 {
     self.dataSource = ds;
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {
-        [self layoutItems];
+        [self layoutItems:view];
     }
 }
 
@@ -672,12 +689,12 @@
     NSTimeInterval t1 = scaleWindow.windowStart + scl * r1;
     CGContextSaveGState(ctx);
     
-    CGAffineTransform xform = CGAffineTransformMake(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
-    CGContextSetTextMatrix(ctx, xform);
-    CGContextSelectFont(ctx, "Helvetica", 10, kCGEncodingMacRoman);
-    CGContextSetFontSize(ctx, 10);
-    CGContextSetTextDrawingMode(ctx, kCGTextFill);
-    CGContextSetFillColorWithColor(ctx, [[UIColor blackColor] CGColor]);
+    //CGAffineTransform xform = CGAffineTransformMake(1.0, 0.0, 0.0, -1.0, 0.0, 0.0);
+    //CGContextSetTextMatrix(ctx, xform);
+    //CGContextSelectFont(ctx, "Helvetica", 10, kCGEncodingMacRoman);
+    //CGContextSetFontSize(ctx, 10);
+    //CGContextSetTextDrawingMode(ctx, kCGTextFill);
+    //CGContextSetFillColorWithColor(ctx, [[UIColor blackColor] CGColor]);
     NSCalendar* calendar = [[cal copy] autorelease];
     IQGridDash prevGridDash = IQMakeGridDash(0, 0);
     UIColor* prevGridColor = nil;
@@ -752,7 +769,6 @@
                     prevGridDash = gd;
                     prevGridColor = color;
                     if(gd.a != 0 || gd.b != 0) {
-                        NSLog(@"y: %f", r.origin.y+self.frame.origin.y);
                         CGContextSetLineDash(ctx, r.origin.y+self.frame.origin.y, (CGFloat[]){gd.a, gd.b}, 2);
                     } else {
                         CGContextSetLineDash(ctx, 0, nil, 0);
@@ -773,7 +789,7 @@
 {
     scaleWindow = win;
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {
-        [self layoutItems];
+        [self layoutItems:view];
     }
     [self setNeedsDisplay];
 }
