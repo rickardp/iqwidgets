@@ -68,16 +68,16 @@ struct {
     UISegmentedControl* ctl = sender;
     switch(ctl.selectedSegmentIndex) {
         case 0:
-            [self setStartDate:[NSDate date] numberOfDays:1];
+            [self setStartDate:[NSDate date] numberOfDays:1 animated:YES];
             break;
         case 1:
-            [self setStartDate:[[NSDate date] dateByAddingTimeInterval:1440*60] numberOfDays:1];
+            [self setStartDate:[[NSDate date] dateByAddingTimeInterval:1440*60] numberOfDays:1 animated:YES];
             break;
         case 2:
-            [self setWeekWithDate:[NSDate date] workdays:YES];
+            [self setWeekWithDate:[NSDate date] workdays:YES animated:YES];
             break;
         case 3:
-            [self setWeekWithDate:[NSDate date] workdays:NO];
+            [self setWeekWithDate:[NSDate date] workdays:NO animated:YES];
             break;
     }
 }
@@ -130,7 +130,7 @@ static UIViewController* CreateViewController(int idx) {
             IQScheduleView* v = [[IQScheduleView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
             UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
             selector.segmentedControlStyle = UISegmentedControlStyleBar;
-            [v setStartDate:[NSDate date] numberOfDays:1];
+            [v setStartDate:[NSDate date] numberOfDays:1 animated:NO];
             [v setZoom:NSMakeRange(18, 22)];
             selector.selectedSegmentIndex = 0;
             [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
@@ -209,9 +209,12 @@ static UIViewController* CreateViewController(int idx) {
                 NSTimeInterval t = [[NSDate date] timeIntervalSinceReferenceDate];
                 t -= 18*3600;
                 NSMutableSet* items = [NSMutableSet set];
+                NSTimeInterval tOld = t;
                 for(int i=0; i<100; i++) {
                     t += 24*3600;
                     if((i+7) % modo != 0) continue;
+                    if((i%6)==0) t = tOld+12*3600;
+                    tOld = t;
                     t = floor(t/3600)*3600;
                     [items addObject:[ExampleCalendarEntry exampleEntryWithText:@"Test" start:[NSDate dateWithTimeIntervalSinceReferenceDate:t] end:[NSDate dateWithTimeIntervalSinceReferenceDate:t+24*3600]]];
                 }
