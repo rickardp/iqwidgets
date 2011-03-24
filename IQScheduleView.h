@@ -24,7 +24,6 @@
 @class IQScheduleBlockView;
 @class IQScheduleViewDay;
 @class IQScheduleView;
-@class IQScheduleHeaderView;
 
 #import "IQScrollView.h"
 
@@ -42,7 +41,7 @@ typedef UIView* (^IQScheduleBlockViewCreationCallback)(IQScheduleView* parent, i
     NSDateFormatter* cornerFormatter, *headerFormatter, *tightHeaderFormatter;
     IQScheduleBlockViewCreationCallback createBlock;
     NSSet* items;
-    UIColor* tintColor;
+    UIColor* tintColor, *headerTextColor;
 }
 
 @property (nonatomic, retain) id<IQCalendarDataSource> dataSource;
@@ -54,20 +53,24 @@ typedef UIView* (^IQScheduleBlockViewCreationCallback)(IQScheduleView* parent, i
 @property (nonatomic) NSRange zoom;
 
 @property (nonatomic, retain) UIColor* tintColor;
+@property (nonatomic, retain) UIColor* headerTextColor;
 @property (nonatomic, retain) UIColor* darkLineColor;
 @property (nonatomic, retain) UIColor* lightLineColor;
 
-- (void) setStartDate:(NSDate*)startDate numberOfDays:(int)numberOfDays;
+- (void) setStartDate:(NSDate*)startDate numberOfDays:(int)numberOfDays animated:(BOOL)animated;
 
 /**
  Sets the scale to show the specified time interval, including the whole days
  of both endpoints.
  */
-- (void) setStartDate:(NSDate*)startDate endDate:(NSDate*)endDate;
+- (void) setStartDate:(NSDate*)startDate endDate:(NSDate*)endDate animated:(BOOL)animated;
 
-- (void) setWeekWithDate:(NSDate*)dayInWeek workdays:(BOOL)workdays;
+- (void) setWeekWithDate:(NSDate*)dayInWeek workdays:(BOOL)workdays animated:(BOOL)animated;
 
 - (void) reloadData;
+
+// Defaults to IQCalendarHeaderView. Should return a UIView subclass implementing IQCalendarHeaderDelegate.
++ (Class) headerViewClass;
 
 @end
 

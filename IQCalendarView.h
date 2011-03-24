@@ -16,13 +16,27 @@
 //  limitations under the License.
 //
 
-#import <UIKit/UIKit.h>
+#import "IQScrollView.h"
 
-
-
+typedef enum _IQCalendarSelectionMode {
+    IQCalendarSelectionSingle,
+    IQCalendarSelectionRange,
+    IQCalendarSelectionRangeStart,
+    IQCalendarSelectionRangeEnd,
+    IQCalendarSelectionMulti
+} IQCalendarSelectionMode;
 
 @interface IQCalendarView : UIView {
+    UIColor* tintColor, *selectionColor, *headerTextColor;
+    UIView* header;
 }
+
+// Defaults to IQCalendarHeaderView. Should return a UIView subclass implementing IQCalendarHeaderDelegate.
++ (Class) headerViewClass;
+@property (nonatomic, retain) UIColor* tintColor;
+@property (nonatomic, retain) UIColor* selectionColor;
+@property (nonatomic, retain) UIColor* headerTextColor;
+
 @end
 
 

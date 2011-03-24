@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		FF10E1C6133B8AE800783849 /* IQCalendarHeaderView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF10E1C4133B8AE800783849 /* IQCalendarHeaderView.h */; };
+		FF10E1C7133B8AE800783849 /* IQCalendarHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = FF10E1C5133B8AE800783849 /* IQCalendarHeaderView.m */; };
 		FF138B97132D5078009C01D2 /* IQGanttView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF138B95132D5078009C01D2 /* IQGanttView.h */; };
 		FF138B98132D5078009C01D2 /* IQGanttView.m in Sources */ = {isa = PBXBuildFile; fileRef = FF138B96132D5078009C01D2 /* IQGanttView.m */; };
 		FF24AF271327A0F300BE3723 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF24AF261327A0F300BE3723 /* CoreGraphics.framework */; };
@@ -60,6 +62,8 @@
 /* Begin PBXFileReference section */
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2AAC07E0554694100DB518D /* libIQWidgets.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIQWidgets.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		FF10E1C4133B8AE800783849 /* IQCalendarHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarHeaderView.h; sourceTree = "<group>"; };
+		FF10E1C5133B8AE800783849 /* IQCalendarHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQCalendarHeaderView.m; sourceTree = "<group>"; };
 		FF138B95132D5078009C01D2 /* IQGanttView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQGanttView.h; sourceTree = "<group>"; };
 		FF138B96132D5078009C01D2 /* IQGanttView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQGanttView.m; sourceTree = "<group>"; };
 		FF24AF261327A0F300BE3723 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -168,6 +172,8 @@
 				FF8C31DF130AFB7600A10CF0 /* IQScheduleView.m */,
 				FF8C31E2130AFBD800A10CF0 /* IQCalendarView.h */,
 				FF8C31E3130AFBD800A10CF0 /* IQCalendarView.m */,
+				FF10E1C4133B8AE800783849 /* IQCalendarHeaderView.h */,
+				FF10E1C5133B8AE800783849 /* IQCalendarHeaderView.m */,
 				FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */,
 				FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */,
 				FF138B95132D5078009C01D2 /* IQGanttView.h */,
@@ -220,6 +226,7 @@
 				FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */,
 				FF138B97132D5078009C01D2 /* IQGanttView.h in Headers */,
 				FFA26831132E895B007B7FBD /* IQScrollView.h in Headers */,
+				FF10E1C6133B8AE800783849 /* IQCalendarHeaderView.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -353,6 +360,7 @@
 				FFC9646B1327DB4200B2EBA6 /* IQCalendarDataSource.m in Sources */,
 				FF138B98132D5078009C01D2 /* IQGanttView.m in Sources */,
 				FFA26832132E895B007B7FBD /* IQScrollView.m in Sources */,
+				FF10E1C7133B8AE800783849 /* IQCalendarHeaderView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -247,6 +247,7 @@
     if([view respondsToSelector:@selector(ganttView:didChangeCalendar:)]) {
         [view ganttView:self didChangeCalendar:calendar];
     }
+    [view setNeedsDisplay];
     NSLog(@"Added row: %@", view);
     [self layoutOnRowsChange];
 }
@@ -601,7 +602,7 @@
          btn.titleLabel.text = @"Apan";*/
         //btn.buttonType = UIButtonTypeRoundedRect;
         UIView* blk = [[gantt createBlockWithRow:self item:item frame:frame] autorelease];
-        if([blk respondsToSelector:@selector(setText:)]) {
+        if([blk respondsToSelector:@selector(setText:)] && [self.dataSource respondsToSelector:@selector(textForItem:)]) {
             NSString* txt = [self.dataSource textForItem:item];
             if(txt != nil) {
                 [(id)blk setText:txt];
