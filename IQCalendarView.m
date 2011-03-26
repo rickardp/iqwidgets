@@ -25,9 +25,8 @@
 @end
 
 @implementation IQCalendarView
-@synthesize tintColor;
-@synthesize headerTextColor;
-@synthesize selectionColor;
+@synthesize tintColor, headerTextColor, selectionColor;
+@synthesize calendar, currentDay;
 
 #pragma mark Initialization
 
@@ -57,6 +56,8 @@
 - (void) setupCalendarView
 {
     CGRect r = self.bounds;
+    currentDay = [[NSDate date] retain];
+    self.calendar = [NSCalendar currentCalendar];
     self.tintColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:209/255.0 alpha:1];
     self.headerTextColor = [UIColor colorWithRed:.15 green:.1 blue:0 alpha:1];
     header = (UIView*)[[[[self class] headerViewClass] alloc] initWithFrame:CGRectMake(0, 0, r.size.width, 44)];
@@ -71,6 +72,7 @@
 
 - (void)dealloc
 {
+    [calendar release];
     [header release];
     [super dealloc];
 }
@@ -93,6 +95,66 @@
     }
     [headerTextColor release];
     headerTextColor = [tc retain];
+}
+
+#pragma mark Date navigation
+
+
+- (void)setCurrentDay:(NSDate*)date display:(BOOL)display animated:(BOOL)animated
+{
+    [currentDay release];
+    currentDay = [date retain];
+}
+
+- (void)setCurrentDay:(NSDate *)date
+{
+    [self setCurrentDay:date display:YES animated:YES];
+}
+
+- (void)displayDay:(NSDate*)day animated:(BOOL)animated
+{
+    [displayDate release];
+    displayDate = [day retain];
+}
+
+- (void)setSelectionIntervalFrom:(NSDate*)startDate to:(NSDate*)endDate animated:(BOOL)animated
+{
+    
+}
+
+-(NSDate*)firstDayInDisplayMonth
+{
+    NSDate* date = displayDate;
+    if(!date) date = currentDay;
+    if(!date) date = [NSDate date];
+    NSDateComponents* cmpnts = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:date];
+    cmpnts.day = 1;
+    return [calendar dateFromComponents:cmpnts];
+}
+
+-(NSDate*)lastDayInDisplayMonth
+{
+    NSDate* date = displayDate;
+    if(!date) date = currentDay;
+    if(!date) date = [NSDate date];
+    NSDateComponents* cmpnts = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:date];
+    cmpnts.day = 0;
+    cmpnts.month += 1;
+    return [calendar dateFromComponents:cmpnts];
+}
+
+-(NSDate*)firstDisplayedDay
+{
+    NSDateComponents* cmpnts = [calendar components:NSWeekdayCalendarUnit|NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:self.firstDayInDisplayMonth];
+    cmpnts.day += ([calendar firstWeekday] - cmpnts.weekday);
+    return [calendar dateFromComponents:cmpnts];
+}
+
+-(NSDate*)lastDisplayedDay
+{
+    NSDateComponents* cmpnts = [calendar components:NSWeekdayCalendarUnit|NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:self.lastDayInDisplayMonth];
+    cmpnts.day += ([calendar firstWeekday] - cmpnts.weekday+7);
+    return [calendar dateFromComponents:cmpnts];
 }
 @end
 

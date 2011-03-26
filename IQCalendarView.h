@@ -29,13 +29,38 @@ typedef enum _IQCalendarSelectionMode {
 @interface IQCalendarView : UIView {
     UIColor* tintColor, *selectionColor, *headerTextColor;
     UIView* header;
+    
+    NSCalendar* calendar;
+    NSDate* currentDay, *displayDate;
+    NSDate* selectionStart, *selectionEnd;
 }
+
+#pragma mark Appearance
 
 // Defaults to IQCalendarHeaderView. Should return a UIView subclass implementing IQCalendarHeaderDelegate.
 + (Class) headerViewClass;
+
 @property (nonatomic, retain) UIColor* tintColor;
 @property (nonatomic, retain) UIColor* selectionColor;
 @property (nonatomic, retain) UIColor* headerTextColor;
+
+@property (nonatomic, retain) NSCalendar* calendar;
+
+#pragma mark Date navigation
+
+// Sets the day which is shown in a different color. Default is the current date.
+- (void)setCurrentDay:(NSDate*)date display:(BOOL)display animated:(BOOL)animated;
+
+- (void)displayDay:(NSDate*)day animated:(BOOL)animated;
+
+// Sets the selection interval
+- (void) setSelectionIntervalFrom:(NSDate*)startDate to:(NSDate*)endDate animated:(BOOL)animated;
+
+@property (nonatomic, retain) NSDate* currentDay;
+@property (nonatomic, readonly) NSDate* firstDayInDisplayMonth;
+@property (nonatomic, readonly) NSDate* lastDayInDisplayMonth;
+@property (nonatomic, readonly) NSDate* firstDisplayedDay;
+@property (nonatomic, readonly) NSDate* lastDisplayedDay;
 
 @end
 

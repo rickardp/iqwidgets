@@ -18,6 +18,20 @@
 
 #import "CalendarTests.h"
 
+@implementation CalendarTests
+
+- (void)testMonthLogic
+{
+    NEED_UI
+    IQCalendarView* cv = [[[IQCalendarView alloc] initWithFrame:CGRectMake(0,0,0,0)] autorelease];
+    [cv setCurrentDay:D(@"2011-03-06") display:NO animated:NO];
+    
+    //STAssertEqualObjects(cv.firstDisplayedDay, D(@"2011-02-28 00:00"), @"Invalid start date");
+}
+
+@end
+
+
 
 NSDate* __D(SenTestCase* self, NSString* str)
 {
@@ -31,6 +45,16 @@ NSDate* __D(SenTestCase* self, NSString* str)
     return date;
 }
 
-@implementation CalendarTests
-
-@end
+void __NEED_UI()
+{
+    if([UIApplication sharedApplication] == nil) {
+        printf("(Creating UIApplication loophole for unit testing. If you see this in the application things will go BAD)\n");
+        static jmp_buf buf;
+        if(!setjmp(buf)) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                longjmp(buf, 0);
+            });
+            UIApplicationMain(2, (char*[]){"unittest","-RegisterForSystemEvents"}, nil, nil);
+        }
+    }
+}

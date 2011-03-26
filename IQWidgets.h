@@ -22,3 +22,6 @@
 #import "IQScheduleView.h"
 #import "IQGanttView.h"
 #import "IQCalendarDataSource.h"
+
+
+#import "IQScreenRecorder.h"

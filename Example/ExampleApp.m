@@ -91,6 +91,14 @@ struct {
     // Override point for customization after app launch    
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
+    [[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
+}
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    
+}
+- (void)applicationWillResignActive:(UIApplication *)application {
+    //NSLog(@"I am resigning");
+    //[[IQScreenRecorder screenRecorder] stop];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section

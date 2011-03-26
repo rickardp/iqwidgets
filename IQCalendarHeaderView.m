@@ -35,6 +35,9 @@
     titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
     titleLabel.backgroundColor = [UIColor clearColor];
     titleLabel.textAlignment = UITextAlignmentCenter;
+    titleLabel.font = [UIFont boldSystemFontOfSize:18.0];
+    titleLabel.shadowColor = [UIColor whiteColor];
+    titleLabel.shadowOffset = CGSizeMake(0, -1);
     titleLabel.text = @"December 2011";
     [self addSubview:titleLabel];
 }

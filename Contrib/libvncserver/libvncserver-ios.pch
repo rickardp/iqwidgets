@@ -1,0 +1,12 @@
+//
+//  libvncserver-ios.pch
+//  libvncserver
+//
+//  Created by Rickard Petzäll on 2011-03-26.
+//  Copyright 2011 evolvIQ. All rights reserved.
+//
+
+
+#include <stdlib.h>
+#include <stdint.h>
+
