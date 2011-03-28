@@ -323,6 +323,7 @@
 - (void)dealloc
 {
     if(grad != nil) CGGradientRelease(grad);
+    if(border != nil) CGColorRelease(border);
     [tintColor release];
     [cal release];
     [floatingLabels release];

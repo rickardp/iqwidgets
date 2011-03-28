@@ -33,10 +33,11 @@ typedef struct _IQCalendarHeaderItem {
 - (void)setTitleCalendarUnits:(NSCalendarUnit)units;
 - (void)setCornerCalendarUnits:(NSCalendarUnit)units;
 - (void)setItemCalendarUnits:(NSCalendarUnit)units;
-- (void)setItems:(const IQCalendarHeaderItem*)items count:(NSUInteger)count cornerWidth:(CGFloat)cornerWidth startTime:(NSDate*)time animated:(BOOL)animated;
+- (void)setItems:(const IQCalendarHeaderItem*)items count:(NSUInteger)count cornerWidth:(CGFloat)cornerWidth startTime:(NSDate*)time titleOffset:(NSTimeInterval)offset animated:(BOOL)animated;
 @end
 
 @interface IQCalendarHeaderView : UIView<IQCalendarHeaderDelegate> {
+    NSDateFormatter* titleFormatter;
     NSCalendarUnit titleCalendarUnits;
     NSCalendarUnit cornerCalendarUnits;
     NSCalendarUnit itemCalendarUnits;
@@ -44,8 +45,13 @@ typedef struct _IQCalendarHeaderItem {
     NSUInteger numItems;
     UIView* border;
     UILabel* titleLabel;
+    UIView* leftArrow, *rightArrow;
+    BOOL displayArrows;
 }
 
 @property (nonatomic, readonly) UILabel* titleLabel;
+
+#pragma mark Appearance
+@property (nonatomic) BOOL displayArrows;
 
 @end

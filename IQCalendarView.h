@@ -26,6 +26,9 @@ typedef enum _IQCalendarSelectionMode {
     IQCalendarSelectionMulti
 } IQCalendarSelectionMode;
 
+@class IQCalendarArea;
+@class IQCalendarRow;
+
 @interface IQCalendarView : UIView {
     UIColor* tintColor, *selectionColor, *headerTextColor;
     UIView* header;
@@ -33,6 +36,8 @@ typedef enum _IQCalendarSelectionMode {
     NSCalendar* calendar;
     NSDate* currentDay, *displayDate;
     NSDate* selectionStart, *selectionEnd;
+    IQCalendarArea* calendarArea;
+    IQCalendarRow* rows[10];
 }
 
 #pragma mark Appearance
