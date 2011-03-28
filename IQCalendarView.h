@@ -44,6 +44,7 @@ typedef enum _IQCalendarSelectionMode {
     IQCalendarRow* rows[9];
     CGFloat dayContentSize;
     NSDateFormatter* dayFormatter;
+    CGSize headerShadowOffset;
 }
 
 #pragma mark Appearance
@@ -51,10 +52,14 @@ typedef enum _IQCalendarSelectionMode {
 // Defaults to IQCalendarHeaderView. Should return a UIView subclass implementing IQCalendarHeaderDelegate.
 + (Class) headerViewClass;
 
+@property (nonatomic, readonly) UIView* headerView;
+
 @property (nonatomic, retain) UIColor* tintColor;
 @property (nonatomic, retain) UIColor* selectionColor;
 @property (nonatomic, retain) UIColor* headerTextColor;
 @property (nonatomic, retain) UIColor* currentDayColor;
+@property (nonatomic, retain) UIColor* textColor;
+@property (nonatomic, retain) UIColor* selectedTextColor;
 
 @property (nonatomic, retain) NSCalendar* calendar;
 @property (nonatomic) BOOL showCurrentDay;

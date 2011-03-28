@@ -32,9 +32,11 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     }
 }
 
-@interface UIArrowView : UIView {
+@interface IQArrowView : UIView {
 }
 @property (nonatomic) BOOL left;
+@property (nonatomic, retain) UIColor* shadowColor;
+@property (nonatomic) CGSize shadowOffset;
 @end
 
 @implementation IQCalendarHeaderView
@@ -57,13 +59,13 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     titleLabel.shadowColor = [UIColor whiteColor];
     titleLabel.shadowOffset = CGSizeMake(0, 1);
     titleLabel.contentMode = UIViewContentModeTop;
-    leftArrow = [[UIArrowView alloc] initWithFrame:CGRectMake(0,0,0,0)];
-    rightArrow = [[UIArrowView alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    leftArrow = [[IQArrowView alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    rightArrow = [[IQArrowView alloc] initWithFrame:CGRectMake(0,0,0,0)];
     leftArrow.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
     rightArrow.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
     self.displayArrows = NO;
-    ((UIArrowView*)leftArrow).left = YES;
-    ((UIArrowView*)rightArrow).left = NO;
+    ((IQArrowView*)leftArrow).left = YES;
+    ((IQArrowView*)rightArrow).left = NO;
     [self addSubview:leftArrow];
     [self addSubview:rightArrow];
     [self addSubview:titleLabel];
@@ -271,10 +273,44 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     }
 }
 
+- (UIColor*)shadowColor
+{
+    return titleLabel.shadowColor;
+}
+
+- (void)setShadowColor:(UIColor *)value
+{
+    titleLabel.shadowColor = value;
+    for(int i = 0; i < 16; i++) {
+        itemLabels[i].shadowColor = value;
+    }
+    ((IQArrowView*)leftArrow).shadowColor = value;
+    ((IQArrowView*)rightArrow).shadowColor = value;
+    [leftArrow setNeedsDisplay];
+    [rightArrow setNeedsDisplay];
+}
+
+- (CGSize)shadowOffset
+{
+    return titleLabel.shadowOffset;
+}
+
+- (void)setShadowOffset:(CGSize)value
+{
+    titleLabel.shadowOffset = value;
+    for(int i = 0; i < 16; i++) {
+        itemLabels[i].shadowOffset = value;
+    }
+    ((IQArrowView*)leftArrow).shadowOffset = value;
+    ((IQArrowView*)rightArrow).shadowOffset = value;
+    [leftArrow setNeedsDisplay];
+    [rightArrow setNeedsDisplay];
+}
+
 @end
 
-@implementation UIArrowView
-@synthesize left;
+@implementation IQArrowView
+@synthesize left, shadowOffset, shadowColor;
 
 - (id)initWithFrame:(CGRect)frame
 {
@@ -285,6 +321,11 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     }
     return self;
 }
+- (void)dealloc
+      {
+          self.shadowColor = nil;
+          [super dealloc];
+      }
 - (void)drawRect:(CGRect)rect
 {
     CGContextRef ctx = UIGraphicsGetCurrentContext();
@@ -300,11 +341,8 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     if([self.superview respondsToSelector:@selector(textColor)]) {
         CGContextSetFillColorWithColor(ctx, [[(id)self.superview textColor] CGColor]);
     }
+    CGContextSetShadowWithColor(ctx, shadowOffset, 0, [shadowColor CGColor]);
     CGContextFillPath(ctx);
-    CGContextMoveToPoint(ctx, (bnds.size.width-width)*.5+1, dy+bnds.size.height * .5+1);
-    CGContextAddLineToPoint(ctx, (bnds.size.width+width)*.5+1, dy+(bnds.size.height+height) * .5+1);
-    CGContextSetStrokeColor(ctx, (CGFloat[]){1,1,1,1});
-    CGContextStrokePath(ctx);
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event

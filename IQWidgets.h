@@ -20,6 +20,7 @@
 #import "IQDrilldownController.h"
 #import "IQScrollView.h"
 #import "IQScheduleView.h"
+#import "IQCalendarHeaderView.h"
 #import "IQGanttView.h"
 #import "IQCalendarDataSource.h"
 

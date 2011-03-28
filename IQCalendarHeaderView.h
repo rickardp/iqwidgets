@@ -44,6 +44,7 @@ typedef enum _IQCalendarHeaderViewUserInteraction {
 @optional
 - (void)setTintColor:(UIColor*)tintColor;
 - (void)setTextColor:(UIColor*)textColor;
+- (void)setShadowColor:(UIColor*)textColor;
 
 - (void)setTitleCalendarUnits:(NSCalendarUnit)units;
 - (void)setCornerCalendarUnits:(NSCalendarUnit)units;
@@ -75,4 +76,6 @@ typedef enum _IQCalendarHeaderViewUserInteraction {
 #pragma mark Appearance
 @property (nonatomic) BOOL displayArrows;
 @property (nonatomic, retain) UIColor* textColor;
+@property (nonatomic, retain) UIColor* shadowColor;
+@property (nonatomic) CGSize shadowOffset;
 @end

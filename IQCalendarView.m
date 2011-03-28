@@ -44,6 +44,8 @@
 }
 - (void)setSelectionColor:(UIColor*)color;
 - (void)setCurrentDayColor:(UIColor*)color;
+@property (nonatomic, retain) UIColor* textColor;
+@property (nonatomic, retain) UIColor* selectedTextColor;
 - (void)setDayContentSize:(CGFloat)dayContentSize;
 - (UIFont*)dayFont;
 - (void)setDayFont:(UIFont*)dayFont;
@@ -56,7 +58,7 @@
 @end
 
 @implementation IQCalendarView
-@synthesize tintColor, headerTextColor, selectionColor, currentDayColor;
+@synthesize tintColor, headerTextColor, selectionColor, currentDayColor, textColor, selectedTextColor;
 @synthesize calendar, currentDay, dayContentSize, selectionMode, showCurrentDay;
 @synthesize selectionStart, selectionEnd, selectedDays;
 
@@ -164,6 +166,11 @@
     [super dealloc];
 }
 
+- (UIView*)headerView
+{
+    return header;
+}
+
 #pragma mark User interaction
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
@@ -174,12 +181,12 @@
         dragStart = [touch locationInView:self];
         NSDate* d = [self dateFromPoint:dragStart];
         if(selectionMode == IQCalendarSelectionRangeEnd) {
-            if([d compare:selectionStart] == NSOrderedAscending) {
+            if(selectionStart == nil || [d compare:selectionStart] == NSOrderedAscending) {
                 selectionStart = [d retain];
             }
             selectionEnd = [d retain];
         } else if(selectionMode == IQCalendarSelectionRangeStart) {
-            if([d compare:selectionEnd] == NSOrderedDescending) {
+            if(selectionEnd == nil || [d compare:selectionEnd] == NSOrderedDescending) {
                 selectionEnd = [d retain];
             }
             selectionStart = [d retain];
@@ -281,6 +288,27 @@
     [calendarArea setTintColor:tintColor];
     [tintColor release];
     tintColor = [tc retain];
+    [calendarArea setNeedsDisplay];
+}
+
+- (void)setTextColor:(UIColor *)tc
+{
+    for(int i=0; i<9; i++) {
+        [rows[i] setTextColor:tc];
+    }
+    [textColor release];
+    textColor = [tc retain];
+    [self redisplayDays];
+}
+
+- (void)setSelectedTextColor:(UIColor *)tc
+{
+    for(int i=0; i<9; i++) {
+        [rows[i] setSelectedTextColor:tc];
+    }
+    [selectedTextColor release];
+    selectedTextColor = [tc retain];
+    [self redisplayDays];
 }
 
 - (void)setHeaderTextColor:(UIColor *)tc
@@ -290,6 +318,14 @@
     }
     [headerTextColor release];
     headerTextColor = [tc retain];
+}
+
+- (void)setHeaderShadowOffset:(CGSize)offset
+{
+    if([header respondsToSelector:@selector(setShadowOffset:)]) {
+        [(id)header setShadowOffset:offset];
+    }
+    headerShadowOffset = offset;
 }
 
 - (CGFloat)dayContentSize
@@ -566,11 +602,13 @@
         cmpnts[0]-.12, cmpnts[1]-.12, cmpnts[2]-.12, 1,
     };
     layer.colors = [NSArray arrayWithObjects:(id)CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors), (id)CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors+4), nil];
+    //[layer setNeedsDisplay];
 }
 
 @end
 
 @implementation IQCalendarRow
+@synthesize textColor, selectedTextColor;
 - (id)initWithFrame:(CGRect)frame
 {
     self = [super initWithFrame:frame];
@@ -792,7 +830,7 @@
             days[i].textColor = [UIColor whiteColor];
             days[i].shadowColor = [UIColor colorWithWhite:0 alpha:0.75];
         } else if(state[i] & kCalendarStateCurrent) {
-            days[i].textColor = [UIColor colorWithWhite:1 alpha:0.8];
+            days[i].textColor = [[UIColor whiteColor] colorWithAlphaComponent:0.8];
             days[i].shadowColor = [UIColor colorWithWhite:0 alpha:0.75];
         } else if(state[i] & kCalendarStateOutsideCurrentMonth) {
             days[i].textColor = [UIColor grayColor];
