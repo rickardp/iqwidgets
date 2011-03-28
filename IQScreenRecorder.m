@@ -3,7 +3,7 @@
 //  IQWidgets
 //
 //  Created by Rickard Petzäll on 2011-03-25.
-//  Copyright 2011 Jeppesen. All rights reserved.
+//  Please be aware that this class is dependent on GPL-licensed code in Contrib/
 //
 
 #import "IQScreenRecorder.h"
