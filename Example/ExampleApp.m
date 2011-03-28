@@ -189,6 +189,8 @@ static UIViewController* CreateViewController(int idx) {
                 vc.toolbarItems = [NSArray arrayWithObjects:sys,[[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease],sys,nil];
             } else {
                 cal.headerTextColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.7 alpha:1.0];
+                cal.selectionMode = IQCalendarSelectionMulti;
+                [cal setActiveSelectionRangeFrom:cal.firstDayInDisplayMonth to:cal.lastDayInDisplayMonth];
             }
             return vc;
         }

@@ -39,11 +39,15 @@
     UILabel* days[7];
     CGFloat dayContentSize;
     int state[7];
+    UIColor* selectionColor;
+    UIColor* currentDayColor;
 }
+- (void)setSelectionColor:(UIColor*)color;
+- (void)setCurrentDayColor:(UIColor*)color;
 - (void)setDayContentSize:(CGFloat)dayContentSize;
 - (UIFont*)dayFont;
 - (void)setDayFont:(UIFont*)dayFont;
-- (void)setDays:(NSDate*)firstDay delta:(int)dayDelta calendar:(NSCalendar*)cal monthStart:(NSDate*)ms monthEnd:(NSDate*)me selStart:(NSDate*)selStart selEnd:(NSDate*)selEnd currentDay:(NSDate*)currentDay selectionMode:(IQCalendarSelectionMode)selectionMode formatter:(NSDateFormatter*)fmt;
+- (void)setDays:(NSDate*)firstDay delta:(int)dayDelta calendar:(NSCalendar*)cal monthStart:(NSDate*)ms monthEnd:(NSDate*)me selStart:(NSDate*)selStart selEnd:(NSDate*)selEnd selDays:(NSSet*)days currentDay:(NSDate*)currentDay selectionMode:(IQCalendarSelectionMode)selectionMode formatter:(NSDateFormatter*)fmt;
 @end
 
 @interface IQCalendarView (PrivateMethods)
@@ -52,8 +56,9 @@
 @end
 
 @implementation IQCalendarView
-@synthesize tintColor, headerTextColor, selectionColor;
+@synthesize tintColor, headerTextColor, selectionColor, currentDayColor;
 @synthesize calendar, currentDay, dayContentSize, selectionMode, showCurrentDay;
+@synthesize selectionStart, selectionEnd, selectedDays;
 
 #pragma mark Initialization
 
@@ -88,6 +93,8 @@
     self.calendar = [NSCalendar currentCalendar];
     self.tintColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:209/255.0 alpha:1];
     self.headerTextColor = [UIColor colorWithRed:.15 green:.1 blue:0 alpha:1];
+    self.selectionColor = [UIColor colorWithRed:25/255.0 green:128/255.0 blue:229/255.0 alpha:1];
+    self.currentDayColor = [UIColor colorWithRed:133/255.0 green:155/255.0 blue:180/255.0 alpha:1];
     header = (UIView*)[[[[self class] headerViewClass] alloc] initWithFrame:CGRectMake(0, 0, r.size.width, 44)];
     if([header respondsToSelector:@selector(setTintColor:)]) {
         [(id)header setTintColor:tintColor];
@@ -117,6 +124,8 @@
     calendarArea.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     for(int i=0; i<9; i++) {
         rows[i] = [[IQCalendarRow alloc] initWithFrame:CGRectMake(0, 44+ht/5.0*i, r.size.width, ht/5.0)];
+        [rows[i] setSelectionColor:selectionColor];
+        [rows[i] setCurrentDayColor:currentDayColor];
         [calendarArea addSubview:rows[i]];
     }
     dayFormatter = [[NSDateFormatter alloc] init];
@@ -138,13 +147,20 @@
 
 - (void)dealloc
 {
+    [self clearSelection];
     [dayFormatter release];
     for(int i=0; i<10; i++) {
         [rows[i] release];
+        rows[i] = nil;
     }
     [calendarArea release];
     [calendar release];
     [header release];
+    [tintColor release];
+    [selectionColor release];
+    [headerTextColor release];
+    [selectionColor release];
+    [currentDayColor release];
     [super dealloc];
 }
 
@@ -167,6 +183,8 @@
                 selectionEnd = [d retain];
             }
             selectionStart = [d retain];
+        } else if(selectionMode == IQCalendarSelectionMulti) {
+            [self setSelected:![self isDaySelected:d] forDay:d];
         } else {
             selectionStart = [d retain];
             selectionEnd = [d retain];
@@ -246,14 +264,23 @@
     [self redisplayDays];
 }
 
+- (void)setSelectionColor:(UIColor *)sc
+{
+    for(int i=0; i<9; i++) {
+        [rows[i] setSelectionColor:sc];
+    }
+    [selectionColor release];
+    selectionColor = [sc retain];
+}
+
 - (void)setTintColor:(UIColor *)tc
 {
     if([header respondsToSelector:@selector(setTintColor:)]) {
         [(id)header setTintColor:tc];
     }
+    [calendarArea setTintColor:tintColor];
     [tintColor release];
     tintColor = [tc retain];
-    [calendarArea setTintColor:tintColor];
 }
 
 - (void)setHeaderTextColor:(UIColor *)tc
@@ -294,7 +321,6 @@
 
 - (void) headerView:(UIView<IQCalendarHeader>*)view didReceiveInteraction:(IQCalendarHeaderViewUserInteraction)interaction
 {
-    NSLog(@"Interaction: %d", interaction);
     if(interaction == IQCalendarHeaderViewUserInteractionNext) {
         [self displayNextMonth];
     } else if(interaction == IQCalendarHeaderViewUserInteractionPrev) {
@@ -316,10 +342,21 @@
     [self setCurrentDay:date display:YES animated:YES];
 }
 
+- (void)_redisplayDays
+{
+    if(needsDayRedisplay) {
+        needsDayRedisplay = NO;
+        for(int i=0; i<5; i++) {
+            [rows[i] setDays:self.firstDisplayedDay delta:7*i calendar:calendar monthStart:self.firstDayInDisplayMonth monthEnd:self.lastDayInDisplayMonth selStart:selectionStart selEnd:selectionEnd  selDays:selectedDays currentDay:showCurrentDay?currentDay:nil selectionMode:selectionMode formatter:dayFormatter];
+        }
+    }
+}
+
 - (void)redisplayDays
 {
-    for(int i=0; i<5; i++) {
-        [rows[i] setDays:self.firstDisplayedDay delta:7*i calendar:calendar monthStart:self.firstDayInDisplayMonth monthEnd:self.lastDayInDisplayMonth selStart:selectionStart selEnd:selectionEnd currentDay:showCurrentDay?currentDay:nil selectionMode:selectionMode formatter:dayFormatter];
+    if(!needsDayRedisplay) {
+        needsDayRedisplay = YES;
+        [self performSelectorOnMainThread:@selector(_redisplayDays) withObject:self waitUntilDone:NO];
     }
 }
 
@@ -394,7 +431,56 @@
 
 - (void)setSelectionIntervalFrom:(NSDate*)startDate to:(NSDate*)endDate animated:(BOOL)animated
 {
-    
+    if(startDate == nil && endDate == nil) {
+        [self clearSelection];
+        return;
+    }
+    [selectedDays release];
+    selectedDays = nil;
+    [selectionStart release];
+    if(startDate == nil) startDate = endDate;
+    selectionStart = [startDate retain];
+    [selectionEnd release];
+    if(endDate == nil) endDate = startDate;
+    selectionEnd = [endDate retain];
+    [self redisplayDays];
+}
+
+- (void)clearSelection
+{
+    [selectedDays release];
+    selectedDays = nil;
+    [selectionStart release];
+    selectionStart = nil;
+    [selectionEnd release];
+    selectionEnd = nil;
+    [self redisplayDays];
+}
+
+-(NSDate*)dayForDate:(NSDate*)date
+{
+    NSDateComponents* cmpnts = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:date];
+    return [calendar dateFromComponents:cmpnts];
+}
+
+- (void)setSelected:(BOOL)selected forDay:(NSDate*)day
+{
+    if(selectedDays == nil) {
+        if(!selected) return;
+        selectedDays = [[NSMutableSet set] retain];
+    }
+    if(selected) [(NSMutableSet*)selectedDays addObject:[self dayForDate:day]];
+    else [(NSMutableSet*)selectedDays removeObject:[self dayForDate:day]];
+}
+- (BOOL)isDaySelected:(NSDate*)day
+{
+    return [selectedDays containsObject:[self dayForDate:day]];
+}
+- (void)setActiveSelectionRangeFrom:(NSDate*)startDate to:(NSDate*)endDate
+{
+    activeRangeStart = startDate;
+    activeRangeEnd = endDate;
+    [self redisplayDays];
 }
 
 -(NSDate*)firstDayInDisplayMonth
@@ -505,6 +591,20 @@
     return self;
 }
 
+- (void)setSelectionColor:(UIColor *)color
+{
+    [selectionColor release];
+    selectionColor = [color retain];
+    [self setNeedsDisplay];
+}
+
+- (void)setCurrentDayColor:(UIColor *)color
+{
+    [currentDayColor release];
+    currentDayColor = [color retain];
+    [self setNeedsDisplay];
+}
+
 - (void)setDayContentSize:(CGFloat)value
 {
     dayContentSize = value;
@@ -562,9 +662,9 @@
         
         if(state[i] & kCalendarStateCurrent) {
             if(state[i] & kCalendarStateSelected) {
-                CGContextSetFillColor(ctx, (CGFloat[]){25/255.0, 128/255.0, 229/255.0, 1});
+                if(selectionColor != nil) CGContextSetFillColorWithColor(ctx, [selectionColor CGColor]);
             } else {
-                CGContextSetFillColor(ctx, (CGFloat[]){133/255.0, 155/255.0, 180/255.0, 1});  
+                if(currentDayColor != nil) CGContextSetFillColorWithColor(ctx, [currentDayColor CGColor]);
             }
             
             CGContextFillRect(ctx, CGRectMake(r.origin.x - kArrowWidth, r.origin.y, r.size.width + 2 * kArrowWidth, r.size.height));
@@ -591,7 +691,7 @@
             CGContextSetShadowWithColor(ctx, CGSizeMake(0, 1), 10, [[UIColor blackColor] CGColor]);
             CGContextFillPath(ctx);
         } else if(state[i] & kCalendarStateSelected) {
-            CGContextSetFillColor(ctx, (CGFloat[]){25/255.0, 128/255.0, 229/255.0, 1});
+            if(selectionColor != nil) CGContextSetFillColorWithColor(ctx, [selectionColor CGColor]);
             BOOL leftShadow = (i>0) && ((state[i-1] & (kCalendarStateSelected|kCalendarStateCurrent))==0);
             BOOL rightShadow = (i<6) && ((state[i+1] & (kCalendarStateSelected|kCalendarStateCurrent))==0);
             CGRect r = CGRectMake(round(x), 0, round(bnds.size.width / 7.0), bnds.size.height);
@@ -653,7 +753,7 @@
         CGContextRestoreGState(ctx);
     }
 }
-- (void)setDays:(NSDate*)firstDay delta:(int)dayDelta calendar:(NSCalendar*)cal monthStart:(NSDate*)ms monthEnd:(NSDate*)me selStart:(NSDate*)selStart selEnd:(NSDate*)selEnd currentDay:(NSDate*)currentDay selectionMode:(IQCalendarSelectionMode)selectionMode formatter:(NSDateFormatter*)fmt
+- (void)setDays:(NSDate*)firstDay delta:(int)dayDelta calendar:(NSCalendar*)cal monthStart:(NSDate*)ms monthEnd:(NSDate*)me selStart:(NSDate*)selStart selEnd:(NSDate*)selEnd selDays:(NSSet*)selDays currentDay:(NSDate*)currentDay selectionMode:(IQCalendarSelectionMode)selectionMode formatter:(NSDateFormatter*)fmt
 {
     NSDateComponents* cmpnts = [[NSDateComponents alloc] init];
     cmpnts.day = dayDelta;
@@ -670,6 +770,8 @@
             if([selStart compare:dt] != NSOrderedDescending && [dt compare:selEnd] != NSOrderedDescending) {
                 state[i] |= kCalendarStateSelected;
             }
+        } else if([selDays containsObject:dt]) {
+            state[i] |= kCalendarStateSelected;
         }
         if([dt compare:ms] == NSOrderedAscending) {
             state[i] |= kCalendarStateOutsideCurrentMonth;

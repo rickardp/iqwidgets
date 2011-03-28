@@ -34,6 +34,16 @@
     STAssertEqualObjects(cv.lastDisplayedDay, isSwedish ? D(@"2011-04-03 00:00") : D(@"2011-04-02 00:00"), @"Invalid start date");
 }
 
+- (void)testBasicDateLogic
+{
+    NEED_UI
+    IQCalendarView* cv = [[[IQCalendarView alloc] initWithFrame:CGRectMake(0,0,0,0)] autorelease];
+    STAssertEqualObjects([cv dayForDate:D(@"2011-03-06 13:24")], D(@"2011-03-06 00:00"), @"Failed start-of-day");
+    NSMutableSet* s = [NSMutableSet set];
+    [s addObject:[cv dayForDate:D(@"2011-03-06 13:24")]];
+    STAssertTrue([s containsObject:D(@"2011-03-06 00:00")], @"Date not suitable in set");
+}
+
 @end
 
 

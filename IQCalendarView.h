@@ -32,10 +32,12 @@ typedef enum _IQCalendarSelectionMode {
 @interface IQCalendarView : UIView {
     UIColor* tintColor, *selectionColor, *headerTextColor;
     UIView* header;
-    
+    BOOL needsDayRedisplay;
     NSCalendar* calendar;
     NSDate* currentDay, *displayDate;
     NSDate* selectionStart, *selectionEnd;
+    NSDate* activeRangeStart, *activeRangeEnd;
+    NSSet* selectedDays;
     CGPoint dragStart;
     BOOL inDrag;
     IQCalendarArea* calendarArea;
@@ -52,6 +54,7 @@ typedef enum _IQCalendarSelectionMode {
 @property (nonatomic, retain) UIColor* tintColor;
 @property (nonatomic, retain) UIColor* selectionColor;
 @property (nonatomic, retain) UIColor* headerTextColor;
+@property (nonatomic, retain) UIColor* currentDayColor;
 
 @property (nonatomic, retain) NSCalendar* calendar;
 @property (nonatomic) BOOL showCurrentDay;
@@ -62,6 +65,10 @@ typedef enum _IQCalendarSelectionMode {
 @property (nonatomic) IQCalendarSelectionMode selectionMode;
 
 @property (nonatomic, retain) UIFont* dayFont;
+
+@property (nonatomic, readonly) NSDate* selectionStart;
+@property (nonatomic, readonly) NSDate* selectionEnd;
+@property (nonatomic, readonly) NSSet* selectedDays;
 
 #pragma mark User interaction
 
@@ -83,6 +90,13 @@ typedef enum _IQCalendarSelectionMode {
 // Sets the selection interval
 - (void)setSelectionIntervalFrom:(NSDate*)startDate to:(NSDate*)endDate animated:(BOOL)animated;
 
+- (void)setActiveSelectionRangeFrom:(NSDate*)startDate to:(NSDate*)endDate;
+
+- (void)clearSelection;
+
+- (void)setSelected:(BOOL)selected forDay:(NSDate*)day;
+- (BOOL)isDaySelected:(NSDate*)day;
+
 @property (nonatomic, retain) NSDate* currentDay;
 @property (nonatomic, readonly) NSDate* firstDayInDisplayMonth;
 @property (nonatomic, readonly) NSDate* lastDayInDisplayMonth;
@@ -90,6 +104,8 @@ typedef enum _IQCalendarSelectionMode {
 @property (nonatomic, readonly) NSDate* lastDisplayedDay;
 @property (nonatomic, readonly) NSDate* firstDayInNextMonth;
 @property (nonatomic, readonly) NSDate* lastDayInPreviousMonth;
+
+- (NSDate*)dayForDate:(NSDate*)date;
 
 @end
 
