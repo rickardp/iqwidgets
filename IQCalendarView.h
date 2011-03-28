@@ -36,8 +36,12 @@ typedef enum _IQCalendarSelectionMode {
     NSCalendar* calendar;
     NSDate* currentDay, *displayDate;
     NSDate* selectionStart, *selectionEnd;
+    CGPoint dragStart;
+    BOOL inDrag;
     IQCalendarArea* calendarArea;
-    IQCalendarRow* rows[10];
+    IQCalendarRow* rows[9];
+    CGFloat dayContentSize;
+    NSDateFormatter* dayFormatter;
 }
 
 #pragma mark Appearance
@@ -50,6 +54,21 @@ typedef enum _IQCalendarSelectionMode {
 @property (nonatomic, retain) UIColor* headerTextColor;
 
 @property (nonatomic, retain) NSCalendar* calendar;
+@property (nonatomic) BOOL showCurrentDay;
+
+// The vertical space reserved below each day number label for extra content
+@property (nonatomic) CGFloat dayContentSize;
+
+@property (nonatomic) IQCalendarSelectionMode selectionMode;
+
+@property (nonatomic, retain) UIFont* dayFont;
+
+#pragma mark User interaction
+
+// Returns the date associated with the point at which the specified touch occurred.
+- (NSDate*)dateFromTouch:(UITouch*)touch;
+// Returns the date associated with a certain point relative to the calendar view
+- (NSDate*)dateFromPoint:(CGPoint)point;
 
 #pragma mark Date navigation
 
@@ -58,14 +77,19 @@ typedef enum _IQCalendarSelectionMode {
 
 - (void)displayDay:(NSDate*)day animated:(BOOL)animated;
 
+- (void)displayNextMonth;
+- (void)displayPreviousMonth;
+
 // Sets the selection interval
-- (void) setSelectionIntervalFrom:(NSDate*)startDate to:(NSDate*)endDate animated:(BOOL)animated;
+- (void)setSelectionIntervalFrom:(NSDate*)startDate to:(NSDate*)endDate animated:(BOOL)animated;
 
 @property (nonatomic, retain) NSDate* currentDay;
 @property (nonatomic, readonly) NSDate* firstDayInDisplayMonth;
 @property (nonatomic, readonly) NSDate* lastDayInDisplayMonth;
 @property (nonatomic, readonly) NSDate* firstDisplayedDay;
 @property (nonatomic, readonly) NSDate* lastDisplayedDay;
+@property (nonatomic, readonly) NSDate* firstDayInNextMonth;
+@property (nonatomic, readonly) NSDate* lastDayInPreviousMonth;
 
 @end
 

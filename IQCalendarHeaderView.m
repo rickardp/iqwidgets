@@ -19,13 +19,26 @@
 #import "IQCalendarHeaderView.h"
 #import <QuartzCore/QuartzCore.h>
 
+NSString* IQLocalizationFormatWeekNumber(int weekNumber)
+{
+    const char* d = [[[NSLocale currentLocale] localeIdentifier] UTF8String];
+    if(d == nil || strlen(d) < 2) d = "en_US";
+    if(d[0] == 's' && d[1] == 'v') {
+        return [NSString stringWithFormat:@"v%d", weekNumber];
+    } else if(d[0] == 'd' && d[1] == 'e') {
+        return [NSString stringWithFormat:@"W%d", weekNumber];
+    } else {
+        return [NSString stringWithFormat:@"w%d", weekNumber];
+    }
+}
+
 @interface UIArrowView : UIView {
 }
 @property (nonatomic) BOOL left;
 @end
 
 @implementation IQCalendarHeaderView
-@synthesize titleLabel;
+@synthesize titleLabel, delegate;
 
 #pragma mark Initialization
 
@@ -36,25 +49,30 @@
     [self addSubview:border];
     border.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
     border.backgroundColor = [UIColor blackColor];
-    titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(40, 5, bd.size.width - 80, 20)];
+    titleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0,0,0,0)];
     titleLabel.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
     titleLabel.backgroundColor = [UIColor clearColor];
     titleLabel.textAlignment = UITextAlignmentCenter;
     titleLabel.font = [UIFont boldSystemFontOfSize:18.0];
     titleLabel.shadowColor = [UIColor whiteColor];
-    titleLabel.shadowOffset = CGSizeMake(0, -1);
-    titleLabel.text = @"December 2011";
-    leftArrow = [[UIArrowView alloc] initWithFrame:CGRectMake(0, 0, bd.size.height, bd.size.height)];
-    rightArrow = [[UIArrowView alloc] initWithFrame:CGRectMake(bd.size.width-bd.size.height, 0, bd.size.height, bd.size.height)];
+    titleLabel.shadowOffset = CGSizeMake(0, 1);
+    titleLabel.contentMode = UIViewContentModeTop;
+    leftArrow = [[UIArrowView alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    rightArrow = [[UIArrowView alloc] initWithFrame:CGRectMake(0,0,0,0)];
     leftArrow.autoresizingMask = UIViewAutoresizingFlexibleRightMargin;
     rightArrow.autoresizingMask = UIViewAutoresizingFlexibleLeftMargin;
+    self.displayArrows = NO;
     ((UIArrowView*)leftArrow).left = YES;
     ((UIArrowView*)rightArrow).left = NO;
     [self addSubview:leftArrow];
     [self addSubview:rightArrow];
     [self addSubview:titleLabel];
     titleFormatter = [[NSDateFormatter alloc] init];
-    [titleFormatter setDateFormat:@"YYYY"];
+    [titleFormatter setDateFormat:@"MMM"];
+    itemFormatter = [[NSDateFormatter alloc] init];
+    [itemFormatter setDateFormat:@"D"];
+    cornerFormatter = [[NSDateFormatter alloc] init];
+    [cornerFormatter setDateFormat:@"YYYY"];
 }
 
 - (id)initWithFrame:(CGRect)frame
@@ -84,8 +102,59 @@
 
 - (void)dealloc
 {
+    [startDate release];
+    [itemFormatter release];
     [titleFormatter release];
+    [cornerFormatter release];
+    [titleLabel release];
+    for(int i = 0; i < 16; i++) {
+        [itemLabels[i] release];
+    }
+    [leftArrow release];
+    [rightArrow release];
+    [border release];
     [super dealloc];
+}
+
+#pragma mark Layout
+
+- (void)updateLabels
+{
+    for(int i=0; i < 16; i++) {
+        if(i < numItems) {
+            if(itemLabels[i] == nil) {
+                itemLabels[i] = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 0, 0)];
+                [self addSubview:itemLabels[i]];
+                itemLabels[i].textAlignment = UITextAlignmentCenter;                
+                itemLabels[i].contentMode = UIViewContentModeBottom;
+                itemLabels[i].font = [UIFont boldSystemFontOfSize:10];
+                itemLabels[i].shadowOffset = CGSizeMake(0, 1);
+                itemLabels[i].shadowColor = [UIColor whiteColor];
+                itemLabels[i].backgroundColor = [UIColor clearColor];
+            }
+            itemLabels[i].hidden = NO;
+            itemLabels[i].text = [itemFormatter stringFromDate:[startDate dateByAddingTimeInterval:items[i].timeOffset]];
+        } else {
+            itemLabels[i].hidden = YES;
+        }
+    }
+    [self setNeedsLayout];
+}
+
+- (void)layoutSubviews
+{
+    CGRect r = self.bounds;
+    CGSize textSize = [@"Gg" sizeWithFont:titleLabel.font constrainedToSize:CGSizeMake(1000, 1000) lineBreakMode:UILineBreakModeClip];
+    if(displayArrows) {
+        leftArrow.frame = CGRectMake(0, 0, r.size.height, r.size.height);
+        rightArrow.frame = CGRectMake(r.size.width-r.size.height, 0, r.size.height, r.size.height);
+        titleLabel.frame = CGRectMake(r.size.height, 5, r.size.width-2*r.size.height, textSize.height);
+    } else {
+        titleLabel.frame = CGRectMake(0, 5, r.size.width, textSize.height);
+    }
+    for(int i=0; i < numItems; i++) {
+        itemLabels[i].frame = CGRectMake(round(i*r.size.width/numItems), r.size.height-20, round(r.size.width/numItems), 20);
+    }
 }
 
 #pragma mark Initialization
@@ -107,39 +176,70 @@
     border.backgroundColor = [UIColor colorWithRed:colors[8] green:colors[9] blue:colors[10] alpha:1];
 }
 
-- (void)setTextColor:(UIColor *)text
-{
-    titleLabel.textColor = text;
-}
-
-- (void)updateLabels
-{
-    
-}
-
 - (void)setTitleCalendarUnits:(NSCalendarUnit)units
 {
     titleCalendarUnits = units;
     if(units & NSYearCalendarUnit) {
         if(units & NSMonthCalendarUnit) {
-            [titleFormatter setDateFormat:@"MMMM YYYY"];
+            [titleFormatter setDateFormat:@"MMMM yyyy"];
         } else {
-            [titleFormatter setDateFormat:@"YYYY"];
+            [titleFormatter setDateFormat:@"yyyy"];
         }
+    } else if(units & NSMonthCalendarUnit) {
+        [titleFormatter setDateFormat:@"MMMM"];        
     }
     [self updateLabels];
 }
 - (void)setCornerCalendarUnits:(NSCalendarUnit)units
 {
-    
+    titleCalendarUnits = units;
+    if(units & NSYearCalendarUnit) {
+        if(units & NSMonthCalendarUnit) {
+            [cornerFormatter setDateFormat:@"MMMM yyyy"];
+        } else {
+            [cornerFormatter setDateFormat:@"yyyy"];
+        }
+    } else if(units & NSMonthCalendarUnit) {
+        [cornerFormatter setDateFormat:@"MMMM"];        
+    }
+    [self updateLabels];
 }
 - (void)setItemCalendarUnits:(NSCalendarUnit)units
 {
-    
+    itemCalendarUnits = units;
+    if(units & NSDayCalendarUnit) {
+        if(units & NSWeekdayCalendarUnit) {
+            [itemFormatter setDateFormat:@"EEE d"];
+        } else {
+            [itemFormatter setDateFormat:@"d"];
+        }
+    } else if(units & NSWeekdayCalendarUnit) {
+        [itemFormatter setDateFormat:@"EEE"];
+    } else if(units & NSWeekCalendarUnit) {
+        [itemFormatter setDateFormat:@"w"];
+    }
+    [self updateLabels];
 }
-- (void)setItems:(const IQCalendarHeaderItem*)items count:(NSUInteger)count cornerWidth:(CGFloat)cornerWidth startTime:(NSDate*)time titleOffset:(NSTimeInterval)offset animated:(BOOL)animated
+- (void)setItems:(const IQCalendarHeaderItem*)newItems count:(NSUInteger)count cornerWidth:(CGFloat)cornerWidth startTime:(NSDate*)time titleOffset:(NSTimeInterval)offset animated:(BOOL)animated
 {
     titleLabel.text = [titleFormatter stringFromDate:[time dateByAddingTimeInterval:offset]];
+    if(count > 16) count = 16;
+    memcpy(items, newItems, count * sizeof(IQCalendarHeaderItem));
+    numItems = count;
+    [startDate release];
+    startDate = [time copy];
+    [self updateLabels];
+}
+
+- (void)didTapNextPrev:(UIView*)np
+{
+    if([delegate respondsToSelector:@selector(headerView:didReceiveInteraction:)]) {
+        if(np == leftArrow) {
+            [delegate headerView:self didReceiveInteraction:IQCalendarHeaderViewUserInteractionPrev];
+        } else if(np == rightArrow) {
+            [delegate headerView:self didReceiveInteraction:IQCalendarHeaderViewUserInteractionNext];
+        }
+    }
 }
 
 #pragma mark Appearance
@@ -154,6 +254,21 @@
     displayArrows = value;
     leftArrow.hidden = !value;
     rightArrow.hidden = !value;
+}
+
+- (UIColor*)textColor
+{
+    return textColor;
+}
+
+- (void)setTextColor:(UIColor *)value
+{
+    [textColor release];
+    textColor = [value retain];
+    titleLabel.textColor = value;
+    for(int i = 0; i < 16; i++) {
+        itemLabels[i].textColor = value;
+    }
 }
 
 @end
@@ -182,12 +297,22 @@
     CGContextMoveToPoint(ctx, round((bnds.size.width-width)*.5)+.5, dy+round(bnds.size.height * .5)+.5);
     CGContextAddLineToPoint(ctx, round((bnds.size.width+width)*.5)+.5, dy+round((bnds.size.height-height) * .5)+.5);
     CGContextAddLineToPoint(ctx, round((bnds.size.width+width)*.5)+.5, dy+round((bnds.size.height+height) * .5)+.5);
-    CGContextSetFillColor(ctx, (CGFloat[]){0,0,0,1});
+    if([self.superview respondsToSelector:@selector(textColor)]) {
+        CGContextSetFillColorWithColor(ctx, [[(id)self.superview textColor] CGColor]);
+    }
     CGContextFillPath(ctx);
     CGContextMoveToPoint(ctx, (bnds.size.width-width)*.5+1, dy+bnds.size.height * .5+1);
     CGContextAddLineToPoint(ctx, (bnds.size.width+width)*.5+1, dy+(bnds.size.height+height) * .5+1);
     CGContextSetStrokeColor(ctx, (CGFloat[]){1,1,1,1});
     CGContextStrokePath(ctx);
-    
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if(touches.count == 1) {
+        if([self.superview respondsToSelector:@selector(didTapNextPrev:)]) {
+            [(id)self.superview didTapNextPrev:self];
+        }
+    }
 }
 @end

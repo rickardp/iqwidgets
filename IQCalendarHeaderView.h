@@ -18,14 +18,29 @@
 
 #import <UIKit/UIKit.h>
 
+extern NSString* IQLocalizationFormatWeekNumber(int weekNumber);
+
 typedef struct _IQCalendarHeaderItem {
     CGFloat x;
     CGFloat width;
     NSTimeInterval timeOffset;
 } IQCalendarHeaderItem;
 
+typedef enum _IQCalendarHeaderViewUserInteraction {
+    IQCalendarHeaderViewUserInteractionHeader,
+    IQCalendarHeaderViewUserInteractionNext,
+    IQCalendarHeaderViewUserInteractionPrev
+} IQCalendarHeaderViewUserInteraction;
+
+@protocol IQCalendarHeader;
+
+@protocol IQCalendarHeaderViewDelegate
+@optional
+- (void) headerView:(UIView<IQCalendarHeader>*)v didReceiveInteraction:(IQCalendarHeaderViewUserInteraction)interaction;
+@end
+
 // Common interface for headers for IQScheduleView and IQCalendarView
-@protocol IQCalendarHeaderDelegate <NSObject>
+@protocol IQCalendarHeader <NSObject>
 @optional
 - (void)setTintColor:(UIColor*)tintColor;
 - (void)setTextColor:(UIColor*)textColor;
@@ -36,22 +51,28 @@ typedef struct _IQCalendarHeaderItem {
 - (void)setItems:(const IQCalendarHeaderItem*)items count:(NSUInteger)count cornerWidth:(CGFloat)cornerWidth startTime:(NSDate*)time titleOffset:(NSTimeInterval)offset animated:(BOOL)animated;
 @end
 
-@interface IQCalendarHeaderView : UIView<IQCalendarHeaderDelegate> {
+@interface IQCalendarHeaderView : UIView<IQCalendarHeader> {
     NSDateFormatter* titleFormatter;
+    NSDateFormatter* itemFormatter;
+    NSDateFormatter* cornerFormatter;
     NSCalendarUnit titleCalendarUnits;
     NSCalendarUnit cornerCalendarUnits;
     NSCalendarUnit itemCalendarUnits;
     IQCalendarHeaderItem items[16];
+    UILabel* itemLabels[16];
     NSUInteger numItems;
     UIView* border;
     UILabel* titleLabel;
     UIView* leftArrow, *rightArrow;
     BOOL displayArrows;
+    UIColor* textColor;
+    NSDate* startDate;
 }
 
 @property (nonatomic, readonly) UILabel* titleLabel;
+@property (nonatomic, retain) NSObject<IQCalendarHeaderViewDelegate>* delegate;
 
 #pragma mark Appearance
 @property (nonatomic) BOOL displayArrows;
-
+@property (nonatomic, retain) UIColor* textColor;
 @end

@@ -12,6 +12,7 @@
 #import <rfb/rfb.h>
 
 static IQScreenRecorder* _default_IQScreenRecorder = nil;
+extern CGImageRef UIGetScreenImage();
 
 @interface IQScreenRecorder (PrivateMethods)
 - (void) startCapturing;
@@ -112,7 +113,6 @@ static IQScreenRecorder* _default_IQScreenRecorder = nil;
     }
 }
 @end
-
 
 @implementation IQScreenRecorder (PrivateMethods)
 
