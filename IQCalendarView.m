@@ -185,16 +185,19 @@
                 selectionStart = [d retain];
             }
             selectionEnd = [d retain];
+            [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionRangeStart) {
             if(selectionEnd == nil || [d compare:selectionEnd] == NSOrderedDescending) {
                 selectionEnd = [d retain];
             }
             selectionStart = [d retain];
+            [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionMulti) {
             [self setSelected:![self isDaySelected:d] forDay:d];
         } else {
             selectionStart = [d retain];
             selectionEnd = [d retain];
+            [self sendActionsForControlEvents:UIControlEventValueChanged];
         }
         [self redisplayDays];
     }
@@ -222,19 +225,23 @@
                 selectionStart = [d0 retain];
                 selectionEnd = [d retain];
             }
+            [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionSingle) {
             selectionStart = [d retain];
             selectionEnd = [d retain];
+            [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionRangeEnd) {
             if([d compare:selectionStart] == NSOrderedAscending) {
                 selectionStart = [d retain];
             }
             selectionEnd = [d retain];
+            [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionRangeStart) {
             if([d compare:selectionEnd] == NSOrderedDescending) {
                 selectionEnd = [d retain];
             }
             selectionStart = [d retain];
+            [self sendActionsForControlEvents:UIControlEventValueChanged];
         }
         [self redisplayDays];
     }
@@ -365,8 +372,6 @@
 }
 
 #pragma mark Date navigation
-
-
 - (void)setCurrentDay:(NSDate*)date display:(BOOL)display animated:(BOOL)animated
 {
     [currentDay release];
@@ -479,6 +484,7 @@
     [selectionEnd release];
     if(endDate == nil) endDate = startDate;
     selectionEnd = [endDate retain];
+    [self sendActionsForControlEvents:UIControlEventValueChanged];
     [self redisplayDays];
 }
 
@@ -502,14 +508,33 @@
 - (void)setSelected:(BOOL)selected forDay:(NSDate*)day
 {
     if(selectedDays == nil) {
-        if(!selected) return;
+        if(!selected && (selectionStart == nil || selectionEnd == nil)) return;
         selectedDays = [[NSMutableSet set] retain];
     }
+    if(selectionStart != nil && selectionEnd != nil) {
+        NSDate* d = [self dayForDate:selectionStart];
+        NSDateComponents* cmpnts = [[[NSDateComponents alloc] init] autorelease];
+        cmpnts.day = 1;
+        while([d compare:selectionEnd] != NSOrderedDescending) {
+            [(NSMutableSet*)selectedDays addObject:d];
+            d = [calendar dateByAddingComponents:cmpnts toDate:d options:0];
+        }
+    }
+    [selectionStart release];
+    selectionStart = nil;
+    [selectionEnd release];
+    selectionEnd = nil;
     if(selected) [(NSMutableSet*)selectedDays addObject:[self dayForDate:day]];
     else [(NSMutableSet*)selectedDays removeObject:[self dayForDate:day]];
+    [self sendActionsForControlEvents:UIControlEventValueChanged];
+    [self redisplayDays];
 }
 - (BOOL)isDaySelected:(NSDate*)day
 {
+    if(selectionStart != nil && selectionEnd != nil) {
+        if([selectionStart compare:day] != NSOrderedDescending && [day compare:selectionEnd] != NSOrderedDescending)
+            return YES;
+    }
     return [selectedDays containsObject:[self dayForDate:day]];
 }
 - (void)setActiveSelectionRangeFrom:(NSDate*)startDate to:(NSDate*)endDate

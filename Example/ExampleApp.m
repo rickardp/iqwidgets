@@ -98,24 +98,31 @@ struct {
             break;
     }
 }
+
+- (void) testMe:(id)sender {
+    NSLog(@"Testing control event generation from %@", sender);
+}
 @end
 
 @implementation ExampleAppDelegate
 @synthesize window;
 @synthesize viewController;
+
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
     
     // Override point for customization after app launch    
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
-    //[[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
+    [[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
+    //[[IQScreenRecorder screenRecorder] performSelector:@selector(startMirroringScreen) withObject:NULL afterDelay:2000];
+    [[IQScreenRecorder screenRecorder] startMirroringScreen];
 }
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     
 }
 - (void)applicationWillResignActive:(UIApplication *)application {
     //NSLog(@"I am resigning");
-    //[[IQScreenRecorder screenRecorder] stop];
+    [[IQScreenRecorder screenRecorder] stopRecording];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -188,6 +195,7 @@ static UIViewController* CreateViewController(int idx) {
                 UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
                 vc.toolbarItems = [NSArray arrayWithObjects:sys,[[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease],sys,nil];
             } else {
+                [cal addTarget:cal action:@selector(testMe:) forControlEvents:UIControlEventValueChanged];
                 cal.headerTextColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.7 alpha:1.0];
                 cal.selectionMode = IQCalendarSelectionMulti;
                 [cal setActiveSelectionRangeFrom:cal.firstDayInDisplayMonth to:cal.lastDayInDisplayMonth];

@@ -29,7 +29,7 @@ typedef enum _IQCalendarSelectionMode {
 @class IQCalendarArea;
 @class IQCalendarRow;
 
-@interface IQCalendarView : UIView {
+@interface IQCalendarView : UIControl {
     UIColor* tintColor, *selectionColor, *headerTextColor;
     UIView* header;
     BOOL needsDayRedisplay;

@@ -54,7 +54,7 @@ extern CGImageRef UIGetScreenImage();
         assetWriter = nil;
         return nil;
     }
-    input = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:[NSDictionary dictionaryWithObjectsAndKeys:AVVideoCodecH264, AVVideoCodecKey, [NSNumber numberWithInt:320], AVVideoWidthKey, [NSNumber numberWithInt:480], AVVideoHeightKey, [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:1024*1024],AVVideoAverageBitRateKey,nil], AVVideoCompressionPropertiesKey, nil]];
+    input = [AVAssetWriterInput assetWriterInputWithMediaType:AVMediaTypeVideo outputSettings:[NSDictionary dictionaryWithObjectsAndKeys:AVVideoCodecH264, AVVideoCodecKey, [NSNumber numberWithInt:320], AVVideoWidthKey, [NSNumber numberWithInt:480], AVVideoHeightKey, [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithInt:100*1024*1024],AVVideoAverageBitRateKey,nil], AVVideoCompressionPropertiesKey, nil]];
     
     inputAdaptor = [[AVAssetWriterInputPixelBufferAdaptor assetWriterInputPixelBufferAdaptorWithAssetWriterInput:input sourcePixelBufferAttributes:nil] retain];
     input.expectsMediaDataInRealTime = YES;
@@ -73,8 +73,7 @@ extern CGImageRef UIGetScreenImage();
 
 - (void) stopRecording
 {
-    NSLog(@"Will now stop capturing");
-    if(screenSharing == nil) {
+    if(screenSharing == nil && !screenMirroringEnabled) {
         [self stopCapturing];
     }
     if(assetWriter != nil) {
@@ -92,7 +91,7 @@ extern CGImageRef UIGetScreenImage();
 {
     if(screenSharing != nil) return;
     rfbScreenInfoPtr rfbScreen = rfbGetScreen(NULL, NULL, 320, 480, 8, 3, 4);
-    NSLog(@"Sharing screen at %p", screenSharing);
+    NSLog(@"Sharing screen at %p", rfbScreen);
     if(rfbScreen == nil) return;
     screenSharing = rfbScreen;
     rfbScreen->desktopName = "IQWidgets DemoEnabler iOS";
@@ -105,12 +104,89 @@ extern CGImageRef UIGetScreenImage();
 
 - (void) stopSharingScreen
 {
-    if(assetWriter == nil) {
+    if(assetWriter == nil && !screenMirroringEnabled) {
         [self stopCapturing];
     }
     if(screenSharing != nil) {
         
     }
+}
+
+- (void) tryStartCreateMirror
+{
+    UIWindow* keyWindow = [[UIApplication sharedApplication] keyWindow];
+	if (keyWindow == nil) return;
+    NSLog(@"Screens: %@", [UIScreen screens]);
+    if([UIScreen screens].count > 1) {
+        UIScreen *external = [[UIScreen screens] objectAtIndex: 1];
+        NSLog(@"I have a new screen: %@", external);
+		CGSize max = CGSizeMake(0, 0);
+		UIScreenMode *maxScreenMode = nil;
+
+        for(UIScreenMode* mode in [external availableModes]) {
+			if (mode.size.width > max.width) {
+				max = mode.size;
+				maxScreenMode = mode;
+			}
+		}
+		external.currentMode = maxScreenMode;
+        screenMirroringWindow = [[UIWindow alloc] initWithFrame: CGRectMake(0,0, max.width, max.height)];
+        screenMirroringWindow.userInteractionEnabled = NO;
+        screenMirroringWindow.screen = external;
+        
+        screenMirroringView = [[UIImageView alloc] initWithFrame:CGRectMake(0,0, max.width, max.height)];
+        [screenMirroringWindow addSubview:screenMirroringView];
+        screenMirroringView.contentMode = UIViewContentModeScaleAspectFit;
+        screenMirroringWindow.backgroundColor = [UIColor blackColor];
+        
+        [keyWindow makeKeyAndVisible];        
+    } else {
+        NSLog(@"I am not doing anything until you plug in the external monitor");
+    }
+}
+
+-(void) screenDidConnectNotification: (NSNotification*) notification
+{
+	NSLog(@"Screen connected: %@", [notification object]);
+    if(!screenMirroringEnabled) return;
+	[self tryStartCreateMirror];
+    UIAlertView* alert = [[UIAlertView alloc] initWithTitle:@"Monitor plugged in" message:nil delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+}
+
+-(void) screenDidDisconnectNotification: (NSNotification*) notification
+{
+	NSLog(@"Screen disconnected: %@", [notification object]);
+    if(!screenMirroringEnabled) return;
+    UIWindow* win = screenMirroringWindow;
+    UIImageView* view = screenMirroringView;
+    screenMirroringWindow = nil;
+    screenMirroringView = nil;
+    [win release];
+    [view release];
+}
+
+-(void) screenModeDidChangeNotification: (NSNotification*) notification
+{
+	NSLog(@"Screen mode changed: %@", [notification object]);
+    if(!screenMirroringEnabled) return;
+	[self tryStartCreateMirror];
+}
+
+- (void) startMirroringScreen
+{
+    NSLog(@"Will start mirroring the screen");
+    screenMirroringEnabled = YES;
+    [self tryStartCreateMirror];
+    [self startCapturing];
+}
+
+- (void) stopMirroringScreen
+{
+    if(assetWriter == nil && screenSharing != nil) {
+        [self stopCapturing];
+    }
+    screenMirroringEnabled = NO;
 }
 @end
 
@@ -231,7 +307,24 @@ extern CGImageRef UIGetScreenImage();
 
 - (void) stopCapturing
 {
+    NSLog(@"Will now stop capturing");
     [displayLink invalidate];
     displayLink = nil;
+}
+
+- (id) init {
+    self = [super init];
+    if(self) {
+        screenSize = [[UIScreen mainScreen] bounds].size;
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(screenDidConnectNotification:) name: UIScreenDidConnectNotification object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(screenDidDisconnectNotification:) name: UIScreenDidDisconnectNotification object: nil];
+        [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(screenModeDidChangeNotification:) name: UIScreenModeDidChangeNotification object: nil];
+    }
+    return self;
+}
+
+- (void) dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver: self];
+    [super dealloc];
 }
 @end

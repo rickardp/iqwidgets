@@ -6,7 +6,7 @@
 //  Please be aware that this class is dependent on GPL-licensed code in Contrib/
 //
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
 @interface IQScreenRecorder : NSObject {
@@ -16,6 +16,10 @@
     AVAssetWriterInputPixelBufferAdaptor* inputAdaptor;
     BOOL startedWriting;
     void* screenSharing;
+    UIWindow* screenMirroringWindow;
+    UIImageView* screenMirroringView;
+    BOOL screenMirroringEnabled;
+    CGSize screenSize;
 }
 
 + (IQScreenRecorder*) screenRecorder;
@@ -25,5 +29,9 @@
 
 - (void) startSharingScreenWithPort:(int)port password:(NSString*)password;
 - (void) stopSharingScreen;
+
+
+- (void) startMirroringScreen;
+- (void) stopMirroringScreen;
 
 @end
