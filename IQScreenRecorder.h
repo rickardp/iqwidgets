@@ -9,6 +9,8 @@
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
 
+typedef struct {int width; int height;} IntSize;
+
 @interface IQScreenRecorder : NSObject {
     AVAssetWriter* assetWriter;
     CADisplayLink* displayLink;
@@ -19,7 +21,7 @@
     UIWindow* screenMirroringWindow;
     UIImageView* screenMirroringView;
     BOOL screenMirroringEnabled;
-    CGSize screenSize;
+    IntSize screenSize;
 }
 
 + (IQScreenRecorder*) screenRecorder;

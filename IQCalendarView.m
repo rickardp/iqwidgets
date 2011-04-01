@@ -61,6 +61,7 @@
 @synthesize tintColor, headerTextColor, selectionColor, currentDayColor, textColor, selectedTextColor;
 @synthesize calendar, currentDay, dayContentSize, selectionMode, showCurrentDay;
 @synthesize selectionStart, selectionEnd, selectedDays;
+@synthesize contentDelegate;
 
 #pragma mark Initialization
 
@@ -149,6 +150,7 @@
 
 - (void)dealloc
 {
+    self.contentDelegate = nil;
     [self clearSelection];
     [dayFormatter release];
     for(int i=0; i<10; i++) {
@@ -343,7 +345,7 @@
 - (void)setDayContentSize:(CGFloat)value
 {
     dayContentSize = value;
-    for(int i=0; i<10; i++) {
+    for(int i=0; i<9; i++) {
         [rows[i] setDayContentSize:value];
     }
 }
@@ -355,7 +357,7 @@
 
 - (void)setDayFont:(UIFont*)value
 {
-    for(int i=0; i<10; i++) {
+    for(int i=0; i<9; i++) {
         [rows[i] setDayFont:value];
     }
 }
@@ -387,8 +389,23 @@
 {
     if(needsDayRedisplay) {
         needsDayRedisplay = NO;
+        if([contentDelegate respondsToSelector:@selector(calendarViewWillLayoutRows:)]) {
+            [contentDelegate calendarViewWillLayoutRows:self];
+        }
         for(int i=0; i<5; i++) {
             [rows[i] setDays:self.firstDisplayedDay delta:7*i calendar:calendar monthStart:self.firstDayInDisplayMonth monthEnd:self.lastDayInDisplayMonth selStart:selectionStart selEnd:selectionEnd  selDays:selectedDays currentDay:showCurrentDay?currentDay:nil selectionMode:selectionMode formatter:dayFormatter];
+            CGRect b = rows[i].bounds;
+            b.origin.y += dayContentSize;
+            b.size.height -= dayContentSize;
+            NSDateComponents* cmpnts = [[[NSDateComponents alloc] init] autorelease];
+            cmpnts.day = 7*i;
+            NSDate* first = [calendar dateByAddingComponents:cmpnts toDate:self.firstDisplayedDay options:0];
+            cmpnts.day += 7;
+            NSDate* last = [calendar dateByAddingComponents:cmpnts toDate:self.firstDisplayedDay options:0];
+            [contentDelegate calendarView:self layoutRow:rows[i] startDate:first endDate:last contentRect:b];
+        }
+        if([contentDelegate respondsToSelector:@selector(calendarViewDidLayoutRows:)]) {
+            [contentDelegate calendarViewDidLayoutRows:self];
         }
     }
 }
@@ -453,7 +470,7 @@
                 } else {
                     for(int i=0; i<5; i++) {
                         rows[i].frame = CGRectMake(0, ht*i, r.size.width, ht);
-                        rows[i+5].frame = CGRectMake(0, ht*(i-4), r.size.width, ht);
+                        if(i<4) rows[i+5].frame = CGRectMake(0, ht*(i-4), r.size.width, ht);
                     }
                 }
                 [UIView commitAnimations];

@@ -28,6 +28,15 @@ typedef enum _IQCalendarSelectionMode {
 
 @class IQCalendarArea;
 @class IQCalendarRow;
+@class IQCalendarView;
+
+@protocol IQCalendarContentDelegate <NSObject>
+@required
+- (void) calendarView:(IQCalendarView*)view layoutRow:(UIView*)rowView startDate:(NSDate*)startDate endDate:(NSDate*)endDate contentRect:(CGRect)contentRect;
+@optional
+- (void) calendarViewWillLayoutRows:(IQCalendarView*)view;
+- (void) calendarViewDidLayoutRows:(IQCalendarView*)view;
+@end
 
 @interface IQCalendarView : UIControl {
     UIColor* tintColor, *selectionColor, *headerTextColor;
@@ -74,6 +83,10 @@ typedef enum _IQCalendarSelectionMode {
 @property (nonatomic, readonly) NSDate* selectionStart;
 @property (nonatomic, readonly) NSDate* selectionEnd;
 @property (nonatomic, readonly) NSSet* selectedDays;
+
+#pragma mark Application content
+
+@property (nonatomic, retain) id<IQCalendarContentDelegate> contentDelegate;
 
 #pragma mark User interaction
 

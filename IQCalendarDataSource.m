@@ -98,7 +98,9 @@
 - (void) setSelectorForText:(SEL)textSelector
 {
     [self setCallbackForText:^(id item) {
-        return [item performSelector:textSelector withObject:item];
+        if([item respondsToSelector:textSelector]) {
+            return [item performSelector:textSelector withObject:item];
+        } else return nil;
     }];
 }
 

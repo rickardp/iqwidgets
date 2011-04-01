@@ -218,6 +218,13 @@ const CGFloat kDayViewPadding = 0.0;
     for(int i=1; i<= 23; i++) {
         hours[i].frame = CGRectMake(0, 12+kDayViewPadding+i*ht/24.0f, 50, 20);
     }
+    for(IQScheduleViewDay* day in days) {
+        CGRect r = day.contentView.frame;
+        if(r.size.height != height) {
+            r.size.height = height;
+            day.contentView.frame = r;
+        }
+    }
 }
 
 - (void)didMoveToSuperview
@@ -252,10 +259,10 @@ const CGFloat kDayViewPadding = 0.0;
         hdr.shadowOffset = CGSizeMake(0, 1);
         hdr.hidden = YES;
         [self.columnHeaderView addSubview:hdr];
-        CGSize ca = self.contentSize;
-        NSLog(@"Creating day with %f", ca.height);
-        IQScheduleDayView* dayContent = [[IQScheduleDayView alloc] initWithFrame:CGRectMake(0, 0, 120, ca.height)];
+        IQScheduleDayView* dayContent = [[IQScheduleDayView alloc] initWithFrame:CGRectMake(0, 0, 120, 100)];
         dayContent.opaque = YES;
+        dayContent.clipsToBounds = YES;
+        dayContent.autoresizingMask = UIViewAutoresizingFlexibleHeight;
         dayContent.backgroundColor = self.backgroundColor;
         dayContent.darkLineColor = self.darkLineColor;
         dayContent.lightLineColor = self.lightLineColor;
@@ -348,6 +355,7 @@ const CGFloat kDayViewPadding = 0.0;
             left += width;
             i++;
         }
+        [self layoutSubviews];
         if(animated) {
             [UIView commitAnimations];
         }
@@ -468,6 +476,7 @@ const CGFloat kDayViewPadding = 0.0;
         r.size.width = ceil(width);
         [contentView setNeedsDisplay];
     }
+    //NSLog(@"Setting frm %d to %f", ti, r.size.height);
     contentView.frame = r;
     if(ti <= 0) {
         headerView.hidden = YES;
@@ -481,7 +490,6 @@ const CGFloat kDayViewPadding = 0.0;
 
 - (void) reloadDataWithSource:(IQScheduleView*)dataSource
 {
-    NSLog(@"Reloading day");
     for(UIView* view in blocks) {
         [view removeFromSuperview];
     }
@@ -490,7 +498,6 @@ const CGFloat kDayViewPadding = 0.0;
     if(dataSource == nil) return;
     CGRect bounds = contentView.bounds;
     CGFloat ht = bounds.size.height - 2 * kDayViewPadding;
-    NSLog(@"Rem: %f", ht);
     [[dataSource dataSource] enumerateEntriesUsing:^(id item, NSTimeInterval startDate, NSTimeInterval endDate) {
         CGFloat y1 = kDayViewPadding - 1 + bounds.origin.y + round(ht * (startDate - timeIndex) / dayLength);
         CGFloat y2 = kDayViewPadding + bounds.origin.y + round(ht * (endDate - timeIndex) / dayLength);
