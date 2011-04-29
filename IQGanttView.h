@@ -98,7 +98,6 @@ typedef struct _IQGanttViewTimeWindow {
     NSCalendarUnit displayCalendarUnits;
     NSMutableArray* floatingLabels;
     char weekdayLetters[8];
-    char weekPrefixChar;
     NSCalendar* cal;
     NSDateFormatter* monthNameFormatter;
 }

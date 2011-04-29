@@ -20,7 +20,7 @@
 #import "IQWidgets.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define NVIEWS 6
+#define NVIEWS 7
 struct {
 	UIView* view;
 	UITableViewCell* cell;
@@ -83,22 +83,46 @@ struct {
 }
 @end
 
+@implementation IQCalendarView (ControlExtensions)
+- (void) didSelectMode:(id) sender {
+    UISegmentedControl* ctl = sender;
+    switch(ctl.selectedSegmentIndex) {
+        case 0:
+            [self setSelectionMode:IQCalendarSelectionRange];
+            break;
+        case 1:
+            [self setSelectionMode:IQCalendarSelectionRangeStart];
+            break;
+        case 2:
+            [self setSelectionMode:IQCalendarSelectionRangeEnd];
+            break;
+    }
+}
+
+- (void) testMe:(id)sender {
+    NSLog(@"Testing control event generation from %@", sender);
+}
+@end
+
 @implementation ExampleAppDelegate
 @synthesize window;
 @synthesize viewController;
+
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
     
     // Override point for customization after app launch    
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
-    //[[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
+    [[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
+    //[[IQScreenRecorder screenRecorder] performSelector:@selector(startMirroringScreen) withObject:NULL afterDelay:2000];
+    [[IQScreenRecorder screenRecorder] startMirroringScreen];
 }
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     
 }
 - (void)applicationWillResignActive:(UIApplication *)application {
     //NSLog(@"I am resigning");
-    //[[IQScreenRecorder screenRecorder] stop];
+    [[IQScreenRecorder screenRecorder] stopRecording];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -136,16 +160,15 @@ static UIViewController* CreateViewController(int idx) {
 		case 0:
         {
             IQScheduleView* v = [[IQScheduleView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
-            UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
-            selector.segmentedControlStyle = UISegmentedControlStyleBar;
             [v setStartDate:[NSDate date] numberOfDays:1 animated:NO];
             [v setZoom:NSMakeRange(18, 22)];
+            UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Today",@"Tomorrow",@"Work week",@"Week",nil]] autorelease];
+            selector.segmentedControlStyle = UISegmentedControlStyleBar;
             selector.selectedSegmentIndex = 0;
             [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
-            UIBarButtonItem* itm = [[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease];
             UIViewController* vc = WrapInController(v);
             UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
-            vc.toolbarItems = [NSArray arrayWithObjects:sys,itm,sys,nil];
+            vc.toolbarItems = [NSArray arrayWithObjects:sys,[[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease],sys,nil];
             NSMutableSet* items = [NSMutableSet set];
             NSTimeInterval t = [[NSDate date] timeIntervalSinceReferenceDate];
             t -= 15*3600;
@@ -159,9 +182,28 @@ static UIViewController* CreateViewController(int idx) {
             return vc;
         }
 		case 1:
-            return WrapInController([[IQCalendarView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)]);
 		case 2:
+        {
+            IQCalendarView* cal = [[IQCalendarView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
+            UIViewController* vc = WrapInController(cal);
+            if(idx == 2) {
+                cal.selectionMode = IQCalendarSelectionRange;
+                UISegmentedControl* selector = [[[UISegmentedControl alloc] initWithItems:[NSArray arrayWithObjects:@"Range",@"Start",@"End",nil]] autorelease];
+                selector.segmentedControlStyle = UISegmentedControlStyleBar;
+                selector.selectedSegmentIndex = 0;
+                [selector addTarget:cal action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
+                UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
+                vc.toolbarItems = [NSArray arrayWithObjects:sys,[[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease],sys,nil];
+            } else {
+                [cal addTarget:cal action:@selector(testMe:) forControlEvents:UIControlEventValueChanged];
+                cal.headerTextColor = [UIColor colorWithRed:0.2 green:0.2 blue:0.7 alpha:1.0];
+                cal.selectionMode = IQCalendarSelectionMulti;
+                [cal setActiveSelectionRangeFrom:cal.firstDayInDisplayMonth to:cal.lastDayInDisplayMonth];
+            }
+            return vc;
+        }
 		case 3:
+		case 4:
 		{
 			IQDrilldownController* drill = [[IQDrilldownController alloc] init];
 			drill.view.backgroundColor = [UIColor viewFlipsideBackgroundColor];
@@ -183,7 +225,7 @@ static UIViewController* CreateViewController(int idx) {
 			drill.stopAtPartiallyVisibleNext = (idx == 2);
 			return drill;
 		}
-        case 4:
+        case 5:
         {
             IQScrollView* scroll = [[IQScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
             
@@ -208,7 +250,7 @@ static UIViewController* CreateViewController(int idx) {
             
             return WrapInController(scroll);
         }
-        case 5:
+        case 6:
         {
             int modo = 3;
             IQGanttView* gantt = [[IQGanttView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
@@ -247,15 +289,18 @@ static UITableViewCell* CreateCell(int idx) {
 			title = @"IQCalendarView";
 			break;
 		case 2:
-			title = @"IQDrilldownController (mode 1)";
+			title = @"IQCalendarView (range)";
 			break;
 		case 3:
+			title = @"IQDrilldownController (mode 1)";
+			break;
+		case 4:
 			title = @"IQDrilldownController (mode 2)";
 			break;
-        case 4:
+        case 5:
             title = @"IQScrollView";
             break;
-        case 5:
+        case 6:
             title = @"IQGanttView";
             break;
         case 5:

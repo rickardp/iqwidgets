@@ -20,6 +20,7 @@
 #import "IQScheduleView.h"
 #import <QuartzCore/QuartzCore.h>
 #import "IQCalendarDataSource.h"
+#import "IQCalendarHeaderView.h"
 
 @interface IQGanttView (PrivateMethods)
 - (void) setupGanttView;
@@ -307,7 +308,6 @@
 {
     self = [super initWithFrame:frame];
     if(self != nil) {
-        weekPrefixChar = 'w';
         monthNameFormatter = [[NSDateFormatter alloc] init];
         [monthNameFormatter setDateFormat:@"MMMM YYYY"];
         self.tintColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:209/255.0 alpha:1];
@@ -411,7 +411,7 @@
             }
             if(wd == fwd && displayCalendarUnits & NSWeekCalendarUnit) {
                 CGContextSetRGBFillColor(ctx, 0, 0, 0, 0.7);
-                snprintf(str, sizeof(str), "%c%d", weekPrefixChar, wk);
+                strncpy(str, [IQLocalizationFormatWeekNumber(wk) UTF8String], sizeof(str));
                 CGContextShowTextAtPoint(ctx, round(x + 3), round(r.origin.y + 0.4*r.size.height + 10), str, strlen(str));
             }
             

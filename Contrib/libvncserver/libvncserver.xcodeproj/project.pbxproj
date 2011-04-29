@@ -533,7 +533,7 @@
 		FF604877133E346D00BB74F6 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				ORGANIZATIONNAME = Jeppesen;
+				ORGANIZATIONNAME = evolvIQ;
 			};
 			buildConfigurationList = FF60487A133E346D00BB74F6 /* Build configuration list for PBXProject "libvncserver" */;
 			compatibilityVersion = "Xcode 3.2";
