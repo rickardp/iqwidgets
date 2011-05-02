@@ -303,6 +303,9 @@ static UITableViewCell* CreateCell(int idx) {
         case 6:
             title = @"IQGanttView";
             break;
+        case 5:
+            title = @"IQViewTessellation";
+            break;
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 			break;

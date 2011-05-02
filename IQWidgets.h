@@ -23,6 +23,6 @@
 #import "IQCalendarHeaderView.h"
 #import "IQGanttView.h"
 #import "IQCalendarDataSource.h"
-
+#import "IQViewTessellation.h"
 
 #import "IQScreenRecorder.h"
