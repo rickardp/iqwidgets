@@ -24,6 +24,7 @@
 		FF5E3C421354E6A90067ADEF /* IQViewTessellation.h in Headers */ = {isa = PBXBuildFile; fileRef = FF5E3C401354E6A80067ADEF /* IQViewTessellation.h */; };
 		FF5E3C431354E6A90067ADEF /* IQViewTessellation.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5E3C411354E6A80067ADEF /* IQViewTessellation.m */; };
 		FF60485E133CD49500BB74F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF60485D133CD49500BB74F6 /* QuartzCore.framework */; };
+		FF86DC56136CA25A0077805F /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF86DC55136CA25A0077805F /* OpenGLES.framework */; };
 		FF8C31E0130AFB7800A10CF0 /* IQScheduleView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C31DE130AFB7600A10CF0 /* IQScheduleView.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF8C31E1130AFB7800A10CF0 /* IQScheduleView.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31DF130AFB7600A10CF0 /* IQScheduleView.m */; };
 		FF8C31E4130AFBDB00A10CF0 /* IQCalendarView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C31E2130AFBD800A10CF0 /* IQCalendarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -65,7 +66,6 @@
 /* Begin PBXFileReference section */
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2AAC07E0554694100DB518D /* libIQWidgets.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIQWidgets.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF106C8F134336EB000DB20B /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		FF10E1C4133B8AE800783849 /* IQCalendarHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarHeaderView.h; sourceTree = "<group>"; };
 		FF10E1C5133B8AE800783849 /* IQCalendarHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQCalendarHeaderView.m; sourceTree = "<group>"; };
 		FF138B95132D5078009C01D2 /* IQGanttView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQGanttView.h; sourceTree = "<group>"; };
@@ -86,6 +86,7 @@
 		FF5E3C401354E6A80067ADEF /* IQViewTessellation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQViewTessellation.h; sourceTree = "<group>"; };
 		FF5E3C411354E6A80067ADEF /* IQViewTessellation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQViewTessellation.m; sourceTree = "<group>"; };
 		FF60485D133CD49500BB74F6 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		FF86DC55136CA25A0077805F /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		FF8C31DE130AFB7600A10CF0 /* IQScheduleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQScheduleView.h; sourceTree = "<group>"; };
 		FF8C31DF130AFB7600A10CF0 /* IQScheduleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQScheduleView.m; sourceTree = "<group>"; };
 		FF8C31E2130AFBD800A10CF0 /* IQCalendarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarView.h; sourceTree = "<group>"; };
@@ -110,6 +111,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF86DC56136CA25A0077805F /* OpenGLES.framework in Frameworks */,
 				FF24AF271327A0F300BE3723 /* CoreGraphics.framework in Frameworks */,
 				FF540ADB12A95ECA00C2C7A5 /* libIQWidgets.a in Frameworks */,
 				FF540AF512A95F1D00C2C7A5 /* UIKit.framework in Frameworks */,
@@ -147,6 +149,7 @@
 		0867D691FE84028FC02AAC07 /* IQTiledScrollView */ = {
 			isa = PBXGroup;
 			children = (
+				FF86DC55136CA25A0077805F /* OpenGLES.framework */,
 				FF60485D133CD49500BB74F6 /* QuartzCore.framework */,
 				FF24AF261327A0F300BE3723 /* CoreGraphics.framework */,
 				FF540AEC12A95EDB00C2C7A5 /* Example */,
@@ -418,11 +421,11 @@
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
-				GCC_MODEL_TUNING = G5;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				PRODUCT_NAME = IQWidgets;
 				PUBLIC_HEADERS_FOLDER_PATH = IQWidgets;
+				SKIP_INSTALL = YES;
 				TEST_AFTER_BUILD = YES;
 			};
 			name = Debug;
@@ -432,10 +435,10 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				GCC_MODEL_TUNING = G5;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				PRODUCT_NAME = IQWidgets;
 				PUBLIC_HEADERS_FOLDER_PATH = IQWidgets;
+				SKIP_INSTALL = YES;
 				TEST_AFTER_BUILD = YES;
 			};
 			name = Release;

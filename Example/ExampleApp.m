@@ -20,7 +20,7 @@
 #import "IQWidgets.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define NVIEWS 7
+#define NVIEWS 8
 struct {
 	UIView* view;
 	UITableViewCell* cell;
@@ -113,16 +113,16 @@ struct {
     // Override point for customization after app launch    
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
-    [[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
+    //[[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
     //[[IQScreenRecorder screenRecorder] performSelector:@selector(startMirroringScreen) withObject:NULL afterDelay:2000];
-    [[IQScreenRecorder screenRecorder] startMirroringScreen];
+    //[[IQScreenRecorder screenRecorder] startMirroringScreen];
 }
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     
 }
 - (void)applicationWillResignActive:(UIApplication *)application {
     //NSLog(@"I am resigning");
-    [[IQScreenRecorder screenRecorder] stopRecording];
+    //[[IQScreenRecorder screenRecorder] stopRecording];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -272,6 +272,17 @@ static UIViewController* CreateViewController(int idx) {
             }
             return WrapInController(gantt);
         }
+        case 7:
+        {
+            IQViewTessellation* tess = [[IQViewTessellation alloc] initWithFrame:CGRectMake(0, 0, 100, 100) withTilesHorizontal:8 vertical:24];
+            tess.backgroundImage = [UIImage imageNamed:@"test.png"];
+            UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(30, 120, 140, 30)];
+            lbl.text = @"Hello, GL World!";
+            [tess addSubview:lbl];
+            UISwitch* sw = [[UISwitch alloc] initWithFrame:CGRectMake(180, 180, 100, 40)];
+            [tess addSubview:sw];
+            return WrapInController(tess);
+        }
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 			break;
@@ -303,7 +314,7 @@ static UITableViewCell* CreateCell(int idx) {
         case 6:
             title = @"IQGanttView";
             break;
-        case 5:
+        case 7:
             title = @"IQViewTessellation";
             break;
 		default:

@@ -15,14 +15,33 @@ typedef struct {
 
 #define IQMakePoint3(x,y,z) ((IQPoint3){(x),(y),(z)})
 
-typedef CGFloat (^IQViewTesselationTransformation)(CGPoint tile, CGSize size, CGFloat animationPosition);
+typedef IQPoint3 (^IQViewTesselationTransformation)(CGPoint pt, CGFloat animationPosition);
 
-@interface IQViewTessellation : NSObject {
-    
+@class CADisplayLink;
+@class EAGLContext;
+@class CALayer;
+
+@interface IQViewTessellation : UIView {
+    NSUInteger htiles, vtiles, vpw, vph;
+    //id *tiles;
+    EAGLContext *context;
+    UIImage* backgroundImage;
+    IQViewTesselationTransformation transformation;
+    CGFloat animationPosition;
+    CADisplayLink* displayLink;
+    unsigned int _fb, _cb, _db, _tex;
+    float clearColor[4];
+    CALayer* innerLayer;
+    BOOL doRenderSubviews;
+    float scale;
 }
 
 -(id)initWithFrame:(CGRect)frame withTilesHorizontal:(NSUInteger)htiles vertical:(NSUInteger)vtiles;
 
-@property (nonatomic, retain) IQViewTesselationTransformation transformation;
+@property (nonatomic, retain) UIImage* backgroundImage;
+@property (nonatomic, copy) IQViewTesselationTransformation transformation;
+
+- (void) startAnimation;
+- (void) stopAnimation;
 
 @end

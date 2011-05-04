@@ -25,4 +25,3 @@
 #import "IQCalendarDataSource.h"
 #import "IQViewTessellation.h"
 
-#import "IQScreenRecorder.h"
