@@ -104,6 +104,17 @@ struct {
 }
 @end
 
+@implementation UILabel (ControlExtensions)
+
+- (void) exampleUpdateText {
+    static int toggleCount = 0;
+    NSLog(@"Toggled switch");
+    self.text = [NSString stringWithFormat:@"Toggle is %s (%d)", (toggleCount&1)?"ON":"OFF", toggleCount];
+    toggleCount++;
+}
+
+@end
+
 @implementation ExampleAppDelegate
 @synthesize window;
 @synthesize viewController;
@@ -278,8 +289,15 @@ static UIViewController* CreateViewController(int idx) {
             tess.backgroundImage = [UIImage imageNamed:@"test.png"];
             UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(30, 120, 140, 30)];
             lbl.text = @"Hello, GL World!";
+            lbl.opaque = NO;
+            lbl.backgroundColor = [UIColor clearColor];
+            lbl.font = [UIFont boldSystemFontOfSize:24];
+            lbl.textColor = [UIColor blueColor];
+            lbl.shadowColor = [UIColor colorWithWhite:0 alpha:0.5];
+            lbl.shadowOffset = CGSizeMake(0, 4);
             [tess addSubview:lbl];
             UISwitch* sw = [[UISwitch alloc] initWithFrame:CGRectMake(180, 180, 100, 40)];
+            [sw addTarget:lbl action:@selector(exampleUpdateText) forControlEvents:UIControlEventValueChanged];
             [tess addSubview:sw];
             return WrapInController(tess);
         }

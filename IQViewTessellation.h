@@ -26,22 +26,30 @@ typedef IQPoint3 (^IQViewTesselationTransformation)(CGPoint pt, CGFloat animatio
     //id *tiles;
     EAGLContext *context;
     UIImage* backgroundImage;
+    UIImage* image;
+    UIView* backgroundView;
     IQViewTesselationTransformation transformation;
     CGFloat animationPosition;
     CADisplayLink* displayLink;
-    unsigned int _fb, _cb, _db, _tex;
+    unsigned int _fb, _cb, _db, _tex[2];
     float clearColor[4];
     CALayer* innerLayer;
     BOOL doRenderSubviews;
+    BOOL hasBackgroundTexture, hasForegroundTexture;
+    BOOL needsTextureUpdate, needsBackgroundTextureUpdate;
     float scale;
 }
 
 -(id)initWithFrame:(CGRect)frame withTilesHorizontal:(NSUInteger)htiles vertical:(NSUInteger)vtiles;
 
 @property (nonatomic, retain) UIImage* backgroundImage;
+@property (nonatomic, retain) UIView* backgroundView;
+@property (nonatomic, retain) UIImage* image;
 @property (nonatomic, copy) IQViewTesselationTransformation transformation;
 
 - (void) startAnimation;
 - (void) stopAnimation;
+
+- (void) setNeedsTextureUpdate;
 
 @end

@@ -15,18 +15,17 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
-@interface IQViewTessellationLayer : CALayer {
-@private
-    IQViewTessellation* parent;
+@interface IQGLLayer : CAEAGLLayer {
+@public
+    CALayer* innerLayer;
+    UIView* owningView;
 }
-- (id) initWithViewTessellation:(IQViewTessellation*)parent;
 @end
-
 @implementation IQViewTessellation
 @synthesize transformation;
 
 + (Class)layerClass {
-    return [CAEAGLLayer class];
+    return [IQGLLayer class];
 }
 - (void) destroyFramebuffer
 {
@@ -34,8 +33,8 @@
     if (_fb) glDeleteFramebuffers(1, &_fb);
     if (_cb) glDeleteRenderbuffers(1, &_cb);
     if (_db) glDeleteRenderbuffers(1, &_db);
-    if (_tex) glDeleteTextures(1, &_tex);
-    _fb = _cb = _db = _tex = 0;
+    if (_tex) glDeleteTextures(2, _tex);
+    _fb = _cb = _db = _tex[0] = _tex[1] = 0;
 }
 
 - (void) createFramebuffer
@@ -62,15 +61,25 @@
     glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, backingWidth, backingHeight);
     glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, _db);
     
-    glGenTextures(1, &_tex);
-    glBindTexture(GL_TEXTURE_2D, _tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    
+    glGenTextures(2, _tex);
+    for(int i=0;i<2;i++){
+        glBindTexture(GL_TEXTURE_2D, _tex[i]);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    }
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         NSLog(@"Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
+    
+    // Setup initial GL state
+    glEnable(GL_LIGHT0);
+    glEnable(GL_TEXTURE_2D);
+    glLightfv(GL_LIGHT0, GL_POSITION, (GLfloat[]){0, 5, 5, 0});
+    glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat[]){1, 1, 1, 1});
+    glLightfv(GL_LIGHT0, GL_DIFFUSE, (GLfloat[]){1, 1, 1, 1});
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    
     NSLog(@"Backed by %d x %d", backingWidth, backingHeight);
     
 }
@@ -84,6 +93,10 @@
         if(htiles == 0 || htiles > 1000 || vtiles == 0 || vtiles > 1000) [NSException raise:@"InvalidArgument" format:@"Tiles out of range"];
         self.backgroundColor = [UIColor whiteColor];
 		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        IQGLLayer* lay = (id)self.layer;
+        NSLog(@"Layer is %@", lay);
+        lay->owningView = self;
+        lay->innerLayer = innerLayer;
         innerLayer = [[CALayer alloc] init];
         innerLayer.frame = frame;
         scale = 1;
@@ -122,45 +135,55 @@
     return self;
 }
 
-- (void) updateTexture
+- (void) updateTexture:(BOOL)updateBackground updateView:(BOOL)updateView;
 {
     [EAGLContext setCurrentContext:context];
-	CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-	GLubyte *textureData = malloc(vpw * vph * 4);
-    GLubyte bytes[4] = {0,0,0,0};
-    const CGFloat* cmp = CGColorGetComponents([self.backgroundColor CGColor]);
-    if(cmp != nil) {
-        for(int i=0;i<4;i++) {
-            bytes[i] = cmp[i]*255.0;
-            clearColor[i] = cmp[i];   
+    for(int textureIndex=0; textureIndex<2; textureIndex++) {
+        UIImage* img = textureIndex ? backgroundImage : image;
+        CALayer* layer = textureIndex ? backgroundView.layer : innerLayer;
+        if(textureIndex && !updateBackground) continue;
+        if(!textureIndex && !updateView) continue;
+        
+        CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+        GLubyte *textureData = malloc(vpw * vph * 4);
+        GLubyte bytes[4] = {0,0,0,0};
+        if(textureIndex) {
+            const CGFloat* cmp = CGColorGetComponents([self.backgroundColor CGColor]);
+            if(cmp != nil) {
+                for(int i=0;i<4;i++) {
+                    bytes[i] = cmp[i]*255.0;
+                    clearColor[i] = cmp[i];   
+                }
+            }
         }
+        memset_pattern4(textureData, bytes, vpw * vph * 4);
+        NSUInteger bytesPerPixel = 4;
+        NSUInteger bytesPerRow = bytesPerPixel * vpw;
+        NSUInteger bitsPerComponent = 8;
+        CGContextRef bitmapContext = CGBitmapContextCreate(textureData, vpw, vph, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
+        CGColorSpaceRelease(colorSpace);
+        if(img != nil) {
+            CGContextSaveGState(bitmapContext);
+            CGContextTranslateCTM(bitmapContext, 0, vph);
+            CGContextScaleCTM(bitmapContext, 1, -1);
+            CGContextDrawImage(bitmapContext, CGRectMake(0, 0, vpw, vph), [img CGImage]);
+            CGContextRestoreGState(bitmapContext);
+        }
+        if(doRenderSubviews) {
+            CGContextScaleCTM(bitmapContext, scale, scale);
+            [layer renderInContext:bitmapContext];
+        }
+        CGContextRelease(bitmapContext);
+        
+        glBindTexture(GL_TEXTURE_2D, _tex[textureIndex]);
+        NSLog(@"TexImaging %d to %p  %dx%d", _tex[textureIndex], textureData, vpw, vph);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vpw, vph, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+        if(textureIndex) hasBackgroundTexture = YES;
+        else hasForegroundTexture = YES;
+        free(textureData);
     }
-	memset_pattern4(textureData, bytes, vpw * vph * 4);
-	NSUInteger bytesPerPixel = 4;
-	NSUInteger bytesPerRow = bytesPerPixel * vpw;
-	NSUInteger bitsPerComponent = 8;
-	CGContextRef bitmapContext = CGBitmapContextCreate(textureData, vpw, vph, bitsPerComponent, bytesPerRow, colorSpace, kCGImageAlphaPremultipliedLast | kCGBitmapByteOrder32Big);
-	CGColorSpaceRelease(colorSpace);
-    if(backgroundImage != nil) {
-        CGContextSaveGState(bitmapContext);
-        CGContextTranslateCTM(bitmapContext, 0, vph);
-        CGContextScaleCTM(bitmapContext, 1, -1);
-        CGContextDrawImage(bitmapContext, CGRectMake(0, 0, vpw, vph), [backgroundImage CGImage]);
-        CGContextRestoreGState(bitmapContext);
-    }
-    if(doRenderSubviews) {
-        CGContextScaleCTM(bitmapContext, scale, scale);
-        CALayer* l = [[innerLayer sublayers] objectAtIndex:0];
-        NSLog(@"Rendering subviews %@ @ %f", l, scale);
-        [innerLayer renderInContext:bitmapContext];
-    }
-	CGContextRelease(bitmapContext);
-    
-	glBindTexture(GL_TEXTURE_2D, _tex);
-    NSLog(@"TexImaging %d to %p  %dx%d", _tex, textureData, vpw, vph);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vpw, vph, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
-    
-	free(textureData);
+    if(updateView) needsTextureUpdate = NO;
+    if(updateBackground) needsBackgroundTextureUpdate = NO;
 }
 IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     IQPoint3 R;
@@ -229,29 +252,42 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+    static CGFloat vertices[] = {
+        -1,-1,  -1,1,  1,1,  1,-1
+    };
+    static CGFloat texcoords[] = {
+        0,0,  0,1,  1,1,  1,0
+    };
+    if(hasBackgroundTexture) {
+        glDisable(GL_LIGHTING);
+        glDisable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D, _tex[1]);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
+        
+        glVertexPointer(2, GL_FLOAT, 0, vertices);
+        glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
+        glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    }
     
-    
-    glEnable(GL_TEXTURE_2D);
-	glEnable(GL_LIGHTING);
-    glEnable(GL_LIGHT0);
-    glLightfv(GL_LIGHT0, GL_POSITION, (GLfloat[]){0, 5, 5, 0});
-    glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat[]){1, 1, 1, 1});
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, (GLfloat[]){1, 1, 1, 1});
     //glLightfv(GL_LIGHT0, GL_SPECULAR, (GLfloat[]){1, 1, 1, 1});
-	glBindTexture(GL_TEXTURE_2D, _tex);
-    
-    glEnableClientState(GL_VERTEX_ARRAY);
-    //glEnableClientState(GL_COLOR_ARRAY);
-    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    glEnableClientState(GL_NORMAL_ARRAY);
-    
-    glVertexPointer(3, GL_FLOAT, sizeof(mesh[0]), &mesh[0].vertex);
-    //glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(mesh[0]), &mesh[0].color[0]);
-    glTexCoordPointer(2, GL_FLOAT, sizeof(mesh[0]), &mesh[0].texcoord[0]);
-    glNormalPointer(GL_FLOAT, sizeof(mesh[0]), &mesh[0].normal);
-	glBindTexture(GL_TEXTURE_2D, _tex);
-    glDrawElements(GL_TRIANGLES, 6*htiles*vtiles, GL_UNSIGNED_SHORT, indices);
-    
+    if(hasForegroundTexture) {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_BLEND);
+        glBindTexture(GL_TEXTURE_2D, _tex[0]);
+        
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        
+        glVertexPointer(3, GL_FLOAT, sizeof(mesh[0]), &mesh[0].vertex);
+        //glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(mesh[0]), &mesh[0].color[0]);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(mesh[0]), &mesh[0].texcoord[0]);
+        glNormalPointer(GL_FLOAT, sizeof(mesh[0]), &mesh[0].normal);
+        //glBindTexture(GL_TEXTURE_2D, _tex);
+        glDrawElements(GL_TRIANGLES, 6*htiles*vtiles, GL_UNSIGNED_SHORT, indices);
+    }
     glBindRenderbuffer(GL_RENDERBUFFER, _cb);
     [context presentRenderbuffer:GL_RENDERBUFFER];
     /*for(NSUInteger y = 0; y < vtiles; y++) {
@@ -270,17 +306,34 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     [innerLayer addSublayer:l];
     NSLog(@"Adding view");
     doRenderSubviews = YES;
-    [self setNeedsDisplay];
+    needsTextureUpdate = YES;
 }
 
-- (void) setBackgroundImage:(UIImage *)image
+- (void) setBackgroundImage:(UIImage *)img
 {
     UIImage* old = backgroundImage;
     backgroundImage = nil;
     [old release];
-    backgroundImage = [image retain];
-    [self updateTexture];
-    [self setNeedsDisplay];
+    backgroundImage = [img retain];
+    needsBackgroundTextureUpdate = YES;
+}
+
+- (void) setImage:(UIImage *)img
+{
+    UIImage* old = image;
+    image = nil;
+    [old release];
+    image = [img retain];
+    needsTextureUpdate = YES;
+}
+
+- (void) setBackgroundView:(UIView *)bgv
+{
+    UIView* old = backgroundView;
+    backgroundView = nil;
+    [old removeFromSuperview];
+    [old release];
+    needsBackgroundTextureUpdate = YES;
 }
 
 - (UIImage*) backgroundImage
@@ -288,18 +341,32 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     return backgroundImage;
 }
 
+- (UIImage*) image
+{
+    return image;
+}
+
+- (UIView*) backgroundView
+{
+    return backgroundView;
+}
+
 - (void) layoutSubviews
 {
     [super layoutSubviews];
     innerLayer.frame = self.layer.frame;
     [self createFramebuffer];
-    [self updateTexture];
+    [self updateTexture:YES updateView:YES];
 }
 
 - (void) display
 {
     animationPosition += displayLink.duration;
     while(animationPosition > 1) animationPosition -= 1;
+    if(needsTextureUpdate || needsBackgroundTextureUpdate) {
+        // TODO: Investigate if some of this could be done in another thread to minimize lag
+        [self updateTexture:needsBackgroundTextureUpdate updateView:needsTextureUpdate];
+    }
     [self updateMesh];
 }
 
@@ -342,30 +409,21 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     free(tiles);*/
 }
 
-- (void) drawTile:(CGRect)tileRect inContext:(CGContextRef)ctx
+- (void) setNeedsTextureUpdate
 {
-   /* CGContextTranslateCTM(ctx, 0, tileRect.size.height);
-    CGContextScaleCTM(ctx, 1.0, -1.0);
-    CGImageRef tile = CGImageCreateWithImageInRect([texture CGImage], tileRect);    
-    CGContextDrawImage(ctx, CGRectMake(0, 0, tileRect.size.width, tileRect.size.height), tile);
-    CGImageRelease(tile);*/
+    needsTextureUpdate = YES;
 }
+
 @end
 
-@implementation IQViewTessellationLayer
+@implementation IQGLLayer
 
-- (id) initWithViewTessellation:(IQViewTessellation*)p
+- (CALayer*)hitTest:(CGPoint)p
 {
-    self = [super init];
-    if(self) {
-        parent = p; // Do not need retain
-    }
-    return self;
-}
-
-- (void) drawInContext:(CGContextRef)ctx
-{
-    [parent drawTile:self.frame inContext:ctx];
+    NSLog(@"Hit test");
+    if(innerLayer) {
+        return [innerLayer hitTest:p];
+    } else return self;
 }
 
 @end
