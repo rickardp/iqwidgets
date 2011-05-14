@@ -22,7 +22,7 @@
 #import "IQCalendarDataSource.h"
 #import "IQCalendarHeaderView.h"
 
-@interface IQGanttView (PrivateMethods)
+@interface IQGanttView ()
 - (void) setupGanttView;
 - (void) layoutOnRowsChange;
 - (void) layoutOnPropertyChange:(BOOL)didChangeZoom;

@@ -24,4 +24,5 @@
 #import "IQGanttView.h"
 #import "IQCalendarDataSource.h"
 #import "IQViewTessellation.h"
+#import "IQViewTransition.h"
 

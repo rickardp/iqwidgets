@@ -21,20 +21,71 @@
     UIView* owningView;
 }
 @end
+
+@interface IQViewTessellation ()
+
+- (void) createFramebuffer;
+- (void) destroyFramebuffer;
+
+@end
+
 @implementation IQViewTessellation
 @synthesize transformation;
 
 + (Class)layerClass {
     return [IQGLLayer class];
 }
-- (void) destroyFramebuffer
+
+- (id) initWithFrame:(CGRect)frame withTilesHorizontal:(NSUInteger)h vertical:(NSUInteger)v
 {
-    [EAGLContext setCurrentContext:context];
-    if (_fb) glDeleteFramebuffers(1, &_fb);
-    if (_cb) glDeleteRenderbuffers(1, &_cb);
-    if (_db) glDeleteRenderbuffers(1, &_db);
-    if (_tex) glDeleteTextures(2, _tex);
-    _fb = _cb = _db = _tex[0] = _tex[1] = 0;
+    self = [super initWithFrame:frame];
+    if(self != nil) {
+        htiles = h;
+        vtiles = v;
+        if(htiles == 0 || htiles > 1000 || vtiles == 0 || vtiles > 1000) [NSException raise:@"InvalidArgument" format:@"Tiles out of range"];
+        self.backgroundColor = [UIColor whiteColor];
+		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        scale = 1;
+        
+        if([[UIScreen mainScreen] respondsToSelector:
+            NSSelectorFromString(@"scale")])
+        {
+            if([self respondsToSelector:
+                NSSelectorFromString(@"contentScaleFactor")])
+            {
+                scale = [[UIScreen mainScreen] scale];
+                self.contentScaleFactor = scale;
+                innerLayer.contentsScale = scale;
+            }
+        }
+        [self createFramebuffer];
+        
+        animationPosition = 0;
+        [self startAnimation];
+    }
+    return self;
+}
+
+- (void) dealloc
+{
+    NSLog(@"dellocing tessellation %p", self);
+    [self stopAnimation];
+    
+    if(context) {
+        [self destroyFramebuffer];
+        [context release];
+        context = nil;
+    }
+    
+    self.transformation = nil;
+    [backgroundImage release];
+    backgroundImage = nil;
+    [image release];
+    image = nil;
+    [transitionFrom release];
+    transitionFrom = nil;
+    [transitionTo release];
+    transitionTo = nil;
 }
 
 - (void) createFramebuffer
@@ -80,67 +131,28 @@
     glLightfv(GL_LIGHT0, GL_DIFFUSE, (GLfloat[]){1, 1, 1, 1});
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
-    NSLog(@"Backed by %d x %d", backingWidth, backingHeight);
+    //NSLog(@"Backed by %d x %d", backingWidth, backingHeight);
     
 }
 
-- (id) initWithFrame:(CGRect)frame withTilesHorizontal:(NSUInteger)h vertical:(NSUInteger)v
+- (void) destroyFramebuffer
 {
-    self = [super initWithFrame:frame];
-    if(self != nil) {
-        htiles = h;
-        vtiles = v;
-        if(htiles == 0 || htiles > 1000 || vtiles == 0 || vtiles > 1000) [NSException raise:@"InvalidArgument" format:@"Tiles out of range"];
-        self.backgroundColor = [UIColor whiteColor];
-		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
-        IQGLLayer* lay = (id)self.layer;
-        NSLog(@"Layer is %@", lay);
-        lay->owningView = self;
-        lay->innerLayer = innerLayer;
-        innerLayer = [[CALayer alloc] init];
-        innerLayer.frame = frame;
-        scale = 1;
-        
-        if([[UIScreen mainScreen] respondsToSelector:
-            NSSelectorFromString(@"scale")])
-        {
-            if([self respondsToSelector:
-                NSSelectorFromString(@"contentScaleFactor")])
-            {
-                scale = [[UIScreen mainScreen] scale];
-                self.contentScaleFactor = scale;
-                innerLayer.contentsScale = scale;
-            }
-        }
-        [self createFramebuffer];
-        
-        /*tiles = calloc(htiles*vtiles, sizeof(id));
-        if(!tiles) [NSException raise:@"BadAlloc" format:@"malloc() failed"];
-        CGSize tileSize = CGSizeMake(self.bounds.size.width / htiles, self.bounds.size.height / vtiles);
-        for(NSUInteger y = 0; y < vtiles; y++) {
-            for(NSUInteger x = 0; x < htiles; x++) {
-                CALayer* tile = [[IQViewTessellationLayer alloc] initWithViewTessellation:self];
-                tiles[x+y*htiles] = tile;
-                tile.frame = CGRectMake(x*tileSize.width, y*tileSize.height, tileSize.width, tileSize.height);
-                [self.layer addSublayer:tile];
-                tile.borderWidth = 1;
-            }
-        }*/
-        animationPosition = 0;
-        self.transformation = ^(CGPoint pt, CGFloat a) {
-            return IQMakePoint3(pt.x*(1+0.1*sin(5*pt.y+4*M_PI*a)), pt.y, 0.1*sin(5*pt.y+4*M_PI*a));
-        };
-        [self startAnimation];
-    }
-    return self;
+    [EAGLContext setCurrentContext:context];
+    if (_fb) glDeleteFramebuffers(1, &_fb);
+    if (_cb) glDeleteRenderbuffers(1, &_cb);
+    if (_db) glDeleteRenderbuffers(1, &_db);
+    if (_tex) glDeleteTextures(2, _tex);
+    _fb = _cb = _db = _tex[0] = _tex[1] = 0;
 }
 
 - (void) updateTexture:(BOOL)updateBackground updateView:(BOOL)updateView;
 {
+    if(context == nil) return;
     [EAGLContext setCurrentContext:context];
     for(int textureIndex=0; textureIndex<2; textureIndex++) {
         UIImage* img = textureIndex ? backgroundImage : image;
         CALayer* layer = textureIndex ? backgroundView.layer : innerLayer;
+        UIView* transitionView = textureIndex ? transitionFrom : transitionTo;
         if(textureIndex && !updateBackground) continue;
         if(!textureIndex && !updateView) continue;
         
@@ -169,9 +181,18 @@
             CGContextDrawImage(bitmapContext, CGRectMake(0, 0, vpw, vph), [img CGImage]);
             CGContextRestoreGState(bitmapContext);
         }
-        if(doRenderSubviews) {
+        if(doRenderSubviews && layer != nil) {
             CGContextScaleCTM(bitmapContext, scale, scale);
             [layer renderInContext:bitmapContext];
+        }
+        if(transitionView != nil) {
+            NSLog(@"TransitionView=%@", transitionView);
+            CGContextScaleCTM(bitmapContext, scale, scale);
+            
+            BOOL h = transitionView.hidden;
+            if(h) transitionView.hidden = NO;
+            [transitionView.layer renderInContext:bitmapContext];
+            if(h) transitionView.hidden = YES;
         }
         CGContextRelease(bitmapContext);
         
@@ -195,6 +216,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
 
 - (void) updateMesh
 {
+    if(context == nil) return;
     [EAGLContext setCurrentContext:context];
     
     glBindFramebuffer(GL_FRAMEBUFFER, _fb);    
@@ -214,7 +236,13 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     for(NSUInteger y = 0; y <= vtiles; y++) {
         for(NSUInteger x = 0; x <= htiles; x++) {
             int i = x+y*(htiles+1);
-            mesh[i].vertex = self.transformation(CGPointMake(x*tx*2-1, y*ty*2-1), animationPosition);
+            if(transformation == nil) {
+                mesh[i].vertex.x = x*tx*2-1;
+                mesh[i].vertex.y = y*ty*2-1;
+                mesh[i].vertex.z = 0;
+            } else {
+                mesh[i].vertex = transformation(CGPointMake(x*tx*2-1, y*ty*2-1), animationPosition);
+            }
             if(y>0 && x>0) {
                 int left = (x-1)+y*(htiles+1);
                 int top = x+(y-1)*(htiles+1);
@@ -298,9 +326,22 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     }*/
 }
 
+- (void) removeFromSuperview
+{
+    [self stopAnimation];
+    [super removeFromSuperview];
+}
+
 - (void) addSubview:(UIView *)view
 {
     [super addSubview:view];
+    if(innerLayer == nil) {
+        IQGLLayer* lay = (id)self.layer;
+        lay->owningView = self;
+        lay->innerLayer = innerLayer;
+        innerLayer = [[CALayer alloc] init];
+        innerLayer.frame = self.frame;
+    }
     CALayer* l = view.layer;
     [l removeFromSuperlayer];
     [innerLayer addSublayer:l];
@@ -361,8 +402,11 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
 
 - (void) display
 {
-    animationPosition += displayLink.duration;
-    while(animationPosition > 1) animationPosition -= 1;
+    NSTimeInterval ts = displayLink.timestamp;
+    if(lastTimestamp > 0) {
+        animationPosition += (ts - lastTimestamp);
+    }
+    lastTimestamp = ts;
     if(needsTextureUpdate || needsBackgroundTextureUpdate) {
         // TODO: Investigate if some of this could be done in another thread to minimize lag
         [self updateTexture:needsBackgroundTextureUpdate updateView:needsTextureUpdate];
@@ -379,7 +423,12 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
 }
 - (void) stopAnimation
 {
-    [displayLink removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    if(displayLink != nil) {
+        CADisplayLink *dl = displayLink;
+        displayLink = nil;
+        [dl removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+        [dl invalidate];
+    }
 }
 
 - (void) setTransformation:(IQViewTesselationTransformation)t
@@ -391,27 +440,16 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     [self updateMesh];
 }
 
-- (void) dealloc
-{
-    [self stopAnimation];
-    [displayLink invalidate];
-    
-    if(context) {
-        [self destroyFramebuffer];
-        [context release];
-    }
-    
-    self.transformation = nil;
-    [backgroundImage release];
-    /*for(NSUInteger i = 0; i < htiles*vtiles; i++) {
-        [tiles[i] release];
-    }
-    free(tiles);*/
-}
-
 - (void) setNeedsTextureUpdate
 {
     needsTextureUpdate = YES;
+}
+- (void) setTransitionViewsFrom:(UIView*)fromView to:(UIView*)toView
+{
+    [transitionFrom release];
+    [transitionTo release];
+    transitionFrom = [fromView retain];
+    transitionTo = [toView retain];
 }
 
 @end

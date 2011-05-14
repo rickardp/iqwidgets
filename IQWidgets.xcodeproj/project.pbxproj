@@ -43,6 +43,8 @@
 		FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF34130C69D10040F26E /* ScheduleTests.h */; settings = {ATTRIBUTES = (); }; };
 		FFD6CF38130C816A0040F26E /* ScheduleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD6CF35130C69D10040F26E /* ScheduleTests.m */; };
 		FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF39130C828B0040F26E /* TestUtil.h */; settings = {ATTRIBUTES = (); }; };
+		FFDEA941137B1CFA00A94388 /* IQViewTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */; };
+		FFDEA942137B1CFA00A94388 /* IQViewTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FFDEA940137B1CFA00A94388 /* IQViewTransition.m */; };
 		FFEEF05412BACC59003CA394 /* IQWidgets.h in Headers */ = {isa = PBXBuildFile; fileRef = FF540B3712A960B800C2C7A5 /* IQWidgets.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
@@ -104,6 +106,8 @@
 		FFD6CF34130C69D10040F26E /* ScheduleTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleTests.h; path = Tests/ScheduleTests.h; sourceTree = "<group>"; };
 		FFD6CF35130C69D10040F26E /* ScheduleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleTests.m; path = Tests/ScheduleTests.m; sourceTree = "<group>"; };
 		FFD6CF39130C828B0040F26E /* TestUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtil.h; path = Tests/TestUtil.h; sourceTree = "<group>"; };
+		FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQViewTransition.h; sourceTree = "<group>"; };
+		FFDEA940137B1CFA00A94388 /* IQViewTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQViewTransition.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -194,6 +198,8 @@
 				FFA26830132E895A007B7FBD /* IQScrollView.m */,
 				FF5E3C401354E6A80067ADEF /* IQViewTessellation.h */,
 				FF5E3C411354E6A80067ADEF /* IQViewTessellation.m */,
+				FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */,
+				FFDEA940137B1CFA00A94388 /* IQViewTransition.m */,
 			);
 			name = Source;
 			sourceTree = "<group>";
@@ -242,6 +248,7 @@
 				FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */,
 				FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */,
 				FF5E3C421354E6A90067ADEF /* IQViewTessellation.h in Headers */,
+				FFDEA941137B1CFA00A94388 /* IQViewTransition.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -377,6 +384,7 @@
 				FFA26832132E895B007B7FBD /* IQScrollView.m in Sources */,
 				FF10E1C7133B8AE800783849 /* IQCalendarHeaderView.m in Sources */,
 				FF5E3C431354E6A90067ADEF /* IQViewTessellation.m in Sources */,
+				FFDEA942137B1CFA00A94388 /* IQViewTransition.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

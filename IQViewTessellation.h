@@ -29,7 +29,8 @@ typedef IQPoint3 (^IQViewTesselationTransformation)(CGPoint pt, CGFloat animatio
     UIImage* image;
     UIView* backgroundView;
     IQViewTesselationTransformation transformation;
-    CGFloat animationPosition;
+    NSTimeInterval animationPosition;
+    NSTimeInterval lastTimestamp;
     CADisplayLink* displayLink;
     unsigned int _fb, _cb, _db, _tex[2];
     float clearColor[4];
@@ -37,6 +38,7 @@ typedef IQPoint3 (^IQViewTesselationTransformation)(CGPoint pt, CGFloat animatio
     BOOL doRenderSubviews;
     BOOL hasBackgroundTexture, hasForegroundTexture;
     BOOL needsTextureUpdate, needsBackgroundTextureUpdate;
+    UIView* transitionFrom, *transitionTo;
     float scale;
 }
 
@@ -45,11 +47,17 @@ typedef IQPoint3 (^IQViewTesselationTransformation)(CGPoint pt, CGFloat animatio
 @property (nonatomic, retain) UIImage* backgroundImage;
 @property (nonatomic, retain) UIView* backgroundView;
 @property (nonatomic, retain) UIImage* image;
-@property (nonatomic, copy) IQViewTesselationTransformation transformation;
+@property (nonatomic, retain) IQViewTesselationTransformation transformation;
 
 - (void) startAnimation;
 - (void) stopAnimation;
 
 - (void) setNeedsTextureUpdate;
+
+// Sets two view references for the background and foreground views. Use this method
+// instead of setting backgroundView and adding subviews if the tessellation effect
+// is temporary, for example during a transition.
+// For transitions, look into IQViewTransition which simplifies the interface.
+- (void) setTransitionViewsFrom:(UIView*)fromView to:(UIView*)toView;
 
 @end
