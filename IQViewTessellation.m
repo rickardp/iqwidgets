@@ -129,6 +129,7 @@
     glLightfv(GL_LIGHT0, GL_POSITION, (GLfloat[]){0, 5, 5, 0});
     glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat[]){1, 1, 1, 1});
     glLightfv(GL_LIGHT0, GL_DIFFUSE, (GLfloat[]){1, 1, 1, 1});
+    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (GLfloat[]){1,1,1,1});
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     
     //NSLog(@"Backed by %d x %d", backingWidth, backingHeight);
@@ -186,7 +187,6 @@
             [layer renderInContext:bitmapContext];
         }
         if(transitionView != nil) {
-            NSLog(@"TransitionView=%@", transitionView);
             CGContextScaleCTM(bitmapContext, scale, scale);
             
             BOOL h = transitionView.hidden;
@@ -197,7 +197,6 @@
         CGContextRelease(bitmapContext);
         
         glBindTexture(GL_TEXTURE_2D, _tex[textureIndex]);
-        NSLog(@"TexImaging %d to %p  %dx%d", _tex[textureIndex], textureData, vpw, vph);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vpw, vph, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
         if(textureIndex) hasBackgroundTexture = YES;
         else hasForegroundTexture = YES;
@@ -219,6 +218,9 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     if(context == nil) return;
     [EAGLContext setCurrentContext:context];
     
+    // Retain self to prevent owner from releasing us in our callback block
+    [self retain];
+    
     glBindFramebuffer(GL_FRAMEBUFFER, _fb);    
     glViewport(0, 0, vpw, vph);
     
@@ -231,17 +233,17 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
         GLfloat texcoord[2];
         GLubyte color[4];
     } mesh[(htiles+1)*(vtiles+1)];
-    
     CGFloat tx = 1.0/htiles, ty = 1.0/vtiles;
+    IQViewTesselationTransformation transformation_ = transformation?Block_copy(transformation):nil;
     for(NSUInteger y = 0; y <= vtiles; y++) {
         for(NSUInteger x = 0; x <= htiles; x++) {
             int i = x+y*(htiles+1);
-            if(transformation == nil) {
+            if(!transformation) {
                 mesh[i].vertex.x = x*tx*2-1;
                 mesh[i].vertex.y = y*ty*2-1;
                 mesh[i].vertex.z = 0;
             } else {
-                mesh[i].vertex = transformation(CGPointMake(x*tx*2-1, y*ty*2-1), animationPosition);
+                mesh[i].vertex = transformation_(CGPointMake(x*tx*2-1, y*ty*2-1), animationPosition);
             }
             if(y>0 && x>0) {
                 int left = (x-1)+y*(htiles+1);
@@ -251,7 +253,10 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
                 mesh[i].normal.x *= scl;
                 mesh[i].normal.y *= scl;
                 mesh[i].normal.z *= scl;
-                if(x == 1) mesh[left].normal = mesh[i].normal;
+                if(x == 1) {
+                    mesh[left].normal = mesh[i].normal;
+                    if(y == 1) mesh[(x-1)+(y-1)*(htiles+1)].normal = mesh[i].normal;
+                }
                 if(y == 1) mesh[top].normal = mesh[i].normal;
             }
             mesh[i].texcoord[0] = x*tx;
@@ -262,6 +267,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
             mesh[i].color[3] = 1;
         }
     }
+    if(transformation_) Block_release(transformation_);
     GLushort indices[6*htiles*vtiles];
     for(NSUInteger y = 0; y < vtiles; y++) {
         for(NSUInteger x = 0; x < htiles; x++) {
@@ -286,6 +292,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     static CGFloat texcoords[] = {
         0,0,  0,1,  1,1,  1,0
     };
+    
     if(hasBackgroundTexture) {
         glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
@@ -318,12 +325,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     }
     glBindRenderbuffer(GL_RENDERBUFFER, _cb);
     [context presentRenderbuffer:GL_RENDERBUFFER];
-    /*for(NSUInteger y = 0; y < vtiles; y++) {
-        for(NSUInteger x = 0; x < htiles; x++) {
-            CALayer* tile = tiles[x+y*htiles];
-            tile.transform = transform;
-        }
-    }*/
+    [self autorelease];
 }
 
 - (void) removeFromSuperview
@@ -345,7 +347,6 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     CALayer* l = view.layer;
     [l removeFromSuperlayer];
     [innerLayer addSublayer:l];
-    NSLog(@"Adding view");
     doRenderSubviews = YES;
     needsTextureUpdate = YES;
 }
@@ -411,6 +412,14 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
         // TODO: Investigate if some of this could be done in another thread to minimize lag
         [self updateTexture:needsBackgroundTextureUpdate updateView:needsTextureUpdate];
     }
+    if(hasBackgroundTexture || hasForegroundTexture) {
+        [self updateMesh];
+    }
+}
+
+- (void) presentFrame
+{
+    [self updateTexture:needsBackgroundTextureUpdate updateView:needsTextureUpdate];
     [self updateMesh];
 }
 
@@ -433,11 +442,18 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
 
 - (void) setTransformation:(IQViewTesselationTransformation)t
 {
-    if(transformation) {
-        Block_release(transformation);
+    IQViewTesselationTransformation oldt = transformation;
+    if(t != nil) {
+        transformation = Block_copy(t);
+    } else {
+        transformation = nil;
     }
-    transformation = Block_copy(t);
-    [self updateMesh];
+    if(oldt) {
+        Block_release(oldt);
+    }
+    if(displayLink == nil) {
+        [self updateMesh];
+    }
 }
 
 - (void) setNeedsTextureUpdate
@@ -450,6 +466,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     [transitionTo release];
     transitionFrom = [fromView retain];
     transitionTo = [toView retain];
+    needsBackgroundTextureUpdate = needsTextureUpdate = YES;
 }
 
 @end

@@ -60,4 +60,6 @@ typedef IQPoint3 (^IQViewTesselationTransformation)(CGPoint pt, CGFloat animatio
 // For transitions, look into IQViewTransition which simplifies the interface.
 - (void) setTransitionViewsFrom:(UIView*)fromView to:(UIView*)toView;
 
+- (void) presentFrame;
+
 @end

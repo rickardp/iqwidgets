@@ -316,21 +316,20 @@ static UIViewController* CreateViewController(int idx) {
             view2.text = @"\nHello, world of beautiful custom OpenGL view transitions.\n\nYou can customize me with a simple transformation block. \n\nYour imagination is the limit to what kind of transformation effects you can do...";
             view2.textAlignment = UITextAlignmentCenter;
             NSLog(@"Adding view to %@", vc.view);
-            [vc.view addSubview:view1];
             [vc.view addSubview:view2];
-            view2.hidden = YES;
+            [vc.view addSubview:view1];
+            //view1.opaque = NO;
+            //view2.hidden = YES;
+            //view2.backgroundColor = [UIColor clearColor];
             IQViewTesselationTransformation trans = ^(CGPoint pt, CGFloat t) {
-                CGFloat x1 = .5*(1+pt.x);
-                CGFloat y1 = .5*(1-pt.y);
-                CGFloat t1 = (x1*x1+y1*y1)*t * M_PI_2 / 2.0;
-                return IQMakePoint3(pt.x-.5*M_SQRT2*sinf(t1), pt.y+.5*M_SQRT2*sin(t), .5*cosf(t1));
+                return IQMakePoint3(pt.x, pt.y+t, 0);
             };
             static IQTransitionCompletionBlock again2 = nil;
             IQTransitionCompletionBlock again = ^(UIView* fromView, UIView *toView) {
                 NSLog(@"Restarting transition %@ -> %@", fromView, toView);
-                fromView.hidden = NO;
-                toView.hidden = YES;
-                //[IQViewTransition transitionFrom:toView to:fromView duration:2.0 withTransformation:trans completion:again2];
+                //fromView.hidden = NO;
+                //toView.hidden = YES;
+                [IQViewTransition transitionFrom:toView to:fromView duration:2.0 withTransformation:trans completion:again2];
             };
             again2 = Block_copy(again);
             [IQViewTransition transitionFrom:view2 to:view1 duration:2.0 withTransformation:trans completion:again2];

@@ -25,6 +25,13 @@ static IQViewTransition* activeTransition;
         [trans release];
     }
 }
+
+- (void) doTransitionStart
+{
+    [from.superview addSubview:transform];
+    [transform setTransitionViewsFrom:from to:to];
+    [transform presentFrame];
+}
 + (void) transitionFrom:(UIView*)fromView to:(UIView*)toView duration:(NSTimeInterval)duration withTransformation:(IQViewTesselationTransformation)transformation completion:(IQTransitionCompletionBlock)complete {
     if(fromView.superview != toView.superview) {
         [NSException raise:@"MustShareSuperview" format:@"Transition between views with different superviews is currently unsupported"];
@@ -35,9 +42,6 @@ static IQViewTransition* activeTransition;
         trans->to = [toView retain];
         trans->transform = [[IQViewTessellation alloc] initWithFrame:fromView.frame withTilesHorizontal:8 vertical:24];
         if(complete) trans->complete = Block_copy(complete);
-        //toView.hidden = NO;
-        [fromView.superview addSubview:trans->transform];
-        [trans->transform setTransitionViewsFrom:fromView to:toView];
         trans->transform.transformation = ^(CGPoint pt, CGFloat t) {
             if(t >= duration) {
                 [trans stop];
@@ -48,6 +52,8 @@ static IQViewTransition* activeTransition;
                 return transformation(pt, t);
             }
         };
+        //toView.hidden = NO;
+        [trans performSelectorOnMainThread:@selector(doTransitionStart) withObject:trans waitUntilDone:NO];
     }
 }
 
@@ -59,6 +65,7 @@ static IQViewTransition* activeTransition;
     complete = nil;
     IQViewTessellation* tf = transform;
     transform = nil;
+    tf.transformation = nil;
     [tf release];
     [from release];
     from = nil;
@@ -73,12 +80,12 @@ static IQViewTransition* activeTransition;
     if(self == activeTransition) {
         activeTransition = nil;
     }
-    [transform stopAnimation];
     if(complete) {
         complete(from, to);
         Block_release(complete);
         complete = nil;
     }
+    [transform stopAnimation];
     transform.transformation = nil;
     [transform removeFromSuperview];
     [self release];
