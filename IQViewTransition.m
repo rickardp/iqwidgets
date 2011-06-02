@@ -28,9 +28,11 @@ static IQViewTransition* activeTransition;
 
 - (void) doTransitionStart
 {
+    transform.hidden = YES;
     [from.superview addSubview:transform];
     [transform setTransitionViewsFrom:from to:to];
     [transform presentFrame];
+    transform.hidden = NO;
 }
 + (void) transitionFrom:(UIView*)fromView to:(UIView*)toView duration:(NSTimeInterval)duration withTransformation:(IQViewTesselationTransformation)transformation completion:(IQTransitionCompletionBlock)complete {
     if(fromView.superview != toView.superview) {
@@ -60,7 +62,6 @@ static IQViewTransition* activeTransition;
 
 - (void) dealloc
 {
-    NSLog(@"dellocing transition");
     if(complete) Block_release(complete);
     complete = nil;
     IQViewTessellation* tf = transform;
@@ -85,9 +86,14 @@ static IQViewTransition* activeTransition;
         Block_release(complete);
         complete = nil;
     }
-    [transform stopAnimation];
-    transform.transformation = nil;
-    [transform removeFromSuperview];
+    if(transform) {
+        [transform stopAnimation];
+        
+        transform.transformation = nil;
+        [transform removeFromSuperview];
+        [transform release];
+        transform = nil;
+    }
     [self release];
 }
 

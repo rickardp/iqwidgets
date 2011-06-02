@@ -195,7 +195,10 @@
             if(h) transitionView.hidden = YES;
         }
         CGContextRelease(bitmapContext);
-        
+        /*GLuint* td = (GLuint*)textureData;
+        for(int i=0; i<vpw * vph; i++) {
+            td[i] = ~td[i] | 0xFF000000;
+        }*/
         glBindTexture(GL_TEXTURE_2D, _tex[textureIndex]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vpw, vph, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
         if(textureIndex) hasBackgroundTexture = YES;
@@ -413,7 +416,9 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
         [self updateTexture:needsBackgroundTextureUpdate updateView:needsTextureUpdate];
     }
     if(hasBackgroundTexture || hasForegroundTexture) {
-        [self updateMesh];
+        if(displayLink != nil) {
+            [self updateMesh];
+        }
     }
 }
 
@@ -451,7 +456,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     if(oldt) {
         Block_release(oldt);
     }
-    if(displayLink == nil) {
+    if(displayLink == nil && t != nil) {
         [self updateMesh];
     }
 }
