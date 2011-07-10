@@ -24,7 +24,7 @@
 {
     NEED_UI
     IQCalendarView* cv = [[[IQCalendarView alloc] initWithFrame:CGRectMake(0,0,0,0)] autorelease];
-    [cv setCurrentDay:D(@"2011-03-06 00:00") display:NO animated:NO];
+    [cv setCurrentDay:D(@"2011-03-06 00:00") display:YES animated:NO];
     
     BOOL isSwedish = [[[NSLocale currentLocale] localeIdentifier] isEqualToString:@"SV_se"];
     

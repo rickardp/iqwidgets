@@ -19,7 +19,7 @@
 #import "IQScrollView.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface IQScrollView (PrivateMethods)
+@interface IQScrollView ()
 - (void) performLayoutAnimated:(BOOL)animated;
 @end
 

@@ -20,7 +20,7 @@
 #import "IQWidgets.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define NVIEWS 7
+#define NVIEWS 9
 struct {
 	UIView* view;
 	UITableViewCell* cell;
@@ -104,6 +104,17 @@ struct {
 }
 @end
 
+@implementation UILabel (ControlExtensions)
+
+- (void) exampleUpdateText {
+    static int toggleCount = 0;
+    NSLog(@"Toggled switch");
+    self.text = [NSString stringWithFormat:@"Toggle is %s (%d)", (toggleCount&1)?"ON":"OFF", toggleCount];
+    toggleCount++;
+}
+
+@end
+
 @implementation ExampleAppDelegate
 @synthesize window;
 @synthesize viewController;
@@ -113,16 +124,16 @@ struct {
     // Override point for customization after app launch    
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
-    [[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
+    //[[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
     //[[IQScreenRecorder screenRecorder] performSelector:@selector(startMirroringScreen) withObject:NULL afterDelay:2000];
-    [[IQScreenRecorder screenRecorder] startMirroringScreen];
+    //[[IQScreenRecorder screenRecorder] startMirroringScreen];
 }
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     
 }
 - (void)applicationWillResignActive:(UIApplication *)application {
     //NSLog(@"I am resigning");
-    [[IQScreenRecorder screenRecorder] stopRecording];
+    //[[IQScreenRecorder screenRecorder] stopRecording];
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
@@ -272,6 +283,59 @@ static UIViewController* CreateViewController(int idx) {
             }
             return WrapInController(gantt);
         }
+        case 7:
+        {
+            IQViewTessellation* tess = [[IQViewTessellation alloc] initWithFrame:CGRectMake(0, 0, 100, 100) withTilesHorizontal:8 vertical:24];
+            tess.backgroundImage = [UIImage imageNamed:@"test.png"];
+            UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(30, 120, 140, 30)];
+            lbl.text = @"Hello, GL World!";
+            lbl.opaque = NO;
+            lbl.backgroundColor = [UIColor clearColor];
+            lbl.font = [UIFont boldSystemFontOfSize:24];
+            lbl.textColor = [UIColor blueColor];
+            lbl.shadowColor = [UIColor colorWithWhite:0 alpha:0.5];
+            lbl.shadowOffset = CGSizeMake(0, 4);
+            [tess addSubview:lbl];
+            UISwitch* sw = [[UISwitch alloc] initWithFrame:CGRectMake(180, 180, 100, 40)];
+            [sw addTarget:lbl action:@selector(exampleUpdateText) forControlEvents:UIControlEventValueChanged];
+            [tess addSubview:sw];
+            tess.transformation = ^(CGPoint pt, CGFloat t) {
+                if(t > 1) t -= floor(t);
+                return IQMakePoint3(pt.x*(1+0.1*sin(5*pt.y+4*M_PI*t)), pt.y, 0.1*sin(5*pt.y+4*M_PI*t));
+            };
+            return WrapInController(tess);
+        }
+        case 8:
+        {
+            UIViewController* vc = [[[UIViewController alloc] init] autorelease];
+            UIImageView* view1 = [[[UIImageView alloc] initWithFrame:vc.view.bounds] autorelease];
+            UITextView* view2 = [[[UITextView alloc] initWithFrame:vc.view.bounds] autorelease];
+            view1.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+            view2.autoresizingMask = UIViewAutoresizingFlexibleHeight;
+            view1.image = [UIImage imageNamed:@"test.png"];
+            view2.text = @"\nHello, world of beautiful custom OpenGL view transitions.\n\nYou can customize me with a simple transformation block. \n\nYour imagination is the limit to what kind of transformation effects you can do...";
+            view2.textAlignment = UITextAlignmentCenter;
+            NSLog(@"Adding view to %@", vc.view);
+            [vc.view addSubview:view2];
+            [vc.view addSubview:view1];
+            //view1.opaque = NO;
+            //view2.hidden = YES;
+            //view2.backgroundColor = [UIColor clearColor];
+            IQViewTesselationTransformation trans = ^(CGPoint pt, CGFloat t) {
+                return IQMakePoint3(pt.x, pt.y+t, 0);
+            };
+            static IQTransitionCompletionBlock again2 = nil;
+            IQTransitionCompletionBlock again = ^(UIView* fromView, UIView *toView) {
+                NSLog(@"Restarting transition %@ -> %@", fromView, toView);
+                //fromView.hidden = NO;
+                //toView.hidden = YES;
+                [IQViewTransition transitionFrom:toView to:fromView duration:2.0 withTransformation:trans completion:again2];
+            };
+            again2 = Block_copy(again);
+            [IQViewTransition transitionFrom:view2 to:view1 duration:2.0 withTransformation:trans completion:again2];
+            //again();
+            return vc;
+        }
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 			break;
@@ -303,8 +367,11 @@ static UITableViewCell* CreateCell(int idx) {
         case 6:
             title = @"IQGanttView";
             break;
-        case 5:
+        case 7:
             title = @"IQViewTessellation";
+            break;
+        case 8:
+            title = @"IQViewTransition";
             break;
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
