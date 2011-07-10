@@ -19,12 +19,12 @@
 #import "IQDrilldownController.h"
 #import <QuartzCore/QuartzCore.h>
 
-@interface UIViewController (Hierarchy)
+/*@interface UIViewController (Hierarchy)
 - (void) setParentViewController:(UIViewController*)viewController;
 - (NSHashTable*) childViewControllers;
 - (void) addChildViewController:(UIViewController*)viewController;
 - (void) removeChildViewController:(UIViewController*)viewController;
-@end
+@end*/
 
 @interface IQDrilldownController (PrivateMethods)
 - (void) setupDrilldownPanel;

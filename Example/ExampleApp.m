@@ -327,8 +327,8 @@ static UIViewController* CreateViewController(int idx) {
             static IQTransitionCompletionBlock again2 = nil;
             IQTransitionCompletionBlock again = ^(UIView* fromView, UIView *toView) {
                 NSLog(@"Restarting transition %@ -> %@", fromView, toView);
-                //fromView.hidden = NO;
-                //toView.hidden = YES;
+                fromView.hidden = NO;
+                toView.hidden = YES;
                 [IQViewTransition transitionFrom:toView to:fromView duration:2.0 withTransformation:trans completion:again2];
             };
             again2 = Block_copy(again);

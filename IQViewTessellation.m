@@ -1,3 +1,4 @@
+
 //
 //  IQViewTessellation.m
 //  IQWidgets
@@ -30,7 +31,7 @@
 @end
 
 @implementation IQViewTessellation
-@synthesize transformation;
+@synthesize transformation, meshTransformation;
 
 + (Class)layerClass {
     return [IQGLLayer class];
@@ -46,6 +47,9 @@
         self.backgroundColor = [UIColor whiteColor];
 		context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
         scale = 1;
+        viewSize = CGSizeMake(1, 1);
+        viewDepth = 0;
+        viewPerspective = NO;
         
         if([[UIScreen mainScreen] respondsToSelector:
             NSSelectorFromString(@"scale")])
@@ -61,7 +65,6 @@
         [self createFramebuffer];
         
         animationPosition = 0;
-        [self startAnimation];
     }
     return self;
 }
@@ -76,7 +79,8 @@
         [context release];
         context = nil;
     }
-    
+    if(mesh != NULL) free(mesh);
+    mesh = NULL;
     self.transformation = nil;
     [backgroundImage release];
     backgroundImage = nil;
@@ -86,6 +90,11 @@
     transitionFrom = nil;
     [transitionTo release];
     transitionTo = nil;
+}
+
+- (void) didMoveToSuperview
+{
+    [self display];
 }
 
 - (void) createFramebuffer
@@ -195,7 +204,10 @@
             if(h) transitionView.hidden = YES;
         }
         CGContextRelease(bitmapContext);
-        
+        /*GLuint* td = (GLuint*)textureData;
+        for(int i=0; i<vpw * vph; i++) {
+            td[i] = ~td[i] | 0xFF000000;
+        }*/
         glBindTexture(GL_TEXTURE_2D, _tex[textureIndex]);
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, vpw, vph, 0, GL_RGBA, GL_UNSIGNED_BYTE, textureData);
         if(textureIndex) hasBackgroundTexture = YES;
@@ -213,6 +225,24 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     return R;
 }
 
+- (void) performMeshUpdateInternal:(struct mesh*)m animationPosition:(NSTimeInterval)t dt:(CGFloat)dt
+{
+    CGFloat tx = 1.0/htiles, ty = 1.0/vtiles;
+    if(meshTransformation != nil) {
+        meshTransformation(&mesh[0].vertex, htiles, vtiles, sizeof(mesh[0]) / sizeof(IQPoint3), t);
+    } else if(transformation != nil) {
+        IQViewTesselationTransformation transformation_ = Block_copy(transformation);
+        for(NSUInteger y = 0; y <= vtiles; y++) {
+            for(NSUInteger x = 0; x <= htiles; x++) {
+                m[x+y*(htiles+1)].vertex = transformation_(CGPointMake(x*tx*2-1, y*ty*2-1), t);
+            }
+        }
+        if(transformation_) Block_release(transformation_);
+    } else {
+        [self resetMesh];
+    }
+}
+
 - (void) updateMesh
 {
     if(context == nil) return;
@@ -227,24 +257,15 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
     glClear(GL_COLOR_BUFFER_BIT);
     
-    struct mesh {
-        IQPoint3 vertex;
-        IQPoint3 normal;
-        GLfloat texcoord[2];
-        GLubyte color[4];
-    } mesh[(htiles+1)*(vtiles+1)];
+    if(mesh == NULL) {
+        mesh = malloc(sizeof(struct mesh)*(htiles+1)*(vtiles+1));
+    }
+    [self performMeshUpdateInternal:mesh animationPosition:animationPosition dt:animationPosition-prevAnimationPosition];
+    prevAnimationPosition = animationPosition;
     CGFloat tx = 1.0/htiles, ty = 1.0/vtiles;
-    IQViewTesselationTransformation transformation_ = transformation?Block_copy(transformation):nil;
     for(NSUInteger y = 0; y <= vtiles; y++) {
         for(NSUInteger x = 0; x <= htiles; x++) {
             int i = x+y*(htiles+1);
-            if(!transformation) {
-                mesh[i].vertex.x = x*tx*2-1;
-                mesh[i].vertex.y = y*ty*2-1;
-                mesh[i].vertex.z = 0;
-            } else {
-                mesh[i].vertex = transformation_(CGPointMake(x*tx*2-1, y*ty*2-1), animationPosition);
-            }
             if(y>0 && x>0) {
                 int left = (x-1)+y*(htiles+1);
                 int top = x+(y-1)*(htiles+1);
@@ -267,7 +288,6 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
             mesh[i].color[3] = 1;
         }
     }
-    if(transformation_) Block_release(transformation_);
     GLushort indices[6*htiles*vtiles];
     for(NSUInteger y = 0; y < vtiles; y++) {
         for(NSUInteger x = 0; x < htiles; x++) {
@@ -283,7 +303,26 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     }
     
     glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    GLfloat a,b,c,d;
+    if(viewPerspective) {
+        a = 0;
+        b = -viewDepth;
+        c = -1;
+        d = 0;
+    } else {
+        a = 1;
+        b = 0;
+        c = 0;
+        d = 1;
+    }
+    GLfloat m[16] = {
+        1.0f / viewSize.width, 0, 0, 0,
+        0, 1.0f / viewSize.height, 0, 0,
+        0, 0, a, c,
+        0, 0, b, d
+    };
+    glLoadMatrixf(m);
+    //glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     static CGFloat vertices[] = {
@@ -377,6 +416,19 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     [old release];
     needsBackgroundTextureUpdate = YES;
 }
+- (void) setPerspective:(CGSize)size depth:(CGFloat)depth
+{
+    viewSize = size;
+    viewDepth = depth;
+    viewPerspective = YES;
+}
+
+- (void) setOrthographic:(CGSize)size
+{
+    viewSize = size;
+    viewDepth = 0;
+    viewPerspective = NO;
+}
 
 - (UIImage*) backgroundImage
 {
@@ -413,7 +465,9 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
         [self updateTexture:needsBackgroundTextureUpdate updateView:needsTextureUpdate];
     }
     if(hasBackgroundTexture || hasForegroundTexture) {
-        [self updateMesh];
+        //if(displayLink != nil) {
+            [self updateMesh];
+        //}
     }
 }
 
@@ -445,13 +499,31 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     IQViewTesselationTransformation oldt = transformation;
     if(t != nil) {
         transformation = Block_copy(t);
+        self.meshTransformation = nil;
     } else {
         transformation = nil;
     }
     if(oldt) {
         Block_release(oldt);
     }
-    if(displayLink == nil) {
+    if(displayLink == nil && t != nil) {
+        [self updateMesh];
+    }
+}
+
+- (void) setMeshTransformation:(IQViewTesselationMeshTransformation)t
+{
+    IQViewTesselationTransformation oldt = transformation;
+    if(t != nil) {
+        meshTransformation = Block_copy(t);
+        self.transformation = nil;
+    } else {
+        meshTransformation = nil;
+    }
+    if(oldt) {
+        Block_release(oldt);
+    }
+    if(displayLink == nil && t != nil) {
         [self updateMesh];
     }
 }
@@ -467,6 +539,20 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     transitionFrom = [fromView retain];
     transitionTo = [toView retain];
     needsBackgroundTextureUpdate = needsTextureUpdate = YES;
+}
+
+- (void) resetMesh
+{
+    NSLog(@"resetMesh");
+    CGFloat tx = 1.0/htiles, ty = 1.0/vtiles;
+    for(NSUInteger y = 0; y <= vtiles; y++) {
+        for(NSUInteger x = 0; x <= htiles; x++) {
+            int i = x+y*(htiles+1);
+            mesh[i].vertex.x = x*tx*2-1;
+            mesh[i].vertex.y = y*ty*2-1;
+            mesh[i].vertex.z = 0;
+        }
+    }
 }
 
 @end
