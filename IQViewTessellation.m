@@ -255,7 +255,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     glViewport(0, 0, vpw, vph);
     
     glClearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
     
     if(mesh == NULL) {
         mesh = malloc(sizeof(struct mesh)*(htiles+1)*(vtiles+1));
@@ -306,11 +306,11 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     GLfloat a,b,c,d;
     if(viewPerspective) {
         a = 0;
-        b = -viewDepth;
-        c = -1;
-        d = 0;
+        b = 0;
+        c = -0.2;
+        d = 1;
     } else {
-        a = 1;
+        a = 0;
         b = 0;
         c = 0;
         d = 1;
@@ -335,6 +335,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     if(hasBackgroundTexture) {
         glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
+        glDisable(GL_DEPTH_TEST);
         glBindTexture(GL_TEXTURE_2D, _tex[1]);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -349,6 +350,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     if(hasForegroundTexture) {
         glEnable(GL_LIGHTING);
         glEnable(GL_BLEND);
+        glEnable(GL_DEPTH_TEST);
         glBindTexture(GL_TEXTURE_2D, _tex[0]);
         
         glEnableClientState(GL_VERTEX_ARRAY);
