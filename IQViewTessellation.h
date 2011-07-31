@@ -37,7 +37,7 @@ typedef void (^IQViewTesselationMeshTransformation)(IQPoint3* mesh, NSUInteger h
     IQViewTesselationMeshTransformation meshTransformation;
     NSTimeInterval lastTimestamp;
     CADisplayLink* displayLink;
-    unsigned int _fb, _cb, _db, _tex[2];
+    unsigned int _fb, _cb, _db, _tex[3];
     float clearColor[4];
     CALayer* innerLayer;
     BOOL doRenderSubviews;
@@ -54,6 +54,9 @@ typedef void (^IQViewTesselationMeshTransformation)(IQPoint3* mesh, NSUInteger h
     CGSize viewSize;
     CGFloat viewDepth;
     BOOL viewPerspective;
+    BOOL drawShadow;
+    IQPoint3 shadow[4];
+    CGFloat shadowOpacity;
 }
 
 -(id)initWithFrame:(CGRect)frame withTilesHorizontal:(NSUInteger)htiles vertical:(NSUInteger)vtiles;
@@ -70,6 +73,14 @@ typedef void (^IQViewTesselationMeshTransformation)(IQPoint3* mesh, NSUInteger h
 // using the transformation property.
 // Note that setting this property to non-nil automatically sets transformation to nil.
 @property (nonatomic, retain) IQViewTesselationMeshTransformation meshTransformation;
+
+// The opacity for the view shadow (if used). Default is 0.75.
+@property (nonatomic) CGFloat shadowOpacity;
+
+// Sets the view shadow coordinates. The shadow must be four vertices, the z-coordinate
+// is used to calculate the softness of the shadow.
+// Set to NULL to disable shadow.
+- (void) setShadow:(IQPoint3*)shadow;
 
 - (void) startAnimation;
 - (void) stopAnimation;
@@ -92,9 +103,11 @@ typedef void (^IQViewTesselationMeshTransformation)(IQPoint3* mesh, NSUInteger h
 
 - (void) presentFrame;
 
+
 @end
 
 @interface IQViewTessellation (OverridableMethods)
 - (void) updateMesh;
+- (void) drawShadow:(IQPoint3*)shadow;
 - (void) performMeshUpdateInternal:(struct mesh*)mesh animationPosition:(NSTimeInterval)animationPosition dt:(CGFloat)dt;
 @end

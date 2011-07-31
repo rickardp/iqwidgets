@@ -16,6 +16,9 @@
 #import <OpenGLES/ES2/gl.h>
 #import <OpenGLES/ES2/glext.h>
 
+const int kShadowSize = 128;
+static unsigned char* gImageGauss = NULL;
+
 @interface IQGLLayer : CAEAGLLayer {
 @public
     CALayer* innerLayer;
@@ -31,7 +34,7 @@
 @end
 
 @implementation IQViewTessellation
-@synthesize transformation, meshTransformation;
+@synthesize transformation, meshTransformation, shadowOpacity;
 
 + (Class)layerClass {
     return [IQGLLayer class];
@@ -41,6 +44,18 @@
 {
     self = [super initWithFrame:frame];
     if(self != nil) {
+        if(gImageGauss == NULL) {
+            gImageGauss = malloc(kShadowSize*kShadowSize);
+            if(gImageGauss == NULL) [NSException raise:@"BadAlloc" format:@"Failed to allocate"];
+            for(int x = 0; x<128; x++) {
+                for(int y = 0; y<kShadowSize; y++) {
+                    double X = (x/(double)kShadowSize)*3.0;
+                    double Y = (y/(double)kShadowSize)*3.0;
+                    gImageGauss[y*kShadowSize+x] = (unsigned char)(exp(-X*X-Y*Y)*255.0);
+                }
+            }
+        }
+        shadowOpacity = 0.75;
         htiles = h;
         vtiles = v;
         if(htiles == 0 || htiles > 1000 || vtiles == 0 || vtiles > 1000) [NSException raise:@"InvalidArgument" format:@"Tiles out of range"];
@@ -121,13 +136,17 @@
     glRenderbufferStorageOES(GL_RENDERBUFFER_OES, GL_DEPTH_COMPONENT16_OES, backingWidth, backingHeight);
     glFramebufferRenderbufferOES(GL_FRAMEBUFFER_OES, GL_DEPTH_ATTACHMENT_OES, GL_RENDERBUFFER_OES, _db);
     
-    glGenTextures(2, _tex);
-    for(int i=0;i<2;i++){
+    glGenTextures(3, _tex);
+    for(int i=0;i<3;i++){
         glBindTexture(GL_TEXTURE_2D, _tex[i]);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        if(i==2) {
+            // Shadow
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, kShadowSize, kShadowSize, 0, GL_ALPHA, GL_UNSIGNED_BYTE, gImageGauss);
+        }
     }
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         NSLog(@"Failed to make complete framebuffer object %x", glCheckFramebufferStatus(GL_FRAMEBUFFER));
@@ -346,6 +365,10 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
         glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
     }
     
+    if(drawShadow) {
+        [self drawShadow:shadow];
+    }
+    
     //glLightfv(GL_LIGHT0, GL_SPECULAR, (GLfloat[]){1, 1, 1, 1});
     if(hasForegroundTexture) {
         glEnable(GL_LIGHTING);
@@ -364,9 +387,112 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
         //glBindTexture(GL_TEXTURE_2D, _tex);
         glDrawElements(GL_TRIANGLES, 6*htiles*vtiles, GL_UNSIGNED_SHORT, indices);
     }
+    
     glBindRenderbuffer(GL_RENDERBUFFER, _cb);
     [context presentRenderbuffer:GL_RENDERBUFFER];
     [self autorelease];
+}
+
+- (void) setShadow:(IQPoint3*)s
+{
+    if(s != NULL) {
+        memcpy(shadow, s, 4*sizeof(IQPoint3));
+        drawShadow = YES;
+    } else {
+        drawShadow = NO;
+    }
+}
+
+- (void) drawShadow:(IQPoint3*)shd
+{
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_LIGHTING);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+    glDisableClientState(GL_NORMAL_ARRAY);
+    glBindTexture(GL_TEXTURE_2D, _tex[2]);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    //IQPoint3 shadow[] = {{-.5, -.5, .2}, {.5, -.5, .2}, {.5, .5, .1}, {-.5, .5, .1}};
+    
+#define IX(x1,y1,x2,y2,x3,y3,x4,y4) (((x1*y2-y1*x2) * (x3-x4) - (x1-x2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)))
+#define IY(x1,y1,x2,y2,x3,y3,x4,y4) (((x1*y2-y1*x2) * (y3-y4) - (y1-y2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)))
+    
+#define ISECT(x1,y1,x2,y2,x3,y3,x4,y4) IX(C[x1],C[y1],C[x2],C[y2],C[x3],C[y3],C[x4],C[y4]), IY(C[x1],C[y1],C[x2],C[y2],C[x3],C[y3],C[x4],C[y4])
+    GLfloat C[] = {
+        shd[0].x-.5*shd[0].z, shd[0].y-.5*shd[0].z,
+        shd[1].x+.5*shd[1].z, shd[1].y-.5*shd[1].z,
+        shd[2].x+.5*shd[2].z, shd[2].y+.5*shd[2].z,
+        shd[3].x-.5*shd[3].z, shd[3].y+.5*shd[3].z,
+        
+        shd[0].x+.5*shd[0].z, shd[0].y+.5*shd[0].z,
+        shd[1].x-.5*shd[1].z, shd[1].y+.5*shd[1].z,
+        shd[2].x-.5*shd[2].z, shd[2].y-.5*shd[2].z,
+        shd[3].x+.5*shd[3].z, shd[3].y-.5*shd[3].z,
+    };
+    GLfloat dvertices[32] = {
+        C[0],C[1],
+        C[2],C[3],
+        C[4],C[5],
+        C[6],C[7],
+        
+        C[8],C[9],
+        C[10],C[11],
+        C[12],C[13],
+        C[14],C[15],
+        
+        ISECT(0,1,2,3, 8,9,14,15),
+        ISECT(0,1,2,3, 10,11,12,13),
+        ISECT(2,3,4,5, 8,9,10,11),
+        ISECT(2,3,4,5, 12,13,14,15),
+        ISECT(4,5,6,7, 10,11,12,13),
+        ISECT(4,5,6,7, 8,9,14,15),
+        ISECT(0,1,6,7, 12,13,14,15),
+        ISECT(0,1,6,7, 8,9,10,11),
+    };
+    CGFloat dtexcoords[32] = {
+        1,1,
+        1,1,
+        1,1,
+        1,1,
+        0,0,
+        0,0,
+        0,0,
+        0,0,
+        0,1,
+        0,1,
+        1,0,
+        1,0,
+        0,1,
+        0,1,
+        1,0,
+        1,0
+    };
+    GLubyte shadowindices[] = {
+        4,6,5,
+        4,7,6,
+        0,4,8,
+        0,15,4,
+        4,5,9,
+        4,9,8,
+        1,9,5,
+        1,5,10,
+        5,6,10,
+        6,11,10,
+        2,11,6,
+        2,6,12,
+        6,7,12,
+        7,13,12,
+        3,13,7,
+        3,7,14,
+        14,7,4,
+        14,4,15
+    };
+    glVertexPointer(2, GL_FLOAT, 0, dvertices);
+    glTexCoordPointer(2, GL_FLOAT, 0, dtexcoords);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glColor4f(0, 0, 0, shadowOpacity);
+    glDrawElements(GL_TRIANGLES, sizeof(shadowindices), GL_UNSIGNED_BYTE, shadowindices);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 - (void) removeFromSuperview
