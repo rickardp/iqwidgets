@@ -20,7 +20,7 @@
 #import "IQWidgets.h"
 #import <QuartzCore/QuartzCore.h>
 
-#define NVIEWS 9
+#define NVIEWS 10
 struct {
 	UIView* view;
 	UITableViewCell* cell;
@@ -336,6 +336,15 @@ static UIViewController* CreateViewController(int idx) {
             //again();
             return vc;
         }
+        case 9:
+        {
+            UIViewController* vc = [[[UIViewController alloc] init] autorelease];
+            IQDrawerView* view = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignTop] autorelease];
+            [vc.view addSubview:view];
+            view = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignBottom] autorelease];
+            [vc.view addSubview:view];
+            return vc;
+        }
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 			break;
@@ -373,6 +382,9 @@ static UITableViewCell* CreateCell(int idx) {
         case 8:
             title = @"IQViewTransition";
             break;
+        case 9:
+            title = @"IQDrawerView";
+            break;
 		default:
 			[NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 			break;
@@ -397,6 +409,8 @@ static UITableViewCell* CreateCell(int idx) {
 	if(idx < 0 || idx >= NVIEWS) [NSException raise:@"Index out of bounds" format:@"Index %d out of bounds", idx];
 	UIViewController* c = CreateViewController(idx);
     c.navigationItem.title = cells[idx].cell.textLabel.text;
+    //viewController.navigationBar.tintColor = [UIColor blueColor];
+    NSLog(@"Tint: %@", viewController.navigationBar.tintColor);
 	//c.view.bounds = viewController.view.bounds;
 	[viewController pushViewController:c animated:YES];
 	[tableView deselectRowAtIndexPath:indexPath animated:YES];

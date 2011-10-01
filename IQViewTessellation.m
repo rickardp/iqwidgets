@@ -155,11 +155,13 @@ static unsigned char* gImageGauss = NULL;
     glEnable(GL_LIGHT0);
     glEnable(GL_TEXTURE_2D);
     glLightfv(GL_LIGHT0, GL_POSITION, (GLfloat[]){0, 5, 5, 0});
-    glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat[]){1, 1, 1, 1});
+    glLightfv(GL_LIGHT0, GL_AMBIENT, (GLfloat[]){.1, .1, .1, 1});
     glLightfv(GL_LIGHT0, GL_DIFFUSE, (GLfloat[]){1, 1, 1, 1});
-    glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, (GLfloat[]){1,1,1,1});
+    glLightfv(GL_LIGHT1, GL_POSITION, (GLfloat[]){0, 51, 1, 0});
+    glLightfv(GL_LIGHT1, GL_AMBIENT, (GLfloat[]){.5, .5, .5, 1});
+    glLightfv(GL_LIGHT1, GL_DIFFUSE, (GLfloat[]){-.8, -.8, -.8, 1});
+    glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, (GLfloat[]){1,1,1,1});
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
     //NSLog(@"Backed by %d x %d", backingWidth, backingHeight);
     
 }
@@ -344,17 +346,19 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     //glLoadIdentity();
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    static CGFloat vertices[] = {
-        -1,-1,  -1,1,  1,1,  1,-1
-    };
-    static CGFloat texcoords[] = {
-        0,0,  0,1,  1,1,  1,0
-    };
     
     if(hasBackgroundTexture) {
+        static CGFloat vertices[] = {
+            -1,-1,  -1,1,  1,1,  1,-1
+        };
+        static CGFloat texcoords[] = {
+            0,0,  0,1,  1,1,  1,0
+        };
         glDisable(GL_LIGHTING);
         glDisable(GL_BLEND);
         glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_TEXTURE_2D);
+        glColor4f(1, 0, 0, 1);
         glBindTexture(GL_TEXTURE_2D, _tex[1]);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -373,7 +377,7 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     if(hasForegroundTexture) {
         glEnable(GL_LIGHTING);
         glEnable(GL_BLEND);
-        glEnable(GL_DEPTH_TEST);
+        glDisable(GL_DEPTH_TEST);
         glBindTexture(GL_TEXTURE_2D, _tex[0]);
         
         glEnableClientState(GL_VERTEX_ARRAY);
@@ -385,7 +389,19 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
         glTexCoordPointer(2, GL_FLOAT, sizeof(mesh[0]), &mesh[0].texcoord[0]);
         glNormalPointer(GL_FLOAT, sizeof(mesh[0]), &mesh[0].normal);
         //glBindTexture(GL_TEXTURE_2D, _tex);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
         glDrawElements(GL_TRIANGLES, 6*htiles*vtiles, GL_UNSIGNED_SHORT, indices);
+        glCullFace(GL_BACK);
+        glDisable(GL_TEXTURE_2D);
+        glColor4f(1, 1, 1, 1);
+        glDisable(GL_LIGHT0);
+        glEnable(GL_LIGHT1);
+        glDrawElements(GL_TRIANGLES, 6*htiles*vtiles, GL_UNSIGNED_SHORT, indices);
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_LIGHT0);
+        glDisable(GL_LIGHT1);
+        glDisable(GL_CULL_FACE);
     }
     
     glBindRenderbuffer(GL_RENDERBUFFER, _cb);
@@ -412,22 +428,35 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     glDisableClientState(GL_NORMAL_ARRAY);
     glBindTexture(GL_TEXTURE_2D, _tex[2]);
     glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-    //IQPoint3 shadow[] = {{-.5, -.5, .2}, {.5, -.5, .2}, {.5, .5, .1}, {-.5, .5, .1}};
+    shadowOpacity = .7;
+    glColor4f(0, 0, 0, shadowOpacity);
     
+#if 0
+    // Hard shadows, useful while debugging
+    glVertexPointer(2, GL_FLOAT, sizeof(IQPoint3), shd);
+    glDisable(GL_TEXTURE_2D);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glEnable(GL_TEXTURE_2D);
+#else
+    // Soft shadows
+    //IQPoint3 shd[] = {{-.5, -.5, .2}, {.5, -.5, .2}, {.5, .5, .1}, {-.5, .5, .1}};
 #define IX(x1,y1,x2,y2,x3,y3,x4,y4) (((x1*y2-y1*x2) * (x3-x4) - (x1-x2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)))
 #define IY(x1,y1,x2,y2,x3,y3,x4,y4) (((x1*y2-y1*x2) * (y3-y4) - (y1-y2)*(x3*y4-y3*x4)) / ((x1-x2)*(y3-y4) - (y1-y2)*(x3-x4)))
     
 #define ISECT(x1,y1,x2,y2,x3,y3,x4,y4) IX(C[x1],C[y1],C[x2],C[y2],C[x3],C[y3],C[x4],C[y4]), IY(C[x1],C[y1],C[x2],C[y2],C[x3],C[y3],C[x4],C[y4])
+#define LEN(a,b) (sqrtf((shd[a].x-shd[b].x)*(shd[a].x-shd[b].x)+(shd[a].y-shd[b].y)*(shd[a].y-shd[b].y)))
+#define PROJX(a,b) ((shd[a].x-shd[b].x) / LEN(a,b))
+#define PROJY(a,b) ((shd[a].y-shd[b].y) / LEN(a,b))
     GLfloat C[] = {
-        shd[0].x-.5*shd[0].z, shd[0].y-.5*shd[0].z,
-        shd[1].x+.5*shd[1].z, shd[1].y-.5*shd[1].z,
-        shd[2].x+.5*shd[2].z, shd[2].y+.5*shd[2].z,
-        shd[3].x-.5*shd[3].z, shd[3].y+.5*shd[3].z,
+        shd[0].x/*-.5*shd[0].z*/, shd[0].y/*-.5*shd[0].z*/,
+        shd[1].x/*+.5*shd[1].z*/, shd[1].y/*-.5*shd[1].z*/,
+        shd[2].x/*+.5*shd[2].z*/, shd[2].y/*+.5*shd[2].z*/,
+        shd[3].x/*-.5*shd[3].z*/, shd[3].y/*+.5*shd[3].z*/,
         
-        shd[0].x+.5*shd[0].z, shd[0].y+.5*shd[0].z,
-        shd[1].x-.5*shd[1].z, shd[1].y+.5*shd[1].z,
-        shd[2].x-.5*shd[2].z, shd[2].y-.5*shd[2].z,
-        shd[3].x+.5*shd[3].z, shd[3].y-.5*shd[3].z,
+        shd[0].x+.5*shd[0].z*PROJX(2,0), shd[0].y+.5*shd[0].z*PROJY(2,0),
+        shd[1].x+.5*shd[1].z*PROJX(3,1), shd[1].y+.5*shd[1].z*PROJY(3,1),
+        shd[2].x+.5*shd[2].z*PROJX(0,2), shd[2].y+.5*shd[2].z*PROJY(0,2),
+        shd[3].x+.5*shd[3].z*PROJX(1,3), shd[3].y+.5*shd[3].z*PROJY(1,3),
     };
     GLfloat dvertices[32] = {
         C[0],C[1],
@@ -489,9 +518,17 @@ IQPoint3 IQPoint3CrossProduct(IQPoint3 o, IQPoint3 b, IQPoint3 c) {
     };
     glVertexPointer(2, GL_FLOAT, 0, dvertices);
     glTexCoordPointer(2, GL_FLOAT, 0, dtexcoords);
-    glDisableClientState(GL_COLOR_ARRAY);
-    glColor4f(0, 0, 0, shadowOpacity);
     glDrawElements(GL_TRIANGLES, sizeof(shadowindices), GL_UNSIGNED_BYTE, shadowindices);
+#if 0
+    glVertexPointer(2, GL_FLOAT, 0, C);
+    glColor4f(1, 0, 0, 1);
+    glDisable(GL_TEXTURE_2D);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+    glColor4f(1, 1, 0, 1);
+    glDrawArrays(GL_TRIANGLE_FAN, 4, 4);
+    glEnable(GL_TEXTURE_2D);
+#endif
+#endif
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
