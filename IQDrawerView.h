@@ -19,7 +19,13 @@ typedef enum _IQDrawerViewAlign {
     IQDrawerViewAlignBottom
 } IQDrawerViewAlign;
 
-@class IQDrawerHeaderView;
+@class IQDrawerHeaderView, IQDrawerView;
+
+@protocol IQDrawerViewDelegate
+@optional
+- (void) drawer:(IQDrawerView*)drawer willChangeState:(BOOL)expanded;
+- (void) drawer:(IQDrawerView*)drawer didChangeState:(BOOL)expanded;
+@end
 
 @interface IQDrawerView : UIView {
     IQDrawerViewStyle style;
@@ -49,5 +55,10 @@ typedef enum _IQDrawerViewAlign {
 // The content view used for the drawer inside. If not set, it is created as a transparent UIView on first access.
 // The height of this view controls the height of the drawer.
 @property (nonatomic, retain) UIView* contentView;
+
+@property (nonatomic, retain) id<IQDrawerViewDelegate> drawerDelegate;
+
+// The expanded (open) state. If set, equivalent to [... setExpanded:expanded animated:YES]
+@property (nonatomic) BOOL expanded;
 
 @end

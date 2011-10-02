@@ -20,6 +20,7 @@
 @end
 
 @implementation IQDrawerView
+@synthesize drawerDelegate;
 
 - (id) initWithStyle:(IQDrawerViewStyle)drawerStyle align:(IQDrawerViewAlign)align
 {
@@ -47,6 +48,18 @@
     [backgroundView release];
 }
 
+- (void)didMoveToSuperview
+{
+    for(UIView* view in self.superview.subviews) {
+        if(view == self) break;
+        if([view isKindOfClass:[UIToolbar class]] || [view isKindOfClass:[UINavigationBar class]]) {
+            NSLog(@"Will move me to behind the toolbar %@", view);
+            [self.superview insertSubview:view belowSubview:view];
+            return;
+        }
+    }
+}
+
 - (void)layoutSubviews
 {
     contentHeight = contentView.bounds.size.height;
@@ -63,11 +76,31 @@
     contentView.frame = backgroundView.frame;
 }
 
+- (void) _animationsComplete
+{
+    if([(NSObject*)drawerDelegate respondsToSelector:@selector(drawer:didChangeState:)]) {
+        [drawerDelegate drawer:self didChangeState:expanded];
+    }
+}
+
+- (void) setExpanded:(BOOL)newexp
+{
+    [self setExpanded:newexp animated:YES];
+}
+
+- (BOOL) expanded
+{
+    return expanded;
+}
+    
 - (void) setExpanded:(BOOL)newexp animated:(BOOL)animated
 {
     CGRect r = self.superview.bounds;
     if(newexp == expanded && animated) return;
     expanded = newexp;
+    if([(NSObject*)drawerDelegate respondsToSelector:@selector(drawer:willChangeState:)]) {
+        [drawerDelegate drawer:self willChangeState:expanded];
+    }
     CGRect frame = self.frame;
     CGFloat ht0 = header->borderHeight + header->tipSize.height;
     frame.size.height = ht0 + contentHeight;
@@ -87,8 +120,11 @@
     }
     if(animated) [UIView beginAnimations:nil context:nil];
     self.frame = frame;
-    NSLog(@"Setting frame of %d to %f,%f,%f,%f", bottom, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
-    if(animated) [UIView commitAnimations];
+    if(animated) {
+        [UIView setAnimationDidStopSelector:@selector(_animationsComplete)];
+        [UIView setAnimationDelegate:self];
+        [UIView commitAnimations];   
+    }
 }
 
 - (void) toggleExpanded
@@ -104,7 +140,9 @@
         backgroundView = nil;
     }
     if(backgroundView == nil) {
+        backgroundViewIsImage = YES;
         backgroundView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 10)];
+        [self addSubview:backgroundView];
     }
 }
 
@@ -112,6 +150,7 @@
 {
     if(contentView == nil) {
         contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 10)];
+        [self addSubview:contentView];
     }
 }
 
