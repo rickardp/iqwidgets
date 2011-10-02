@@ -45,6 +45,7 @@
 		FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF39130C828B0040F26E /* TestUtil.h */; settings = {ATTRIBUTES = (); }; };
 		FFDA7DE31436FF0300B5FB92 /* IQDrawerView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFDA7DE11436FF0300B5FB92 /* IQDrawerView.h */; };
 		FFDA7DE41436FF0300B5FB92 /* IQDrawerView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFDA7DE21436FF0300B5FB92 /* IQDrawerView.m */; };
+		FFDA7DEC14377FE900B5FB92 /* ExampleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FFDA7DE814376CA900B5FB92 /* ExampleViewController.m */; };
 		FFDEA941137B1CFA00A94388 /* IQViewTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */; };
 		FFDEA942137B1CFA00A94388 /* IQViewTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FFDEA940137B1CFA00A94388 /* IQViewTransition.m */; };
 		FFEEF05412BACC59003CA394 /* IQWidgets.h in Headers */ = {isa = PBXBuildFile; fileRef = FF540B3712A960B800C2C7A5 /* IQWidgets.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -110,6 +111,8 @@
 		FFD6CF39130C828B0040F26E /* TestUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtil.h; path = Tests/TestUtil.h; sourceTree = "<group>"; };
 		FFDA7DE11436FF0300B5FB92 /* IQDrawerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQDrawerView.h; sourceTree = "<group>"; };
 		FFDA7DE21436FF0300B5FB92 /* IQDrawerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQDrawerView.m; sourceTree = "<group>"; };
+		FFDA7DE714376CA900B5FB92 /* ExampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExampleViewController.h; path = Example/ExampleViewController.h; sourceTree = "<group>"; };
+		FFDA7DE814376CA900B5FB92 /* ExampleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExampleViewController.m; path = Example/ExampleViewController.m; sourceTree = "<group>"; };
 		FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQViewTransition.h; sourceTree = "<group>"; };
 		FFDEA940137B1CFA00A94388 /* IQViewTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQViewTransition.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -213,6 +216,8 @@
 		FF540AEC12A95EDB00C2C7A5 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				FFDA7DEB14377F0E00B5FB92 /* Examples */,
+				FFDA7DE614376C7E00B5FB92 /* Supporting Code */,
 				FFA26834132E8F23007B7FBD /* test.png */,
 				FF540AED12A95EF400C2C7A5 /* ExampleApp.h */,
 				FF540AEE12A95EF400C2C7A5 /* ExampleApp.m */,
@@ -233,6 +238,22 @@
 				FFD6CF39130C828B0040F26E /* TestUtil.h */,
 			);
 			name = Tests;
+			sourceTree = "<group>";
+		};
+		FFDA7DE614376C7E00B5FB92 /* Supporting Code */ = {
+			isa = PBXGroup;
+			children = (
+				FFDA7DE714376CA900B5FB92 /* ExampleViewController.h */,
+				FFDA7DE814376CA900B5FB92 /* ExampleViewController.m */,
+			);
+			name = "Supporting Code";
+			sourceTree = "<group>";
+		};
+		FFDA7DEB14377F0E00B5FB92 /* Examples */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Examples;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -404,6 +425,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF540AEF12A95EF400C2C7A5 /* ExampleApp.m in Sources */,
+				FFDA7DEC14377FE900B5FB92 /* ExampleViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

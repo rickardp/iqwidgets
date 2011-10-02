@@ -9,6 +9,16 @@
 #import "IQDrawerView.h"
 #import <QuartzCore/QuartzCore.h>
 
+@interface IQDrawerHeaderView : UIView <UIGestureRecognizerDelegate> {
+@public
+    BOOL bottom;
+    CGSize tipSize;
+    CGFloat borderHeight;
+}
+
+- (id) initWithFrame:(CGRect)frame bottom:(BOOL)bottom;
+@end
+
 @implementation IQDrawerView
 
 - (id) initWithStyle:(IQDrawerViewStyle)drawerStyle align:(IQDrawerViewAlign)align
@@ -16,38 +26,171 @@
     self = [super initWithFrame:CGRectMake(0, 0, 320, 30)];
     if (self) {
         contentHeight = 0;
-        borderHeight = 10;
-        tipSize = CGSizeMake(100, 20);
         style = drawerStyle;
         bottom = (align == IQDrawerViewAlignBottom);
+        header = [[IQDrawerHeaderView alloc] initWithFrame:self.bounds bottom:bottom];
+        if(bottom) {
+            self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
+        } else {
+            self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
+        }
+        [self addSubview:header];
         self.opaque = NO;
         self.backgroundColor = [UIColor clearColor];
+    }
+    return self;
+}
+
+- (void)dealloc
+{
+    [header release];
+    [backgroundView release];
+}
+
+- (void)layoutSubviews
+{
+    contentHeight = contentView.bounds.size.height;
+    [self setExpanded:expanded animated:NO];
+    CGRect r = self.bounds;
+    CGFloat framesz = header->tipSize.height+header->borderHeight;
+    if(bottom) {
+        header.frame = CGRectMake(0, 0, r.size.width, framesz);
+        backgroundView.frame = CGRectMake(0, framesz, r.size.width, contentHeight);
+    } else {
+        header.frame = CGRectMake(0, r.size.height-framesz, r.size.width, framesz);
+        backgroundView.frame = CGRectMake(0, 0, r.size.width, contentHeight);
+    }
+    contentView.frame = backgroundView.frame;
+}
+
+- (void) setExpanded:(BOOL)newexp animated:(BOOL)animated
+{
+    CGRect r = self.superview.bounds;
+    if(newexp == expanded && animated) return;
+    expanded = newexp;
+    CGRect frame = self.frame;
+    CGFloat ht0 = header->borderHeight + header->tipSize.height;
+    frame.size.height = ht0 + contentHeight;
+    if(bottom) {
+        if(expanded) frame.origin.y = r.size.height-frame.size.height;
+        else frame.origin.y = r.size.height-ht0;
+    } else {
+        if(expanded) frame.origin.y = 0;
+        else frame.origin.y = -contentHeight;
+    }
+    if(animated) [UIView beginAnimations:nil context:nil];
+    self.frame = frame;
+    NSLog(@"Setting frame of %d to %f,%f,%f,%f", bottom, frame.origin.x, frame.origin.y, frame.size.width, frame.size.height);
+    if(animated) [UIView commitAnimations];
+}
+
+- (void) toggleExpanded
+{
+    [self setExpanded:!expanded animated:YES];
+}
+
+- (void) _createBackgroundView
+{
+    if(!backgroundViewIsImage) {
+        [backgroundView removeFromSuperview];
+        [backgroundView release];
+        backgroundView = nil;
+    }
+    if(backgroundView == nil) {
+        backgroundView = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 10)];
+    }
+}
+
+- (void) _createContentView
+{
+    if(contentView == nil) {
+        contentView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 10)];
+    }
+}
+
+#pragma mark Properties
+
+- (void)setBackgroundColor:(UIColor *)backgroundColor
+{
+    [self _createBackgroundView];
+    [backgroundView setBackgroundColor:backgroundColor];
+}
+
+- (UIColor*)backgroundColor
+{
+    if(!backgroundViewIsImage) return [UIColor clearColor];
+    return backgroundView.backgroundColor;
+}
+
+- (void)setBackgroundImage:(UIImage *)backgroundImage
+{
+    [self _createBackgroundView];
+    [(UIImageView*)backgroundView setImage:backgroundImage];
+}
+
+- (UIImage*)backgroundImage
+{
+    if(!backgroundViewIsImage) return nil;
+    return [(UIImageView*)backgroundView image];
+}
+
+- (void)setBackgroundView:(UIView *)bgv
+{
+    [backgroundView removeFromSuperview];
+    backgroundView = [bgv retain];
+    [self addSubview:backgroundView];
+}
+
+- (UIView*)backgroundView
+{
+    return backgroundView;
+}
+
+- (void)setContentView:(UIView *)cv
+{
+    [contentView removeFromSuperview];
+    contentView = [cv retain];
+    [self addSubview:contentView];
+}
+
+- (UIView*)contentView
+{
+    if(contentView == nil) {
+        [self setContentView:[[[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 10)] autorelease]];
+    }
+    return contentView;
+}
+
+@end
+
+
+@implementation IQDrawerHeaderView
+
+- (void) toggleByTap
+{
+    [(IQDrawerView*)self.superview toggleExpanded];
+}
+
+- (id) initWithFrame:(CGRect)frame bottom:(BOOL)btm
+{
+    self = [super initWithFrame:CGRectMake(0, 0, 320, 30)];
+    if (self) {
+        bottom = btm;
+        tipSize = CGSizeMake(100, 20);
+        borderHeight = 10;
+        self.backgroundColor = [UIColor clearColor];
         self.layer.shadowOpacity = 0.55;
+        self.contentMode = UIViewContentModeRedraw;
         if(bottom) {
             self.layer.shadowOffset = CGSizeMake(0, -2);
         } else {
             self.layer.shadowOffset = CGSizeMake(0, 2);
         }
-        //self.layer.shadowRadius = 8;
+        self.opaque = NO;
+        UITapGestureRecognizer* tap = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleByTap)] autorelease];
+        [self addGestureRecognizer:tap];
     }
     return self;
-}
-
-- (void)layoutSubviews
-{
-    NSLog(@"Layouting subviews");
-}
-
-- (void)didMoveToSuperview
-{
-    CGRect r = self.superview.bounds;
-    if(bottom) {
-        self.frame = CGRectMake(0, r.size.height-tipSize.height-borderHeight, r.size.width, tipSize.height+borderHeight);
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleTopMargin;
-    } else {
-        self.frame = CGRectMake(0, 0, r.size.width, tipSize.height+borderHeight);
-        self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleBottomMargin;
-    }
 }
 
 - (CGGradientRef) createFill
@@ -100,9 +243,9 @@
     CGRect r = self.bounds;
     CGContextRef ctx = UIGraphicsGetCurrentContext();
     /*CGContextSetBlendMode(ctx, kCGBlendModeCopy);
-    CGContextSetFillColorWithColor(ctx, [UIColor clearColor].CGColor);
-    CGContextFillRect(ctx, r);
-    CGContextSetBlendMode(ctx, kCGBlendModeNormal);*/
+     CGContextSetFillColorWithColor(ctx, [UIColor clearColor].CGColor);
+     CGContextFillRect(ctx, r);
+     CGContextSetBlendMode(ctx, kCGBlendModeNormal);*/
     //UIBezierPath* path = [[[UIBezierPath alloc] init] autorelease];
     //CGContextSetFillColorWithColor(ctx, [UIColor blueColor].CGColor);
     //CGContextFillRect(ctx, CGRectMake((r.size.width-tipSize.width)*.5f, borderHeight, tipSize.width, tipSize.height));
@@ -153,20 +296,23 @@
     };
     CGContextStrokeLineSegments(ctx, line, 2);
     
+    CGContextSetStrokeColorWithColor(ctx, [UIColor colorWithWhite:0 alpha:0.8].CGColor);
+    line[0] = CGPointMake(0, (bottom?(borderHeight+tipSize.height):0));
+    line[1] = CGPointMake(r.size.width, (bottom?(borderHeight+tipSize.height):0));
+    
     /*CGContextMoveToPoint(ctx, 0, 0);
-    CGContextAddLineToPoint(ctx, r.size.width, 0);
-    CGContextAddLineToPoint(ctx, r.size.width, borderHeight);
-    CGContextAddLineToPoint(ctx, .5*(r.size.width+tipSize.width), borderHeight);
-    
-    
-    CGContextAddCurveToPoint(ctx, rc, borderHeight, rc, borderHeight+tipSize.height, r.size.width*.5f, borderHeight+tipSize.height);
-    
-    CGContextAddCurveToPoint(ctx, lc, borderHeight+tipSize.height, lc, borderHeight, .5*(r.size.width-tipSize.width), borderHeight);
-    
-    CGContextAddLineToPoint(ctx, 0, borderHeight);
-    CGContextAddLineToPoint(ctx, 0, 0);
-    CGContextFillPath(ctx);*/
+     CGContextAddLineToPoint(ctx, r.size.width, 0);
+     CGContextAddLineToPoint(ctx, r.size.width, borderHeight);
+     CGContextAddLineToPoint(ctx, .5*(r.size.width+tipSize.width), borderHeight);
+     
+     
+     CGContextAddCurveToPoint(ctx, rc, borderHeight, rc, borderHeight+tipSize.height, r.size.width*.5f, borderHeight+tipSize.height);
+     
+     CGContextAddCurveToPoint(ctx, lc, borderHeight+tipSize.height, lc, borderHeight, .5*(r.size.width-tipSize.width), borderHeight);
+     
+     CGContextAddLineToPoint(ctx, 0, borderHeight);
+     CGContextAddLineToPoint(ctx, 0, 0);
+     CGContextFillPath(ctx);*/
 }
-
 
 @end

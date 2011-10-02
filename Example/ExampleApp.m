@@ -17,6 +17,7 @@
 //
 
 #import "ExampleApp.h"
+#import "ExampleViewController.h"
 #import "IQWidgets.h"
 #import <QuartzCore/QuartzCore.h>
 
@@ -141,8 +142,8 @@ struct {
 	return NVIEWS;
 }
 
-static UIViewController* WrapInController(UIView* view) {
-	UIViewController* c = [[[UIViewController alloc] init] autorelease];
+static ExampleViewController* WrapInController(UIView* view) {
+	ExampleViewController* c = [[[ExampleViewController alloc] init] autorelease];
 	c.view = [view autorelease];
 	return c;
 }
@@ -177,7 +178,7 @@ static UIViewController* CreateViewController(int idx) {
             selector.segmentedControlStyle = UISegmentedControlStyleBar;
             selector.selectedSegmentIndex = 0;
             [selector addTarget:v action:@selector(didSelectMode:) forControlEvents:UIControlEventValueChanged];
-            UIViewController* vc = WrapInController(v);
+            ExampleViewController* vc = WrapInController(v);
             UIBarButtonItem* sys = [[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil] autorelease];
             vc.toolbarItems = [NSArray arrayWithObjects:sys,[[[UIBarButtonItem alloc] initWithCustomView:selector] autorelease],sys,nil];
             NSMutableSet* items = [NSMutableSet set];
@@ -338,11 +339,18 @@ static UIViewController* CreateViewController(int idx) {
         }
         case 9:
         {
-            UIViewController* vc = [[[UIViewController alloc] init] autorelease];
+            ExampleViewController* vc = [ExampleViewController exampleViewController];
             IQDrawerView* view = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignTop] autorelease];
             [vc.view addSubview:view];
+            UILabel* topDrawer = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)] autorelease];
+            topDrawer.text = @"This is the top drawer";
+            view.contentView = topDrawer;
             view = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignBottom] autorelease];
             [vc.view addSubview:view];
+            UILabel* bottomDrawer = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 50)] autorelease];
+            bottomDrawer.text = @"This is the bottom drawer";
+            bottomDrawer.textAlignment = UITextAlignmentCenter;
+            view.contentView = bottomDrawer;
             return vc;
         }
 		default:
