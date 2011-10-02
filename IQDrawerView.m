@@ -72,8 +72,15 @@
     CGFloat ht0 = header->borderHeight + header->tipSize.height;
     frame.size.height = ht0 + contentHeight;
     if(bottom) {
-        if(expanded) frame.origin.y = r.size.height-frame.size.height;
-        else frame.origin.y = r.size.height-ht0;
+        CGFloat ylow = r.size.height;
+        for(UIView* view in self.superview.subviews) {
+            if([view isKindOfClass:[UIToolbar class]]) {
+                CGRect cr = view.frame;
+                if(cr.origin.y < ylow) ylow = cr.origin.y;
+            }
+        }
+        if(expanded) frame.origin.y = ylow-frame.size.height;
+        else frame.origin.y = ylow-ht0;
     } else {
         if(expanded) frame.origin.y = 0;
         else frame.origin.y = -contentHeight;
