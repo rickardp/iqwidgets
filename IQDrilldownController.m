@@ -19,13 +19,6 @@
 #import "IQDrilldownController.h"
 #import <QuartzCore/QuartzCore.h>
 
-/*@interface UIViewController (Hierarchy)
-- (void) setParentViewController:(UIViewController*)viewController;
-- (NSHashTable*) childViewControllers;
-- (void) addChildViewController:(UIViewController*)viewController;
-- (void) removeChildViewController:(UIViewController*)viewController;
-@end*/
-
 @interface IQDrilldownController (PrivateMethods)
 - (void) setupDrilldownPanel;
 - (void) setDropShadowsForViewController:(UIViewController*)vc to:(BOOL)enable;
@@ -125,7 +118,6 @@
 	}
 	if([viewControllers containsObject:viewController]) return;
 	[viewControllers addObject:viewController];
-	[viewController setParentViewController:self];
 	[self addChildViewController:viewController];
 	[self.view addSubview:viewController.view];
 	activeIndex = viewControllers.count - 1;
@@ -154,8 +146,6 @@
 	if(viewControllers.count == 0) return;
 	UIViewController* last = [viewControllers lastObject];
 	[viewControllers removeObject:last];
-	[last setParentViewController:nil];
-	[self removeChildViewController:last];
 	activeIndex = viewControllers.count - 1;
 	[self doLayout:animated];
 }
