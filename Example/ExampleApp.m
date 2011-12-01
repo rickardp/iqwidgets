@@ -340,17 +340,19 @@ static UIViewController* CreateViewController(int idx) {
         case 9:
         {
             ExampleViewController* vc = [ExampleViewController exampleViewController];
-            IQDrawerView* view = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignTop] autorelease];
+            IQDrawerView* topDrawer = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignTop] autorelease];
+            [vc.view addSubview:topDrawer];
+            UILabel* topLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)] autorelease];
+            topLabel.text = @"This is the top drawer";
+            topLabel.shadowOpacity = 0.55;
+            topDrawer.contentView = topLabel;
+            IQDrawerView* bottomDrawer = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignBottom] autorelease];
             [vc.view addSubview:view];
-            UILabel* topDrawer = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)] autorelease];
-            topDrawer.text = @"This is the top drawer";
-            view.contentView = topDrawer;
-            view = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignBottom] autorelease];
-            [vc.view addSubview:view];
-            UILabel* bottomDrawer = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 50)] autorelease];
-            bottomDrawer.text = @"This is the bottom drawer";
-            bottomDrawer.textAlignment = UITextAlignmentCenter;
-            view.contentView = bottomDrawer;
+            UILabel* bottomLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 50)] autorelease];
+            bottomLabel.text = @"This is the bottom drawer";
+            bottomLabel.textAlignment = UITextAlignmentCenter;   
+            bottomDrawer.shadowOpacity = 0.55;
+            bottomDrawer.contentView = bottomLabel;
             return vc;
         }
 		default:

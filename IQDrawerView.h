@@ -61,4 +61,12 @@ typedef enum _IQDrawerViewAlign {
 // The expanded (open) state. If set, equivalent to [... setExpanded:expanded animated:YES]
 @property (nonatomic) BOOL expanded;
 
+// The shadow opacity
+@property (nonatomic) CGFloat shadowOpacity;
+// The shadow offset. Default depends on the alignment
+@property (nonatomic) CGSize shadowOffset;
+// The shadow radius.
+@property (nonatomic) CGFloat shadowRadius;
+@property (nonatomic, retain) UIColor* shadowColor;
+
 @end

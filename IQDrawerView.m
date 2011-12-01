@@ -207,6 +207,39 @@
     return contentView;
 }
 
+- (void)setShadowColor:(UIColor *)shadowColor {
+    header.layer.shadowColor = shadowColor.CGColor;
+}
+
+- (UIColor*)shadowColor {
+    CGColorRef colr = header.layer.shadowColor;
+    if(colr == nil) return nil;
+    return [UIColor colorWithCGColor:colr];
+}
+
+- (void)setShadowOpacity:(CGFloat)shadowOpacity {
+    header.layer.shadowOpacity = shadowOpacity;
+}
+
+- (CGFloat)shadowOpacity {
+    return header.layer.shadowOpacity;
+}
+
+- (void)setShadowOffset:(CGSize)shadowOffset {
+    header.layer.shadowOffset = shadowOffset;
+}
+
+- (CGSize)shadowOffset {
+    return header.layer.shadowOffset;
+}
+
+- (void)setShadowRadius:(CGFloat)shadowRadius {
+    header.layer.shadowRadius = shadowRadius;
+}
+
+- (CGFloat)shadowRadius {
+    return header.layer.shadowRadius;
+}
 @end
 
 
@@ -225,7 +258,6 @@
         tipSize = CGSizeMake(100, 20);
         borderHeight = 10;
         self.backgroundColor = [UIColor clearColor];
-        self.layer.shadowOpacity = 0.55;
         self.contentMode = UIViewContentModeRedraw;
         if(bottom) {
             self.layer.shadowOffset = CGSizeMake(0, -2);
