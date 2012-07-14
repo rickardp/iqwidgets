@@ -32,6 +32,7 @@
 @interface IQDrilldownController : UIViewController<UIGestureRecognizerDelegate> {
 	CGFloat panelWidth;
 	CGFloat minimizedMargin;
+    UIViewController* rootViewController;
 	NSMutableArray* viewControllers;
 	BOOL activeViewRightAligned;
 	BOOL stopAtPartiallyVisibleNext;
@@ -46,10 +47,16 @@
 	CGFloat shadowOpacity;
 }
 
+/**
+ Initializer specifying a root view controller. A root view controller is controlling
+ the (immovable) root view. Use of a root view is optional, and this argument can be nil.
+ */
+- (id) initWithRootViewController:(UIViewController*)rootViewController;
+
 // Pushes a view controller to the top of the view stack as the outermost view controller.
 - (void) pushViewController:(UIViewController*)viewController animated:(BOOL)animated;
 // Replaces the entire view controller stack with the specified view controller
-- (void) setRootViewController:(UIViewController*) viewController animated:(BOOL)animated;
+- (void) setViewController:(UIViewController*) viewController animated:(BOOL)animated;
 
 - (void) popViewControllerAnimated:(BOOL)animated;
 
@@ -72,6 +79,8 @@
 @property (nonatomic) CGFloat shadowOpacity;
 @property (nonatomic) CGFloat panelWidth;
 @property (nonatomic) BOOL stopAtPartiallyVisibleNext;
+
+@property (nonatomic, readonly) UIViewController* rootViewController;
 
 @end
 

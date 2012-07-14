@@ -30,10 +30,10 @@
 @implementation IQDrilldownController
 @synthesize delegate;
 @synthesize enableViewShadows;
-@synthesize shadowRadius;
-@synthesize shadowOpacity;
+@synthesize shadowRadius, shadowOpacity;
 @synthesize panelWidth;
 @synthesize stopAtPartiallyVisibleNext;
+@synthesize rootViewController;
 
 // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
 
@@ -48,6 +48,15 @@
 - (id)initWithCoder:(NSCoder *)aDecoder {
 	self = [super initWithCoder:aDecoder];
 	if(self) {
+		[self setupDrilldownPanel];
+	}
+    return self;
+}
+
+- (id)initWithRootViewController:(UIViewController *)root {
+	self = [super init];
+	if(self) {
+        rootViewController = [root retain];
 		[self setupDrilldownPanel];
 	}
     return self;
@@ -84,6 +93,9 @@
 	stopAtPartiallyVisibleNext = YES;
 	shadowRadius = 50;
 	shadowOpacity = 0.3;
+    if(rootViewController != nil) {
+        [self.view addSubview:rootViewController.view];
+    }
 }
 
 - (void) setDropShadowsForViewController:(UIViewController*)vc to:(BOOL)enable {
@@ -112,10 +124,14 @@
 }
 
 - (void) pushViewController:(UIViewController*)viewController animated:(BOOL)animated {
+    if(viewController == nil) return;
 	if(viewControllers.count >= MAX_VIEWS) {
 		[NSException raise:@"TooManyViews" format:@"The IQDrilldownController does only support %d views", MAX_VIEWS];
 		return;
 	}
+    if(viewController == rootViewController) {
+        [NSException raise:@"InvalidArgument" format:@"Cannot push the root view controller to the controller stack"];
+    }
 	if([viewControllers containsObject:viewController]) return;
 	[viewControllers addObject:viewController];
 	[self addChildViewController:viewController];
@@ -137,7 +153,7 @@
 	[self doLayout:animated];
 }
 
-- (void) setRootViewController:(UIViewController*) viewController animated:(BOOL)animated {
+- (void) setViewController:(UIViewController*) viewController animated:(BOOL)animated {
 	while(viewControllers.count > 0) [self popViewControllerAnimated:animated];
 	[self pushViewController:viewController animated:animated];
 }
