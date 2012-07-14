@@ -344,10 +344,10 @@ static UIViewController* CreateViewController(int idx) {
             [vc.view addSubview:topDrawer];
             UILabel* topLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 30)] autorelease];
             topLabel.text = @"This is the top drawer";
-            topLabel.shadowOpacity = 0.55;
+            topDrawer.shadowOpacity = 0.55;
             topDrawer.contentView = topLabel;
             IQDrawerView* bottomDrawer = [[[IQDrawerView alloc] initWithStyle:IQDrawerViewStyleBarDefault align:IQDrawerViewAlignBottom] autorelease];
-            [vc.view addSubview:view];
+            [vc.view addSubview:bottomDrawer];
             UILabel* bottomLabel = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 50)] autorelease];
             bottomLabel.text = @"This is the bottom drawer";
             bottomLabel.textAlignment = UITextAlignmentCenter;   

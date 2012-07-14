@@ -24,7 +24,7 @@
 
 - (id) initWithStyle:(IQDrawerViewStyle)drawerStyle align:(IQDrawerViewAlign)align
 {
-    self = [super initWithFrame:CGRectMake(0, 0, 320, 30)];
+    self = [super initWithFrame:CGRectMake(0, 0, 0, 30)];
     if (self) {
         contentHeight = 0;
         style = drawerStyle;
@@ -46,6 +46,7 @@
 {
     [header release];
     [backgroundView release];
+    [super dealloc];
 }
 
 - (void)didMoveToSuperview
@@ -57,6 +58,11 @@
             [self.superview insertSubview:view belowSubview:view];
             return;
         }
+    }
+    CGRect frame = self.frame;
+    if(frame.size.width == 0) {
+        frame.size.width = self.superview.bounds.size.width;
+        self.frame = frame;
     }
 }
 

@@ -67,12 +67,12 @@ typedef void (^IQViewTesselationMeshTransformation)(IQPoint3* mesh, NSUInteger h
 
 // The view transformation, given as a callback on every data point.
 // Note that setting this property to non-nil automatically sets meshTransformation to nil.
-@property (nonatomic, retain) IQViewTesselationTransformation transformation;
+@property (nonatomic, copy) IQViewTesselationTransformation transformation;
 
 // The view transformation, operating on the mesh in a single call. This performs slightly better than
 // using the transformation property.
 // Note that setting this property to non-nil automatically sets transformation to nil.
-@property (nonatomic, retain) IQViewTesselationMeshTransformation meshTransformation;
+@property (nonatomic, copy) IQViewTesselationMeshTransformation meshTransformation;
 
 // The opacity for the view shadow (if used). Default is 0.75.
 @property (nonatomic) CGFloat shadowOpacity;

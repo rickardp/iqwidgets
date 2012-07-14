@@ -99,8 +99,8 @@
 {
     [self setCallbackForText:^(id item) {
         if([item respondsToSelector:textSelector]) {
-            return [item performSelector:textSelector withObject:item];
-        } else return nil;
+            return (NSString*)[item performSelector:textSelector withObject:item];
+        } else return (NSString*)nil;
     }];
 }
 

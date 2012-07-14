@@ -205,17 +205,10 @@
 		CGFloat cleft;
 		if(idx < activeIndex) {
 			cleft = minimizedMargin;
-			//vc.view.backgroundColor = [UIColor whiteColor];
-			//if(idx == activeIndex - 1) vc.view.hidden = NO;
 		} else if(idx == activeIndex) {
-			//vc.view.backgroundColor = [UIColor yellowColor];
 			cleft = left;
-			//vc.view.hidden = NO;
 		} else {
-			//vc.view.backgroundColor = [UIColor whiteColor];
 			cleft = left + width;
-			//if(idx == activeIndex + 1) vc.view.hidden = NO;
-			//else vc.view.hidden = YES;
 			if(idx > activeIndex + 1) cleft += width;
 		}
 		origin[idx] = CGPointMake(cleft, 0);
