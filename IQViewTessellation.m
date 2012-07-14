@@ -105,6 +105,7 @@ static unsigned char* gImageGauss = NULL;
     transitionFrom = nil;
     [transitionTo release];
     transitionTo = nil;
+    [super dealloc];
 }
 
 - (void) didMoveToSuperview

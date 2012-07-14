@@ -72,7 +72,8 @@ static IQViewTransition* activeTransition;
     from = nil;
     [to release];
     to = nil;
-}
+    [super dealloc];
+};
 
 - (void) stop
 {
