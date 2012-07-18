@@ -26,26 +26,17 @@
 - (BOOL) drilldown:(IQDrilldownController*)drilldown stopAtPartiallyVisibleController:(UIViewController*)viewController;
 @end
 
-// The maximum depth of the drilldown controller.
-#define MAX_VIEWS 8
+typedef enum _IQDrilldownRootViewPosition {
+    IQDrilldownRootViewPositionBelow = 0,
+    IQDrilldownRootViewPositionAbove = 1
+} IQDrilldownRootViewPosition;
 
-@interface IQDrilldownController : UIViewController<UIGestureRecognizerDelegate> {
-	CGFloat panelWidth;
-	CGFloat minimizedMargin;
-    UIViewController* rootViewController;
-	NSMutableArray* viewControllers;
-	BOOL activeViewRightAligned;
-	BOOL stopAtPartiallyVisibleNext;
-	BOOL enableViewShadows;
-	int activeIndex;
-	CGPoint origin[MAX_VIEWS];
-	id<IQDrilldownControllerDelegate> delegate;
-	UISwipeGestureRecognizer* swipeLeft, *swipeRight;
-	UIPanGestureRecognizer* pan;
-	BOOL inPan;
-	CGFloat shadowRadius;
-	CGFloat shadowOpacity;
-}
+typedef enum _IQDrilldownDirection {
+    IQDrilldownDirectionLeftToRight = 0,
+    IQDrilldownDirectionRightToLeft = 1
+} IQDrilldownDirection;
+
+@interface IQDrilldownController : UIViewController<UIGestureRecognizerDelegate>
 
 /**
  Initializer specifying a root view controller. A root view controller is controlling
@@ -82,6 +73,16 @@
 
 @property (nonatomic, readonly) UIViewController* rootViewController;
 
+/**
+ Controls whether the root view is above or below the drilldown views (default is below).
+ Can only be set when there are no drilldown panels, otherwise an exception is thrown.
+ */
+@property (nonatomic) IQDrilldownRootViewPosition rootViewPosition;
+
+/**
+ The direction of the drilldown panels. Default is left-to-right.
+ */
+@property (nonatomic) IQDrilldownDirection drilldownDirection;
 @end
 
 @interface UIViewController (DrilldownExtensions)
