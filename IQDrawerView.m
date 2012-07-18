@@ -277,7 +277,7 @@
     return self;
 }
 
-- (CGGradientRef) createFill
+- (CGGradientRef) newFill
 {
     CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
     CGFloat locs[] = {0,0.5,0.5,1};
@@ -337,7 +337,7 @@
     UIBezierPath* path = [self drawerPathWithTopCap:YES];
     [self.layer setShadowPath:[path CGPath]];
     [path addClip];
-    CGGradientRef grad = [self createFill];
+    CGGradientRef grad = [self newFill];
     CGContextDrawLinearGradient(ctx, grad, CGPointMake(0, 0), CGPointMake(0, borderHeight+tipSize.height), 0);
     CGGradientRelease(grad);
     

@@ -26,7 +26,7 @@
 - (void) setupGanttView;
 - (void) layoutOnRowsChange;
 - (void) layoutOnPropertyChange:(BOOL)didChangeZoom;
-- (UIView*) createBlockWithRow:(UIView*)rowView item:(id)item frame:(CGRect)frame;
+- (UIView*) blockViewForRow:(UIView*)rowView item:(id)item frame:(CGRect)frame;
 @end
 
 @implementation IQGanttView
@@ -75,21 +75,21 @@
 
 - (void) didMoveToWindow
 {
-    UIView* view = [[self createTimeHeaderViewWithFrame:CGRectMake(0, 0, self.bounds.size.width, 44)] autorelease];
-    if(view != nil) {
-        if([view respondsToSelector:@selector(ganttView:shouldDisplayCalendarUnits:)]) {
-            [(id<IQGanttHeaderDelegate>)view ganttView:self shouldDisplayCalendarUnits:displayCalendarUnits];
+    UIView* colHead = [self timeHeaderViewWithFrame:CGRectMake(0, 0, self.bounds.size.width, 44)];
+    if(colHead != nil) {
+        if([colHead respondsToSelector:@selector(ganttView:shouldDisplayCalendarUnits:)]) {
+            [(id<IQGanttHeaderDelegate>)colHead ganttView:self shouldDisplayCalendarUnits:displayCalendarUnits];
         }
-        if([view respondsToSelector:@selector(ganttView:didChangeCalendar:)]) {
-            [(id<IQGanttHeaderDelegate>)view ganttView:self didChangeCalendar:calendar];
+        if([colHead respondsToSelector:@selector(ganttView:didChangeCalendar:)]) {
+            [(id<IQGanttHeaderDelegate>)colHead ganttView:self didChangeCalendar:calendar];
         }
         
-        self.columnHeaderView = view;
+        self.columnHeaderView = colHead;
     }
-    view = [[self createRowHeaderViewWithFrame:CGRectMake(0, 0, 100, self.bounds.size.height)] autorelease];
-    if(view != nil) self.rowHeaderView = view;
-    view = [[self createCornerViewWithFrame:CGRectMake(0, 0, self.bounds.size.width, 44)] autorelease];
-    if(view != nil) self.cornerView = view;
+    UIView* rowHead = [self rowHeaderViewWithFrame:CGRectMake(0, 0, 100, self.bounds.size.height)];
+    if(rowHead != nil) self.rowHeaderView = rowHead;
+    UIView* corner = [self cornerViewWithFrame:CGRectMake(0, 0, self.bounds.size.width, 44)];
+    if(corner != nil) self.cornerView = corner;
     [self layoutOnPropertyChange:YES];
 }
 
@@ -235,7 +235,7 @@
 }
 - (void)addRow:(id<IQCalendarDataSource>)row
 {
-    UIView<IQGanttRowDelegate>* view = [self createViewForRow:row withFrame:CGRectMake(0, 0, self.contentSize.width, self.bounds.size.height * 0.25)];
+    UIView<IQGanttRowDelegate>* view = [self viewForRow:row withFrame:CGRectMake(0, 0, self.contentSize.width, self.bounds.size.height * 0.25)];
     view.autoresizingMask = UIViewAutoresizingFlexibleWidth;
     [self addSubview:view];
     if(rows == nil) rows = [NSMutableArray new];
@@ -255,29 +255,29 @@
 
 #pragma mark Default implementation of base methods
 
-- (UIView*) createCornerViewWithFrame:(CGRect)frame
+- (UIView*) cornerViewWithFrame:(CGRect)frame
 {
     return nil;
 }
 
-- (UIView<IQGanttHeaderDelegate>*) createTimeHeaderViewWithFrame:(CGRect)frame
+- (UIView<IQGanttHeaderDelegate>*) timeHeaderViewWithFrame:(CGRect)frame
 {
-    return [[IQGanttHeaderView alloc] initWithFrame:frame];
+    return [[[IQGanttHeaderView alloc] initWithFrame:frame] autorelease];
 }
 
-- (UIView*) createRowHeaderViewWithFrame:(CGRect)frame
+- (UIView*) rowHeaderViewWithFrame:(CGRect)frame
 {
     return nil;
 }
-- (UIView<IQGanttRowDelegate>*) createViewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame
+- (UIView<IQGanttRowDelegate>*) viewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame
 {
-    return [[IQGanttRowView alloc] initWithFrame:frame];
+    return [[[IQGanttRowView alloc] initWithFrame:frame] autorelease];
 }
 
-- (UIView*) createBlockWithRow:(UIView*)rowView item:(id)item frame:(CGRect)frame
+- (UIView*) blockViewForRow:(UIView*)rowView item:(id)item frame:(CGRect)frame
 {
     if(createBlock == nil) {
-        IQScheduleBlockView* lbl = [[IQScheduleBlockView alloc] initWithFrame:frame];
+        IQScheduleBlockView* lbl = [[[IQScheduleBlockView alloc] initWithFrame:frame] autorelease];
         lbl.contentMode = UIViewContentModeCenter;
         lbl.backgroundColor = [UIColor redColor];
         return lbl;
@@ -433,7 +433,7 @@
     }
     
     while(index >= floatingLabels.count) {
-        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 16)];
+        UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 16)] autorelease];
         label.font = [UIFont boldSystemFontOfSize:12];
         label.backgroundColor = [UIColor clearColor];
         label.textColor = [UIColor colorWithRed:.15 green:.1 blue:0 alpha:1];
@@ -602,7 +602,7 @@
          btn.frame = frame;
          btn.titleLabel.text = @"Apan";*/
         //btn.buttonType = UIButtonTypeRoundedRect;
-        UIView* blk = [[gantt createBlockWithRow:self item:item frame:frame] autorelease];
+        UIView* blk = [gantt blockViewForRow:self item:item frame:frame];
         if([blk respondsToSelector:@selector(setText:)] && [self.dataSource respondsToSelector:@selector(textForItem:)]) {
             NSString* txt = [self.dataSource textForItem:item];
             if(txt != nil) {

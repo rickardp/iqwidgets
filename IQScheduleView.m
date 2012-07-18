@@ -138,7 +138,7 @@ const CGFloat kDayViewPadding = 0.0;
 
 - (NSDate*) endDate
 {
-    NSDateComponents* cmpnts = [NSDateComponents new];
+    NSDateComponents* cmpnts = [[NSDateComponents new] autorelease];
     [cmpnts setDay:numDays-1];
     return [calendar dateByAddingComponents:cmpnts toDate:startDate options:0];
 }
@@ -249,7 +249,7 @@ const CGFloat kDayViewPadding = 0.0;
 {
     if(days == nil) return;
     while([days count] < capacity) {
-        UILabel* hdr = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 120, 24)];
+        UILabel* hdr = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 120, 24)] autorelease];
         hdr.font = [UIFont systemFontOfSize:14];
         hdr.autoresizingMask = UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin;
         hdr.textAlignment = UITextAlignmentCenter;
@@ -259,7 +259,7 @@ const CGFloat kDayViewPadding = 0.0;
         hdr.shadowOffset = CGSizeMake(0, 1);
         hdr.hidden = YES;
         [self.columnHeaderView addSubview:hdr];
-        IQScheduleDayView* dayContent = [[IQScheduleDayView alloc] initWithFrame:CGRectMake(0, 0, 120, 100)];
+        IQScheduleDayView* dayContent = [[[IQScheduleDayView alloc] initWithFrame:CGRectMake(0, 0, 120, 100)] autorelease];
         dayContent.opaque = YES;
         dayContent.clipsToBounds = YES;
         dayContent.autoresizingMask = UIViewAutoresizingFlexibleHeight;
@@ -292,7 +292,7 @@ const CGFloat kDayViewPadding = 0.0;
     ((UILabel*)self.cornerView).text = [cornerFormatter stringFromDate:startDate];
     [self ensureCapacity:numDays];
     
-    NSDateComponents* dc = [[NSDateComponents alloc] init];
+    NSDateComponents* dc = [[NSDateComponents new] autorelease];
     
     int tMin = 0;
     int pivotPoint = -1;

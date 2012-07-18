@@ -54,11 +54,11 @@ typedef struct _IQGanttViewTimeWindow {
 
 // Overridable methods. Subclass IQGanttView and override the below methods
 // to achieve further customization of the user interface.
-- (UIView*) createCornerViewWithFrame:(CGRect)frame; // default implementation returns nil
-- (UIView<IQGanttHeaderDelegate>*) createTimeHeaderViewWithFrame:(CGRect)frame; // default implementation returns a IQGanttHeaderView
-- (UIView*) createRowHeaderViewWithFrame:(CGRect)frame; // default implementation returns nil
+- (UIView*) cornerViewWithFrame:(CGRect)frame; // default implementation returns nil
+- (UIView<IQGanttHeaderDelegate>*) timeHeaderViewWithFrame:(CGRect)frame; // default implementation returns a IQGanttHeaderView
+- (UIView*) rowHeaderViewWithFrame:(CGRect)frame; // default implementation returns nil
 
-- (UIView<IQGanttRowDelegate>*) createViewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame; // default implementation returns a IQGanttRowView 
+- (UIView<IQGanttRowDelegate>*) viewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame; // default implementation returns a IQGanttRowView 
 
 @end
 
