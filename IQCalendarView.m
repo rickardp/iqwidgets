@@ -643,7 +643,11 @@
         cmpnts[0], cmpnts[1], cmpnts[2], 1,
         cmpnts[0]-.12, cmpnts[1]-.12, cmpnts[2]-.12, 1,
     };
-    layer.colors = [NSArray arrayWithObjects:(id)CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors), (id)CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors+4), nil];
+    CGColorRef c1 = CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors);
+    CGColorRef c2 = CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors+4);
+    layer.colors = [NSArray arrayWithObjects:(id)c1, (id)c2, nil];
+    CGColorRelease(c1);
+    CGColorRelease(c2);
     //[layer setNeedsDisplay];
 }
 
