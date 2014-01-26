@@ -2,4 +2,6 @@
 *.pbxuser
 xcuserdata
 .DS_Store
-
+build/
+Products/
+Documentation/html/
