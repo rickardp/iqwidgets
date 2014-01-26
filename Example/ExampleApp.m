@@ -83,7 +83,6 @@
     [menu addSection:themeSection animated:NO];
     
     self.rootViewController = [[IQNavigationController alloc] initWithRootViewController:[self aboutViewController] sidebarViewController:menu];
-    ((IQNavigationController*)self.rootViewController).sidebarAnimationType = IQNavigationPanTypeSlideUnder;
     self.window.rootViewController = self.rootViewController;
     [self.window makeKeyAndVisible];
     //[[IQScreenRecorder screenRecorder] startSharingScreenWithPort:5900 password:nil];
