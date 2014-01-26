@@ -26,12 +26,12 @@
 - (BOOL) drilldown:(IQDrilldownController*)drilldown stopAtPartiallyVisibleController:(UIViewController*)viewController;
 @end
 
-typedef enum _IQDrilldownRootViewPosition {
+typedef enum IQDrilldownRootViewPosition {
     IQDrilldownRootViewPositionBelow = 0,
     IQDrilldownRootViewPositionAbove = 1
 } IQDrilldownRootViewPosition;
 
-typedef enum _IQDrilldownDirection {
+typedef enum IQDrilldownDirection {
     IQDrilldownDirectionLeftToRight = 0,
     IQDrilldownDirectionRightToLeft = 1
 } IQDrilldownDirection;
@@ -52,15 +52,18 @@ typedef enum _IQDrilldownDirection {
 - (void) popViewControllerAnimated:(BOOL)animated;
 
 - (void) setActiveIndex:(int)index animated:(BOOL)animated;
+@property (nonatomic) int activeIndex;
+
+- (void) setRootViewVisible:(BOOL)visible animated:(BOOL)animated;
+@property (nonatomic) BOOL rootViewVisible;
+
+@property (nonatomic) BOOL showsNavigationBar;
 
 - (void) goLeftAnimated:(BOOL)animated;
 - (void) goRightAnimated:(BOOL)animated;
 
-- (IBAction) debugAction1:(id)sender;
-- (IBAction) debugAction2:(id)sender;
-
-@property (nonatomic) int activeIndex;
 @property (nonatomic, retain) IBOutlet id<IQDrilldownControllerDelegate> delegate;
+
 /**
  If YES, manages the view shadows of the drilldown pages automatically.
  Default is YES.

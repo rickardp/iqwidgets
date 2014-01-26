@@ -18,54 +18,58 @@
 
 #import <Foundation/Foundation.h>
 
-typedef void (^IQCalendarDataSourceEntryCallback)(id item, NSTimeInterval startDate, NSTimeInterval endDate);
-typedef NSString* (^IQCalendarDataSourceTextExtractor)(id item);
+@protocol IQCalendarActivity <NSObject>
+@optional
+// IQCalendarActivity can be a simple string...
+- (NSUInteger)length;
+- (unichar)characterAtIndex:(NSUInteger)index;
+// Note that none of the calender-widgets require an IQCalendarActivity to understand
+// its start and end times.
+@end
+
+typedef void (^IQCalendarDataSourceEntryCallback)(NSTimeInterval startDate, NSTimeInterval endDate, NSObject<IQCalendarActivity>* value);
+typedef NSObject<IQCalendarActivity>* (^IQCalendarDataSourceValueExtractor)(id item);
 typedef NSTimeInterval (^IQCalendarDataSourceTimeExtractor)(id item);
 
 @protocol IQCalendarDataSource <NSObject>
 @required
 - (void) enumerateEntriesUsing:(IQCalendarDataSourceEntryCallback)enumerator from:(NSTimeInterval)startTime to:(NSTimeInterval)endTime;
 @optional
-- (NSString*) textForItem:(id)item;
 - (NSString*) labelText;
+- (NSString*) themeClassName;
+@end
+
+@protocol IQCalendarSimpleDataItem <NSObject>
+@required
+- (NSDate*) startDate;
+- (NSDate*) endDate;
+@optional
+- (NSObject<IQCalendarActivity>*) value;
 @end
 
 // IQCalendarDataSource implementation that uses a collection of objects
-// and customizable callbacks to these. If no callback, selector or key is set,
-// the default is to perform the following selectors on the object:
-//  - (NSDate*) startDate;
-//  - (NSDate*) endDate;
-//  - (NSString*) text;
-@interface IQCalendarSimpleDataSource : NSObject<IQCalendarDataSource> {
-@private
-    NSObject<NSFastEnumeration>* data;
-    IQCalendarDataSourceTimeExtractor startDateOfItem, endDateOfItem;
-    IQCalendarDataSourceTextExtractor textOfItem;
-    NSString* labelText;
-}
+// and customizable callbacks to these. If no callbacks are set,
+// the default is to assume the item implements the IQCalendarSimpleDataItem
+// protocol.
+@interface IQCalendarSimpleDataSource : NSObject<IQCalendarDataSource>
 
-+ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name set:(NSSet*)items;
-+ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name array:(NSArray*)items;
++ (IQCalendarSimpleDataSource*) dataSourceWithLabel:(NSString*)label set:(NSSet*)items;
++ (IQCalendarSimpleDataSource*) dataSourceWithLabel:(NSString*)label array:(NSArray*)items;
 + (IQCalendarSimpleDataSource*) dataSourceWithSet:(NSSet*)items;
 + (IQCalendarSimpleDataSource*) dataSourceWithArray:(NSArray*)items;
 
 - (id) initWithSet:(NSSet*)items;
 - (id) initWithArray:(NSArray*)items;
 
-// Blocks (recommended)
-- (void) setCallbacksForStartDate:(IQCalendarDataSourceTimeExtractor)startDateCallback endDate:(IQCalendarDataSourceTimeExtractor)endDateCallback;
-- (void) setCallbackForText:(IQCalendarDataSourceTextExtractor)textCallback;
-
-// Selectors (uses blocks internally)
-// - (NSDate*)startEndDateSelector;
-- (void) setSelectorsForStartDate:(SEL)startDateSelector endDate:(SEL)endDateSelector;
-// - (NSString*)textSelector;
-- (void) setSelectorForText:(SEL)textSelector;
-
 // Key/value coding (uses blocks internally)
 - (void) setKeysForStartDate:(NSString*)startDateKey endDate:(NSString*)endDateKey;
 // - (NSString*)textSelector:(id)item;
-- (void) setKeyForText:(NSString*)textKey;
+- (void) setKeyForValue:(NSString*)valueKey;
 
 @property (nonatomic, retain) NSString* labelText;
+@property (nonatomic, retain) NSString* themeClassName;
+
+@property (nonatomic, copy) IQCalendarDataSourceTimeExtractor startDateCallback;
+@property (nonatomic, copy) IQCalendarDataSourceTimeExtractor endDateCallback;
+@property (nonatomic, copy) IQCalendarDataSourceValueExtractor valueCallback;
 @end

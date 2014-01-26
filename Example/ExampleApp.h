@@ -18,13 +18,11 @@
 
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
+#import "IQWidgets.h"
 
-@interface ExampleAppDelegate : NSObject<UIApplicationDelegate, UITableViewDataSource, UITableViewDelegate> {
-    UIWindow *window;
-    UINavigationController *viewController;
-}
+@interface ExampleAppDelegate : NSObject<UIApplicationDelegate, UIWebViewDelegate>
 
-@property (nonatomic, retain) IBOutlet UIWindow *window;
-@property (nonatomic, retain) IBOutlet UINavigationController *viewController;
+@property (nonatomic, retain) UIWindow *window;
+@property (nonatomic, retain) UIViewController *rootViewController;
 
 @end

@@ -1,10 +1,19 @@
 //
 //  IQTheme.m
-//  DrilldownTest
+//  IQWidgets for iOS
 //
-//  Created by Rickard Petzäll on 2012-09-30.
-//  Copyright (c) 2012 EvolvIQ. All rights reserved.
+//  Copyright 2012 Rickard Petzäll, EvolvIQ
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #import "IQTheme.h"
 
@@ -130,7 +139,19 @@ static IQTheme* _default = nil;
             }
         }
     }
+    if(flags & IQThemeViewApplyVisibility) {
+        IQThemeTristate hidden = [self isHidden:themeable];
+        if(hidden != IQThemeNotSet) {
+            view.hidden = hidden;
+            didSet = YES;
+        }
+    }
     return didSet;
+}
+
+- (IQThemeTristate) isHidden:(NSObject<IQThemeable>*)themeable
+{
+    return IQThemeNotSet;
 }
 
 - (UIFont*) fontFor:(NSObject<IQThemeable>*)themeable
@@ -158,6 +179,11 @@ static IQTheme* _default = nil;
 }
 
 - (UIColor*) backgroundColorFor:(NSObject<IQThemeable>*)themeable
+{
+    return nil;
+}
+
+- (UIColor*) borderColorFor:(NSObject<IQThemeable>*)themeable
 {
     return nil;
 }
@@ -318,6 +344,30 @@ static IQTheme* _default = nil;
     return nil;
 }
 
+- (UIColor*) borderColorFor:(NSObject<IQThemeable>*)themeable
+{
+    NSObject* color = (NSObject*)[self _themeProperty:@"border-color" for:themeable];
+    if(color) {
+        if([color isKindOfClass:[UIColor class]]) {
+            return (UIColor*)color;
+        } else {
+            return _IQMutableTheme_ParseCssColor([color description]);
+        }
+    }
+    return nil;
+}
+
+- (IQThemeTristate) isHidden:(NSObject<IQThemeable>*)themeable
+{
+    NSObject* vis = [self _themeProperty:@"visibility" for:themeable];
+    if([vis isEqual:@"hidden"]) {
+        return IQThemeYes;
+    } else if([vis isEqual:@"visible"]) {
+        return IQThemeNo;
+    }
+    return IQThemeNotSet;
+}
+
 - (UITableViewStyle) tableViewStyleFor:(NSObject<IQThemeable>*)themeable
 {
     NSObject* tst = [self _themeProperty:@"table-style" for:themeable];
@@ -390,6 +440,11 @@ static IQTheme* _default = nil;
 - (void) setBackgroundColor:(UIColor*)bgcolor for:(NSObject*)themeableOrString
 {
     [self _setThemeValue:bgcolor property:@"background-color" for:themeableOrString];
+}
+
+- (void) setBorderColor:(UIColor*)bdcolor for:(NSObject*)themeableOrString
+{
+    [self _setThemeValue:bdcolor property:@"border-color" for:themeableOrString];
 }
 
 #pragma mark - CSS output

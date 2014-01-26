@@ -27,22 +27,10 @@
 
 #import "IQScrollView.h"
 
-typedef UIView* (^IQScheduleBlockViewCreationCallback)(IQScheduleView* parent, id item, CGRect frame);
-
-@interface IQScheduleView : IQScrollView {
-    id<IQCalendarDataSource> dataSource;
-    NSDate* startDate;
-    int numDays;
-    NSMutableArray* days;
-    UILabel* hours[24];
-    UIView* nowTimeIndicator;
-    NSCalendar* calendar;
-    BOOL dirty;
-    NSDateFormatter* cornerFormatter, *headerFormatter, *tightHeaderFormatter;
-    IQScheduleBlockViewCreationCallback createBlock;
-    NSSet* items;
-    UIColor* tintColor, *headerTextColor;
-}
+/**
+ The IQScheduleView is similar to the day/week calendar view in iCal
+ */
+@interface IQScheduleView : IQScrollView
 
 @property (nonatomic, retain) id<IQCalendarDataSource> dataSource;
 @property (nonatomic, retain) NSCalendar* calendar;
@@ -69,17 +57,14 @@ typedef UIView* (^IQScheduleBlockViewCreationCallback)(IQScheduleView* parent, i
 
 - (void) reloadData;
 
+#pragma mark - Overridable methods
+
 // Defaults to IQCalendarHeaderView. Should return a UIView subclass implementing IQCalendarHeaderDelegate.
 + (Class) headerViewClass;
 
-@end
+// Override this method to define a custom view creation. Detfault is to create a themeable simple view.
+- (UIView*) createViewForActivityWithFrame:(CGRect)frame text:(NSString*)text;
 
-// This category uses blocks for defining a call-back interface. This
-// option performs better with large data sets and allows for more
-// customization than the simple interface.
-
-@interface IQScheduleView (CallbackInterface)
-- (void) setBlockCreationCallback:(IQScheduleBlockViewCreationCallback)callback;
 @end
 
 @interface IQScheduleDayView : UIView {

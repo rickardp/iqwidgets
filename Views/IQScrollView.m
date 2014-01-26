@@ -57,19 +57,6 @@
     return self;
 }
 
-#pragma mark Disposal
-
-- (void) dealloc
-{
-    [scrollView release];
-    [contentPanel release];
-    [rowHeaderView release];
-    [columnHeaderView release];
-    [cornerView release];
-    [backgroundColor release];
-    [super dealloc];
-}
-
 #pragma mark Drawing
 
 - (void) drawRect:(CGRect)rect
@@ -155,15 +142,16 @@
 {
     if(rowHeaderView != nil) {
         [rowHeaderView removeFromSuperview];
-        [rowHeaderView release];
     }
-    rowHeaderView = [rhv retain];
-    headerSize.width = rhv.bounds.size.width;
-    if(scrollView == nil) [self performLayoutAnimated:NO];
-    if(cornerView != nil) {
-        [scrollView insertSubview:rhv belowSubview:cornerView];
-    } else {
-        [scrollView addSubview:rhv];
+    rowHeaderView = rhv;
+    if(rhv) {
+        headerSize.width = rhv.bounds.size.width;
+        if(scrollView == nil) [self performLayoutAnimated:NO];
+        if(cornerView != nil) {
+            [scrollView insertSubview:rhv belowSubview:cornerView];
+        } else {
+            [scrollView addSubview:rhv];
+        }
     }
     [self performLayoutAnimated:NO];
 }
@@ -177,15 +165,16 @@
 {
     if(columnHeaderView != nil) {
         [columnHeaderView removeFromSuperview];
-        [columnHeaderView release];
     }
-    columnHeaderView = [chv retain];
-    headerSize.height = chv.bounds.size.height;
-    if(scrollView == nil) [self performLayoutAnimated:NO];
-    if(cornerView != nil) {
-        [scrollView insertSubview:chv belowSubview:cornerView];
-    } else {
-        [scrollView addSubview:chv];
+    columnHeaderView = chv;
+    if(chv) {
+        headerSize.height = chv.bounds.size.height;
+        if(scrollView == nil) [self performLayoutAnimated:NO];
+        if(cornerView != nil) {
+            [scrollView insertSubview:chv belowSubview:cornerView];
+        } else {
+            [scrollView addSubview:chv];
+        }
     }
     [self performLayoutAnimated:NO];
 }
@@ -199,11 +188,12 @@
 {
     if(cornerView != nil) {
         [cornerView removeFromSuperview];
-        [cornerView release];
     }
-    cornerView = [cv retain];
-    if(scrollView == nil) [self performLayoutAnimated:NO];
-    [scrollView addSubview:cornerView];
+    cornerView = cv;
+    if(cv) {
+        if(scrollView == nil) [self performLayoutAnimated:NO];
+        [scrollView addSubview:cornerView];
+    }
     [self performLayoutAnimated:NO];
 }
 
@@ -215,8 +205,7 @@
 - (void)setBackgroundColor:(UIColor *)bg
 {
     [contentPanel setBackgroundColor:bg];
-    [backgroundColor release];
-    backgroundColor = [bg retain];
+    backgroundColor = bg;
 }
 
 - (CGPoint) contentOffset

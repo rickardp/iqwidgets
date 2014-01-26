@@ -6,49 +6,71 @@
 	objectVersion = 46;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		FF2E31721881C5D200B34F1C /* IQWidgets - universal */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = FF2E31751881C5D200B34F1C /* Build configuration list for PBXAggregateTarget "IQWidgets - universal" */;
+			buildPhases = (
+				FF2E31781881C6CE00B34F1C /* ShellScript */,
+			);
+			dependencies = (
+			);
+			name = "IQWidgets - universal";
+			productName = "IQWidgets - universal";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
-		FF10E1C6133B8AE800783849 /* IQCalendarHeaderView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF10E1C4133B8AE800783849 /* IQCalendarHeaderView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FF10E1C7133B8AE800783849 /* IQCalendarHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = FF10E1C5133B8AE800783849 /* IQCalendarHeaderView.m */; };
-		FF138B97132D5078009C01D2 /* IQGanttView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF138B95132D5078009C01D2 /* IQGanttView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FF138B98132D5078009C01D2 /* IQGanttView.m in Sources */ = {isa = PBXBuildFile; fileRef = FF138B96132D5078009C01D2 /* IQGanttView.m */; };
 		FF24AF271327A0F300BE3723 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF24AF261327A0F300BE3723 /* CoreGraphics.framework */; };
-		FF3C054912E65A2A00CFB524 /* IQDrilldownController.h in Headers */ = {isa = PBXBuildFile; fileRef = FF3C054712E65A2A00CFB524 /* IQDrilldownController.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FF3C054A12E65A2A00CFB524 /* IQDrilldownController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF3C054812E65A2A00CFB524 /* IQDrilldownController.m */; };
 		FF4553D112BAC48000B26A30 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF4553D012BAC48000B26A30 /* MapKit.framework */; };
 		FF4553D812BAC48E00B26A30 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF4553D712BAC48E00B26A30 /* CoreLocation.framework */; };
 		FF540ADB12A95ECA00C2C7A5 /* libIQWidgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC07E0554694100DB518D /* libIQWidgets.a */; };
 		FF540AEF12A95EF400C2C7A5 /* ExampleApp.m in Sources */ = {isa = PBXBuildFile; fileRef = FF540AEE12A95EF400C2C7A5 /* ExampleApp.m */; };
 		FF540AF512A95F1D00C2C7A5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF540AF412A95F1D00C2C7A5 /* UIKit.framework */; };
-		FF540B0312A95F8500C2C7A5 /* ExampleApp.xib in Resources */ = {isa = PBXBuildFile; fileRef = FF540B0212A95F8500C2C7A5 /* ExampleApp.xib */; };
 		FF540D6912A9913F00C2C7A5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF540D6812A9913F00C2C7A5 /* QuartzCore.framework */; };
-		FF5E3C421354E6A90067ADEF /* IQViewTessellation.h in Headers */ = {isa = PBXBuildFile; fileRef = FF5E3C401354E6A80067ADEF /* IQViewTessellation.h */; };
-		FF5E3C431354E6A90067ADEF /* IQViewTessellation.m in Sources */ = {isa = PBXBuildFile; fileRef = FF5E3C411354E6A80067ADEF /* IQViewTessellation.m */; };
 		FF60485E133CD49500BB74F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF60485D133CD49500BB74F6 /* QuartzCore.framework */; };
+		FF67B0721621EFBA00F20BA3 /* IQTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = FF67B06E1621EFBA00F20BA3 /* IQTheme.m */; };
+		FF67B0731621EFBA00F20BA3 /* IQThemeCSS.m in Sources */ = {isa = PBXBuildFile; fileRef = FF67B06F1621EFBA00F20BA3 /* IQThemeCSS.m */; };
+		FF67B0741621EFBA00F20BA3 /* IQTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = FF67B0701621EFBA00F20BA3 /* IQTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FF67B0751621EFBA00F20BA3 /* IQThemeCSS.h in Headers */ = {isa = PBXBuildFile; fileRef = FF67B0711621EFBA00F20BA3 /* IQThemeCSS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF86DC56136CA25A0077805F /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF86DC55136CA25A0077805F /* OpenGLES.framework */; };
-		FF8C31E0130AFB7800A10CF0 /* IQScheduleView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C31DE130AFB7600A10CF0 /* IQScheduleView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FF8C31E1130AFB7800A10CF0 /* IQScheduleView.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31DF130AFB7600A10CF0 /* IQScheduleView.m */; };
-		FF8C31E4130AFBDB00A10CF0 /* IQCalendarView.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C31E2130AFBD800A10CF0 /* IQCalendarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FF8C31E5130AFBDB00A10CF0 /* IQCalendarView.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31E3130AFBD800A10CF0 /* IQCalendarView.m */; };
 		FF8C31F9130B111400A10CF0 /* CalendarTests.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C31F7130B111400A10CF0 /* CalendarTests.h */; settings = {ATTRIBUTES = (); }; };
 		FF8C3211130B136E00A10CF0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF540AF412A95F1D00C2C7A5 /* UIKit.framework */; };
 		FF8C3212130B136E00A10CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AACBBE490F95108600F1A2B1 /* Foundation.framework */; };
 		FF8C3214130B136E00A10CF0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8C3213130B136E00A10CF0 /* CoreGraphics.framework */; };
 		FF8C3226130B138800A10CF0 /* CalendarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31F8130B111400A10CF0 /* CalendarTests.m */; };
 		FF8C3227130B150B00A10CF0 /* libIQWidgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC07E0554694100DB518D /* libIQWidgets.a */; };
-		FFA26831132E895B007B7FBD /* IQScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFA2682F132E895A007B7FBD /* IQScrollView.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		FFA26832132E895B007B7FBD /* IQScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFA26830132E895A007B7FBD /* IQScrollView.m */; };
+		FF9D9DD716277A81002A9272 /* IQNavigationController.h in Headers */ = {isa = PBXBuildFile; fileRef = FF9D9DD516277A81002A9272 /* IQNavigationController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FF9D9DD816277A81002A9272 /* IQNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF9D9DD616277A81002A9272 /* IQNavigationController.m */; };
+		FF9D9DD916277DFC002A9272 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = FF9D9DD31624B692002A9272 /* about.html */; };
+		FF9D9DDC1627808C002A9272 /* NavBarIconLauncher.png in Resources */ = {isa = PBXBuildFile; fileRef = FF9D9DDA1627808C002A9272 /* NavBarIconLauncher.png */; };
+		FF9D9DDD1627808C002A9272 /* NavBarIconLauncher@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = FF9D9DDB1627808C002A9272 /* NavBarIconLauncher@2x.png */; };
+		FF9D9DDE16278536002A9272 /* social.css in Resources */ = {isa = PBXBuildFile; fileRef = FF9D9DD21624B419002A9272 /* social.css */; };
+		FF9D9DDF16278538002A9272 /* basic.css in Resources */ = {isa = PBXBuildFile; fileRef = FF9D9DD11624B408002A9272 /* basic.css */; };
+		FF9D9DE2162793C1002A9272 /* MonthCalendarExample.m in Sources */ = {isa = PBXBuildFile; fileRef = FF9D9DE1162793C1002A9272 /* MonthCalendarExample.m */; };
 		FFA26835132E8F29007B7FBD /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = FFA26834132E8F23007B7FBD /* test.png */; };
 		FFC9646A1327DB4200B2EBA6 /* IQCalendarDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFC9646B1327DB4200B2EBA6 /* IQCalendarDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */; };
 		FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF34130C69D10040F26E /* ScheduleTests.h */; settings = {ATTRIBUTES = (); }; };
 		FFD6CF38130C816A0040F26E /* ScheduleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD6CF35130C69D10040F26E /* ScheduleTests.m */; };
 		FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF39130C828B0040F26E /* TestUtil.h */; settings = {ATTRIBUTES = (); }; };
-		FFDA7DE31436FF0300B5FB92 /* IQDrawerView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFDA7DE11436FF0300B5FB92 /* IQDrawerView.h */; };
-		FFDA7DE41436FF0300B5FB92 /* IQDrawerView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFDA7DE21436FF0300B5FB92 /* IQDrawerView.m */; };
-		FFDA7DEC14377FE900B5FB92 /* ExampleViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FFDA7DE814376CA900B5FB92 /* ExampleViewController.m */; };
-		FFDEA941137B1CFA00A94388 /* IQViewTransition.h in Headers */ = {isa = PBXBuildFile; fileRef = FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */; };
-		FFDEA942137B1CFA00A94388 /* IQViewTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = FFDEA940137B1CFA00A94388 /* IQViewTransition.m */; };
 		FFEEF05412BACC59003CA394 /* IQWidgets.h in Headers */ = {isa = PBXBuildFile; fileRef = FF540B3712A960B800C2C7A5 /* IQWidgets.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23727161ABF40009F64CF /* IQDrilldownController.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF23725161ABF40009F64CF /* IQDrilldownController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23728161ABF40009F64CF /* IQDrilldownController.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF23726161ABF40009F64CF /* IQDrilldownController.m */; };
+		FFF23735161ABF7D009F64CF /* IQCalendarHeaderView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF23729161ABF7D009F64CF /* IQCalendarHeaderView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23736161ABF7D009F64CF /* IQCalendarView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF2372A161ABF7D009F64CF /* IQCalendarView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23737161ABF7D009F64CF /* IQDrawerView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF2372B161ABF7D009F64CF /* IQDrawerView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23738161ABF7D009F64CF /* IQScheduleView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF2372C161ABF7D009F64CF /* IQScheduleView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23739161ABF7D009F64CF /* IQScrollView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF2372D161ABF7D009F64CF /* IQScrollView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF2373A161ABF7D009F64CF /* IQScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF2372E161ABF7D009F64CF /* IQScrollView.m */; };
+		FFF2373B161ABF7D009F64CF /* IQCalendarView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF2372F161ABF7D009F64CF /* IQCalendarView.m */; };
+		FFF2373C161ABF7D009F64CF /* IQScheduleView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF23730161ABF7D009F64CF /* IQScheduleView.m */; };
+		FFF2373D161ABF7D009F64CF /* IQCalendarHeaderView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF23731161ABF7D009F64CF /* IQCalendarHeaderView.m */; };
+		FFF2373E161ABF7D009F64CF /* IQDrawerView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF23732161ABF7D009F64CF /* IQDrawerView.m */; };
+		FFF2373F161ABF7D009F64CF /* IQGanttView.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF23733161ABF7D009F64CF /* IQGanttView.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23740161ABF7D009F64CF /* IQGanttView.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF23734161ABF7D009F64CF /* IQGanttView.m */; };
+		FFF23743161ABFEA009F64CF /* IQMenuViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF23741161ABFEA009F64CF /* IQMenuViewController.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		FFF23744161ABFEA009F64CF /* IQMenuViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = FFF23742161ABFEA009F64CF /* IQMenuViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -71,50 +93,59 @@
 /* Begin PBXFileReference section */
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		D2AAC07E0554694100DB518D /* libIQWidgets.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libIQWidgets.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		FF10E1C4133B8AE800783849 /* IQCalendarHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarHeaderView.h; sourceTree = "<group>"; };
-		FF10E1C5133B8AE800783849 /* IQCalendarHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQCalendarHeaderView.m; sourceTree = "<group>"; };
-		FF138B95132D5078009C01D2 /* IQGanttView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQGanttView.h; sourceTree = "<group>"; };
-		FF138B96132D5078009C01D2 /* IQGanttView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQGanttView.m; sourceTree = "<group>"; };
 		FF24AF261327A0F300BE3723 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
-		FF3C054712E65A2A00CFB524 /* IQDrilldownController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQDrilldownController.h; sourceTree = "<group>"; };
-		FF3C054812E65A2A00CFB524 /* IQDrilldownController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQDrilldownController.m; sourceTree = "<group>"; };
 		FF4553D012BAC48000B26A30 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 		FF4553D712BAC48E00B26A30 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		FF540AD312A95EC200C2C7A5 /* IQTSVExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IQTSVExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF540AED12A95EF400C2C7A5 /* ExampleApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExampleApp.h; path = Example/ExampleApp.h; sourceTree = "<group>"; };
 		FF540AEE12A95EF400C2C7A5 /* ExampleApp.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExampleApp.m; path = Example/ExampleApp.m; sourceTree = "<group>"; };
 		FF540AF412A95F1D00C2C7A5 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		FF540B0212A95F8500C2C7A5 /* ExampleApp.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = ExampleApp.xib; path = Example/ExampleApp.xib; sourceTree = "<group>"; };
 		FF540B0D12A95FB200C2C7A5 /* Example-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Example-Info.plist"; path = "Example/Example-Info.plist"; sourceTree = "<group>"; };
 		FF540B3712A960B800C2C7A5 /* IQWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQWidgets.h; sourceTree = "<group>"; };
 		FF540D6812A9913F00C2C7A5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
-		FF5E3C401354E6A80067ADEF /* IQViewTessellation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQViewTessellation.h; sourceTree = "<group>"; };
-		FF5E3C411354E6A80067ADEF /* IQViewTessellation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQViewTessellation.m; sourceTree = "<group>"; };
 		FF60485D133CD49500BB74F6 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		FF67B06E1621EFBA00F20BA3 /* IQTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQTheme.m; path = Theming/IQTheme.m; sourceTree = "<group>"; };
+		FF67B06F1621EFBA00F20BA3 /* IQThemeCSS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQThemeCSS.m; path = Theming/IQThemeCSS.m; sourceTree = "<group>"; };
+		FF67B0701621EFBA00F20BA3 /* IQTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQTheme.h; path = Theming/IQTheme.h; sourceTree = "<group>"; };
+		FF67B0711621EFBA00F20BA3 /* IQThemeCSS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQThemeCSS.h; path = Theming/IQThemeCSS.h; sourceTree = "<group>"; };
 		FF86DC55136CA25A0077805F /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		FF8C31DE130AFB7600A10CF0 /* IQScheduleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQScheduleView.h; sourceTree = "<group>"; };
-		FF8C31DF130AFB7600A10CF0 /* IQScheduleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQScheduleView.m; sourceTree = "<group>"; };
-		FF8C31E2130AFBD800A10CF0 /* IQCalendarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarView.h; sourceTree = "<group>"; };
-		FF8C31E3130AFBD800A10CF0 /* IQCalendarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQCalendarView.m; sourceTree = "<group>"; };
 		FF8C31F7130B111400A10CF0 /* CalendarTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CalendarTests.h; path = Tests/CalendarTests.h; sourceTree = "<group>"; };
 		FF8C31F8130B111400A10CF0 /* CalendarTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CalendarTests.m; path = Tests/CalendarTests.m; sourceTree = "<group>"; };
 		FF8C3210130B136D00A10CF0 /* BasicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BasicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C3213130B136E00A10CF0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		FF8C322C130B175700A10CF0 /* Tests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Tests-Info.plist"; path = "Tests/Tests-Info.plist"; sourceTree = "<group>"; };
-		FFA2682F132E895A007B7FBD /* IQScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQScrollView.h; sourceTree = "<group>"; };
-		FFA26830132E895A007B7FBD /* IQScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQScrollView.m; sourceTree = "<group>"; };
+		FF9D9DD11624B408002A9272 /* basic.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = basic.css; path = Example/Themes/basic.css; sourceTree = "<group>"; };
+		FF9D9DD21624B419002A9272 /* social.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = social.css; path = Example/Themes/social.css; sourceTree = "<group>"; };
+		FF9D9DD31624B692002A9272 /* about.html */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; name = about.html; path = Example/about.html; sourceTree = "<group>"; };
+		FF9D9DD416275E3A002A9272 /* test.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = test.plist; sourceTree = "<group>"; };
+		FF9D9DD516277A81002A9272 /* IQNavigationController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQNavigationController.h; path = Controllers/IQNavigationController.h; sourceTree = "<group>"; };
+		FF9D9DD616277A81002A9272 /* IQNavigationController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQNavigationController.m; path = Controllers/IQNavigationController.m; sourceTree = "<group>"; };
+		FF9D9DDA1627808C002A9272 /* NavBarIconLauncher.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NavBarIconLauncher.png; sourceTree = "<group>"; };
+		FF9D9DDB1627808C002A9272 /* NavBarIconLauncher@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "NavBarIconLauncher@2x.png"; sourceTree = "<group>"; };
+		FF9D9DE0162793C1002A9272 /* MonthCalendarExample.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MonthCalendarExample.h; path = Example/Examples/MonthCalendarExample.h; sourceTree = "<group>"; };
+		FF9D9DE1162793C1002A9272 /* MonthCalendarExample.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MonthCalendarExample.m; path = Example/Examples/MonthCalendarExample.m; sourceTree = "<group>"; };
 		FFA26834132E8F23007B7FBD /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = test.png; path = Example/test.png; sourceTree = "<group>"; };
 		FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarDataSource.h; sourceTree = "<group>"; };
 		FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQCalendarDataSource.m; sourceTree = "<group>"; };
 		FFD6CF34130C69D10040F26E /* ScheduleTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleTests.h; path = Tests/ScheduleTests.h; sourceTree = "<group>"; };
 		FFD6CF35130C69D10040F26E /* ScheduleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleTests.m; path = Tests/ScheduleTests.m; sourceTree = "<group>"; };
 		FFD6CF39130C828B0040F26E /* TestUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtil.h; path = Tests/TestUtil.h; sourceTree = "<group>"; };
-		FFDA7DE11436FF0300B5FB92 /* IQDrawerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQDrawerView.h; sourceTree = "<group>"; };
-		FFDA7DE21436FF0300B5FB92 /* IQDrawerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQDrawerView.m; sourceTree = "<group>"; };
-		FFDA7DE714376CA900B5FB92 /* ExampleViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ExampleViewController.h; path = Example/ExampleViewController.h; sourceTree = "<group>"; };
-		FFDA7DE814376CA900B5FB92 /* ExampleViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ExampleViewController.m; path = Example/ExampleViewController.m; sourceTree = "<group>"; };
-		FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQViewTransition.h; sourceTree = "<group>"; };
-		FFDEA940137B1CFA00A94388 /* IQViewTransition.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQViewTransition.m; sourceTree = "<group>"; };
+		FFF23725161ABF40009F64CF /* IQDrilldownController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQDrilldownController.h; path = Controllers/IQDrilldownController.h; sourceTree = "<group>"; };
+		FFF23726161ABF40009F64CF /* IQDrilldownController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQDrilldownController.m; path = Controllers/IQDrilldownController.m; sourceTree = "<group>"; };
+		FFF23729161ABF7D009F64CF /* IQCalendarHeaderView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQCalendarHeaderView.h; path = Views/IQCalendarHeaderView.h; sourceTree = "<group>"; };
+		FFF2372A161ABF7D009F64CF /* IQCalendarView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQCalendarView.h; path = Views/IQCalendarView.h; sourceTree = "<group>"; };
+		FFF2372B161ABF7D009F64CF /* IQDrawerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQDrawerView.h; path = Views/IQDrawerView.h; sourceTree = "<group>"; };
+		FFF2372C161ABF7D009F64CF /* IQScheduleView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQScheduleView.h; path = Views/IQScheduleView.h; sourceTree = "<group>"; };
+		FFF2372D161ABF7D009F64CF /* IQScrollView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQScrollView.h; path = Views/IQScrollView.h; sourceTree = "<group>"; };
+		FFF2372E161ABF7D009F64CF /* IQScrollView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQScrollView.m; path = Views/IQScrollView.m; sourceTree = "<group>"; };
+		FFF2372F161ABF7D009F64CF /* IQCalendarView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQCalendarView.m; path = Views/IQCalendarView.m; sourceTree = "<group>"; };
+		FFF23730161ABF7D009F64CF /* IQScheduleView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQScheduleView.m; path = Views/IQScheduleView.m; sourceTree = "<group>"; };
+		FFF23731161ABF7D009F64CF /* IQCalendarHeaderView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQCalendarHeaderView.m; path = Views/IQCalendarHeaderView.m; sourceTree = "<group>"; };
+		FFF23732161ABF7D009F64CF /* IQDrawerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQDrawerView.m; path = Views/IQDrawerView.m; sourceTree = "<group>"; };
+		FFF23733161ABF7D009F64CF /* IQGanttView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQGanttView.h; path = Views/IQGanttView.h; sourceTree = "<group>"; };
+		FFF23734161ABF7D009F64CF /* IQGanttView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQGanttView.m; path = Views/IQGanttView.m; sourceTree = "<group>"; };
+		FFF23741161ABFEA009F64CF /* IQMenuViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQMenuViewController.h; path = Controllers/IQMenuViewController.h; sourceTree = "<group>"; };
+		FFF23742161ABFEA009F64CF /* IQMenuViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQMenuViewController.m; path = Controllers/IQMenuViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -160,12 +191,17 @@
 		0867D691FE84028FC02AAC07 /* IQTiledScrollView */ = {
 			isa = PBXGroup;
 			children = (
+				FF9D9DD416275E3A002A9272 /* test.plist */,
 				FF86DC55136CA25A0077805F /* OpenGLES.framework */,
 				FF60485D133CD49500BB74F6 /* QuartzCore.framework */,
 				FF24AF261327A0F300BE3723 /* CoreGraphics.framework */,
 				FF540AEC12A95EDB00C2C7A5 /* Example */,
 				FF8C31F6130B10FB00A10CF0 /* Tests */,
-				08FB77AEFE84172EC02AAC07 /* Source */,
+				FF96D43A16173742003D50AF /* Prototypes / Base Classes */,
+				FF67B06C1621EF8800F20BA3 /* Theming */,
+				FF96D4381617372E003D50AF /* Controllers */,
+				FF96D43B16173757003D50AF /* Views */,
+				08FB77AEFE84172EC02AAC07 /* Support Classes */,
 				0867D69AFE84028FC02AAC07 /* Frameworks */,
 				034768DFFF38A50411DB9C8B /* Products */,
 			);
@@ -185,46 +221,42 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		08FB77AEFE84172EC02AAC07 /* Source */ = {
+		08FB77AEFE84172EC02AAC07 /* Support Classes */ = {
 			isa = PBXGroup;
 			children = (
 				FF540B3712A960B800C2C7A5 /* IQWidgets.h */,
-				FF3C054712E65A2A00CFB524 /* IQDrilldownController.h */,
-				FF3C054812E65A2A00CFB524 /* IQDrilldownController.m */,
-				FF8C31DE130AFB7600A10CF0 /* IQScheduleView.h */,
-				FF8C31DF130AFB7600A10CF0 /* IQScheduleView.m */,
-				FF8C31E2130AFBD800A10CF0 /* IQCalendarView.h */,
-				FF8C31E3130AFBD800A10CF0 /* IQCalendarView.m */,
-				FF10E1C4133B8AE800783849 /* IQCalendarHeaderView.h */,
-				FF10E1C5133B8AE800783849 /* IQCalendarHeaderView.m */,
 				FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */,
 				FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */,
-				FF138B95132D5078009C01D2 /* IQGanttView.h */,
-				FF138B96132D5078009C01D2 /* IQGanttView.m */,
-				FFA2682F132E895A007B7FBD /* IQScrollView.h */,
-				FFA26830132E895A007B7FBD /* IQScrollView.m */,
-				FF5E3C401354E6A80067ADEF /* IQViewTessellation.h */,
-				FF5E3C411354E6A80067ADEF /* IQViewTessellation.m */,
-				FFDEA93F137B1CFA00A94388 /* IQViewTransition.h */,
-				FFDEA940137B1CFA00A94388 /* IQViewTransition.m */,
-				FFDA7DE11436FF0300B5FB92 /* IQDrawerView.h */,
-				FFDA7DE21436FF0300B5FB92 /* IQDrawerView.m */,
 			);
-			name = Source;
+			name = "Support Classes";
 			sourceTree = "<group>";
 		};
 		FF540AEC12A95EDB00C2C7A5 /* Example */ = {
 			isa = PBXGroup;
 			children = (
+				FF9D9DDA1627808C002A9272 /* NavBarIconLauncher.png */,
+				FF9D9DDB1627808C002A9272 /* NavBarIconLauncher@2x.png */,
+				FF9D9DD01624B3F4002A9272 /* Themes */,
 				FFDA7DEB14377F0E00B5FB92 /* Examples */,
 				FFDA7DE614376C7E00B5FB92 /* Supporting Code */,
 				FFA26834132E8F23007B7FBD /* test.png */,
+				FF9D9DD31624B692002A9272 /* about.html */,
 				FF540AED12A95EF400C2C7A5 /* ExampleApp.h */,
 				FF540AEE12A95EF400C2C7A5 /* ExampleApp.m */,
-				FF540B0212A95F8500C2C7A5 /* ExampleApp.xib */,
 				FF540B0D12A95FB200C2C7A5 /* Example-Info.plist */,
 			);
 			name = Example;
+			sourceTree = "<group>";
+		};
+		FF67B06C1621EF8800F20BA3 /* Theming */ = {
+			isa = PBXGroup;
+			children = (
+				FF67B0701621EFBA00F20BA3 /* IQTheme.h */,
+				FF67B06E1621EFBA00F20BA3 /* IQTheme.m */,
+				FF67B0711621EFBA00F20BA3 /* IQThemeCSS.h */,
+				FF67B06F1621EFBA00F20BA3 /* IQThemeCSS.m */,
+			);
+			name = Theming;
 			sourceTree = "<group>";
 		};
 		FF8C31F6130B10FB00A10CF0 /* Tests */ = {
@@ -240,11 +272,57 @@
 			name = Tests;
 			sourceTree = "<group>";
 		};
+		FF96D4381617372E003D50AF /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				FFF23725161ABF40009F64CF /* IQDrilldownController.h */,
+				FFF23726161ABF40009F64CF /* IQDrilldownController.m */,
+				FFF23741161ABFEA009F64CF /* IQMenuViewController.h */,
+				FFF23742161ABFEA009F64CF /* IQMenuViewController.m */,
+				FF9D9DD516277A81002A9272 /* IQNavigationController.h */,
+				FF9D9DD616277A81002A9272 /* IQNavigationController.m */,
+			);
+			name = Controllers;
+			sourceTree = "<group>";
+		};
+		FF96D43A16173742003D50AF /* Prototypes / Base Classes */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = "Prototypes / Base Classes";
+			sourceTree = "<group>";
+		};
+		FF96D43B16173757003D50AF /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				FFF2372A161ABF7D009F64CF /* IQCalendarView.h */,
+				FFF2372F161ABF7D009F64CF /* IQCalendarView.m */,
+				FFF23729161ABF7D009F64CF /* IQCalendarHeaderView.h */,
+				FFF23731161ABF7D009F64CF /* IQCalendarHeaderView.m */,
+				FFF2372C161ABF7D009F64CF /* IQScheduleView.h */,
+				FFF23730161ABF7D009F64CF /* IQScheduleView.m */,
+				FFF23733161ABF7D009F64CF /* IQGanttView.h */,
+				FFF23734161ABF7D009F64CF /* IQGanttView.m */,
+				FFF2372D161ABF7D009F64CF /* IQScrollView.h */,
+				FFF2372E161ABF7D009F64CF /* IQScrollView.m */,
+				FFF2372B161ABF7D009F64CF /* IQDrawerView.h */,
+				FFF23732161ABF7D009F64CF /* IQDrawerView.m */,
+			);
+			name = Views;
+			sourceTree = "<group>";
+		};
+		FF9D9DD01624B3F4002A9272 /* Themes */ = {
+			isa = PBXGroup;
+			children = (
+				FF9D9DD11624B408002A9272 /* basic.css */,
+				FF9D9DD21624B419002A9272 /* social.css */,
+			);
+			name = Themes;
+			sourceTree = "<group>";
+		};
 		FFDA7DE614376C7E00B5FB92 /* Supporting Code */ = {
 			isa = PBXGroup;
 			children = (
-				FFDA7DE714376CA900B5FB92 /* ExampleViewController.h */,
-				FFDA7DE814376CA900B5FB92 /* ExampleViewController.m */,
 			);
 			name = "Supporting Code";
 			sourceTree = "<group>";
@@ -252,6 +330,8 @@
 		FFDA7DEB14377F0E00B5FB92 /* Examples */ = {
 			isa = PBXGroup;
 			children = (
+				FF9D9DE0162793C1002A9272 /* MonthCalendarExample.h */,
+				FF9D9DE1162793C1002A9272 /* MonthCalendarExample.m */,
 			);
 			name = Examples;
 			sourceTree = "<group>";
@@ -264,19 +344,21 @@
 			buildActionMask = 2147483647;
 			files = (
 				FFEEF05412BACC59003CA394 /* IQWidgets.h in Headers */,
-				FF3C054912E65A2A00CFB524 /* IQDrilldownController.h in Headers */,
-				FF8C31E0130AFB7800A10CF0 /* IQScheduleView.h in Headers */,
-				FF8C31E4130AFBDB00A10CF0 /* IQCalendarView.h in Headers */,
 				FFC9646A1327DB4200B2EBA6 /* IQCalendarDataSource.h in Headers */,
-				FF138B97132D5078009C01D2 /* IQGanttView.h in Headers */,
-				FFA26831132E895B007B7FBD /* IQScrollView.h in Headers */,
-				FF10E1C6133B8AE800783849 /* IQCalendarHeaderView.h in Headers */,
 				FF8C31F9130B111400A10CF0 /* CalendarTests.h in Headers */,
 				FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */,
 				FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */,
-				FF5E3C421354E6A90067ADEF /* IQViewTessellation.h in Headers */,
-				FFDEA941137B1CFA00A94388 /* IQViewTransition.h in Headers */,
-				FFDA7DE31436FF0300B5FB92 /* IQDrawerView.h in Headers */,
+				FFF23727161ABF40009F64CF /* IQDrilldownController.h in Headers */,
+				FFF23735161ABF7D009F64CF /* IQCalendarHeaderView.h in Headers */,
+				FFF23736161ABF7D009F64CF /* IQCalendarView.h in Headers */,
+				FFF23737161ABF7D009F64CF /* IQDrawerView.h in Headers */,
+				FFF23738161ABF7D009F64CF /* IQScheduleView.h in Headers */,
+				FFF23739161ABF7D009F64CF /* IQScrollView.h in Headers */,
+				FFF2373F161ABF7D009F64CF /* IQGanttView.h in Headers */,
+				FFF23743161ABFEA009F64CF /* IQMenuViewController.h in Headers */,
+				FF67B0741621EFBA00F20BA3 /* IQTheme.h in Headers */,
+				FF67B0751621EFBA00F20BA3 /* IQThemeCSS.h in Headers */,
+				FF9D9DD716277A81002A9272 /* IQNavigationController.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,6 +445,7 @@
 				D2AAC07D0554694100DB518D /* IQWidgets */,
 				FF540AD212A95EC200C2C7A5 /* IQWidgetsExample */,
 				FF8C320F130B136D00A10CF0 /* BasicTests */,
+				FF2E31721881C5D200B34F1C /* IQWidgets - universal */,
 			);
 		};
 /* End PBXProject section */
@@ -372,8 +455,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF540B0312A95F8500C2C7A5 /* ExampleApp.xib in Resources */,
 				FFA26835132E8F29007B7FBD /* test.png in Resources */,
+				FF9D9DD916277DFC002A9272 /* about.html in Resources */,
+				FF9D9DDC1627808C002A9272 /* NavBarIconLauncher.png in Resources */,
+				FF9D9DDD1627808C002A9272 /* NavBarIconLauncher@2x.png in Resources */,
+				FF9D9DDE16278536002A9272 /* social.css in Resources */,
+				FF9D9DDF16278538002A9272 /* basic.css in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -387,6 +474,19 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		FF2E31781881C6CE00B34F1C /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Sets the target folders and the final framework product.\nFMK_NAME=IQWidgets\nTARGET_NAME=\"IQWidgets\"\n\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\nINSTALL_DIR=${BUILD_ROOT}/${CONFIGURATION}-universal/${FMK_NAME}.framework\n\n# Working dir will be deleted after the framework creation.\nDEVICE_DIR=${CONFIGURATION_BUILD_DIR}/iphoneos\nSIMULATOR_DIR=${CONFIGURATION_BUILD_DIR}/iphonesimulator\nLIBRARY_NAME=lib${FMK_NAME}.a\n\n# Building both architectures.\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphoneos CONFIGURATION_BUILD_DIR=${DEVICE_DIR}\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${SIMULATOR_DIR}\n\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]; then\nrm -rf \"${INSTALL_DIR}\"\nfi\n\n# Creates and renews the final product folder.\nmkdir -p \"${INSTALL_DIR}\"\nmkdir -p \"${INSTALL_DIR}/Versions\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Headers\"\n\n# Creates the internal links.\n# It MUST uses relative path, otherwise will not work when the folder is copied/moved.\nln -s \"${FRAMEWORK_VERSION}\" \"${INSTALL_DIR}/Versions/Current\"\nln -s \"Versions/Current/Headers\" \"${INSTALL_DIR}/Headers\"\nln -s \"Versions/Current/Resources\" \"${INSTALL_DIR}/Resources\"\nln -s \"Versions/Current/${FMK_NAME}\" \"${INSTALL_DIR}/${FMK_NAME}\"\n\n# Copies the headers and resources files to the final product folder.\ncp -R \"${DEVICE_DIR}/IQWidgets/\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Headers/\"\n#cp -R \"${DEVICE_DIR}/\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/\"\n\n# Removes the binary and header from the resources folder.\n#rm -r \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/Headers\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/${FMK_NAME}\"\n\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${LIBRARY_NAME}\" \"${SIMULATOR_DIR}/${LIBRARY_NAME}\" -output \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/${FMK_NAME}\"\n";
+		};
 		FF8C320E130B136D00A10CF0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -407,16 +507,18 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF3C054A12E65A2A00CFB524 /* IQDrilldownController.m in Sources */,
-				FF8C31E1130AFB7800A10CF0 /* IQScheduleView.m in Sources */,
-				FF8C31E5130AFBDB00A10CF0 /* IQCalendarView.m in Sources */,
 				FFC9646B1327DB4200B2EBA6 /* IQCalendarDataSource.m in Sources */,
-				FF138B98132D5078009C01D2 /* IQGanttView.m in Sources */,
-				FFA26832132E895B007B7FBD /* IQScrollView.m in Sources */,
-				FF10E1C7133B8AE800783849 /* IQCalendarHeaderView.m in Sources */,
-				FF5E3C431354E6A90067ADEF /* IQViewTessellation.m in Sources */,
-				FFDEA942137B1CFA00A94388 /* IQViewTransition.m in Sources */,
-				FFDA7DE41436FF0300B5FB92 /* IQDrawerView.m in Sources */,
+				FFF23728161ABF40009F64CF /* IQDrilldownController.m in Sources */,
+				FFF2373A161ABF7D009F64CF /* IQScrollView.m in Sources */,
+				FFF2373B161ABF7D009F64CF /* IQCalendarView.m in Sources */,
+				FFF2373C161ABF7D009F64CF /* IQScheduleView.m in Sources */,
+				FFF2373D161ABF7D009F64CF /* IQCalendarHeaderView.m in Sources */,
+				FFF2373E161ABF7D009F64CF /* IQDrawerView.m in Sources */,
+				FFF23740161ABF7D009F64CF /* IQGanttView.m in Sources */,
+				FFF23744161ABFEA009F64CF /* IQMenuViewController.m in Sources */,
+				FF67B0721621EFBA00F20BA3 /* IQTheme.m in Sources */,
+				FF67B0731621EFBA00F20BA3 /* IQThemeCSS.m in Sources */,
+				FF9D9DD816277A81002A9272 /* IQNavigationController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -425,7 +527,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FF540AEF12A95EF400C2C7A5 /* ExampleApp.m in Sources */,
-				FFDA7DEC14377FE900B5FB92 /* ExampleViewController.m in Sources */,
+				FF9D9DE2162793C1002A9272 /* MonthCalendarExample.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -458,7 +560,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -474,7 +575,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				PRODUCT_NAME = IQWidgets;
 				PUBLIC_HEADERS_FOLDER_PATH = IQWidgets;
@@ -486,7 +586,8 @@
 		1DEB922308733DC00010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_OPTIMIZATION_LEVEL = 0;
@@ -494,7 +595,7 @@
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "Contrib/libvncserver/x11vnc-0.9.12";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
@@ -507,20 +608,35 @@
 		1DEB922408733DC00010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				ARCHS = "$(ARCHS_STANDARD_INCLUDING_64_BIT)";
+				CLANG_ENABLE_OBJC_ARC = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_GENERATE_TEST_COVERAGE_FILES = YES;
 				GCC_VERSION = com.apple.compilers.llvm.clang.1_0;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				HEADER_SEARCH_PATHS = "Contrib/libvncserver/x11vnc-0.9.12";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				IPHONEOS_DEPLOYMENT_TARGET = 5.1.1;
 				OTHER_LDFLAGS = (
 					"-all_load",
 					"-ObjC",
 				);
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		FF2E31731881C5D200B34F1C /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = IQWidgets;
+			};
+			name = Debug;
+		};
+		FF2E31741881C5D200B34F1C /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = IQWidgets;
 			};
 			name = Release;
 		};
@@ -643,6 +759,14 @@
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
+		};
+		FF2E31751881C5D200B34F1C /* Build configuration list for PBXAggregateTarget "IQWidgets - universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				FF2E31731881C5D200B34F1C /* Debug */,
+				FF2E31741881C5D200B34F1C /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
 		};
 		FF540AD812A95EC300C2C7A5 /* Build configuration list for PBXNativeTarget "IQWidgetsExample" */ = {
 			isa = XCConfigurationList;

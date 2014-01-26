@@ -42,13 +42,6 @@
     return self;
 }
 
-- (void)dealloc
-{
-    [header release];
-    [backgroundView release];
-    [super dealloc];
-}
-
 - (void)didMoveToSuperview
 {
     for(UIView* view in self.superview.subviews) {
@@ -142,7 +135,6 @@
 {
     if(!backgroundViewIsImage) {
         [backgroundView removeFromSuperview];
-        [backgroundView release];
         backgroundView = nil;
     }
     if(backgroundView == nil) {
@@ -189,7 +181,7 @@
 - (void)setBackgroundView:(UIView *)bgv
 {
     [backgroundView removeFromSuperview];
-    backgroundView = [bgv retain];
+    backgroundView = bgv;
     [self addSubview:backgroundView];
 }
 
@@ -201,14 +193,14 @@
 - (void)setContentView:(UIView *)cv
 {
     [contentView removeFromSuperview];
-    contentView = [cv retain];
+    contentView = cv;
     [self addSubview:contentView];
 }
 
 - (UIView*)contentView
 {
     if(contentView == nil) {
-        [self setContentView:[[[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 10)] autorelease]];
+        [self setContentView:[[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 10)]];
     }
     return contentView;
 }
@@ -271,7 +263,7 @@
             self.layer.shadowOffset = CGSizeMake(0, 2);
         }
         self.opaque = NO;
-        UITapGestureRecognizer* tap = [[[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleByTap)] autorelease];
+        UITapGestureRecognizer* tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(toggleByTap)];
         [self addGestureRecognizer:tap];
     }
     return self;
@@ -285,8 +277,8 @@
     CGColorRef tint2 = [UIColor colorWithRed:134.0f/255.0f green:156.0f/255.0f blue:179.0f/255.0f alpha:1.0f].CGColor;
     CGColorRef tint3 = [UIColor colorWithRed:126.0f/255.0f green:150.0f/255.0f blue:174.0f/255.0f alpha:1.0f].CGColor;
     CGColorRef tint4 = [UIColor colorWithRed:106.0f/255.0f green:133.0f/255.0f blue:162.0f/255.0f alpha:1.0f].CGColor;
-    NSArray* colors = [NSArray arrayWithObjects:(id)tint1,(id)tint2,(id)tint3,(id)tint4,nil];
-    CGGradientRef grad = CGGradientCreateWithColors(colorSpace, (CFArrayRef)colors, locs);
+    NSArray* colors = [NSArray arrayWithObjects:(__bridge id)tint1,(__bridge id)tint2,(__bridge id)tint3,(__bridge id)tint4,nil];
+    CGGradientRef grad = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)colors, locs);
     CGColorSpaceRelease(colorSpace);
     return grad;
 }

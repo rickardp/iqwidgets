@@ -28,14 +28,13 @@
 @end
 
 @interface IQDrilldownController () {
-	CGFloat panelWidth;
+	CGFloat panelWidth, rootWidth;
 	CGFloat minimizedMargin;
     _IQDrilldownPanel* rootPanel;
 	NSMutableArray* panels;
 	BOOL activeViewRightAligned;
 	BOOL stopAtPartiallyVisibleNext;
 	BOOL enableViewShadows;
-	int activeIndex;
 	id<IQDrilldownControllerDelegate> delegate;
 	UISwipeGestureRecognizer* swipeLeft, *swipeRight;
 	UIPanGestureRecognizer* pan;
@@ -60,6 +59,8 @@
 @synthesize stopAtPartiallyVisibleNext;
 @synthesize rootViewController;
 @synthesize rootViewPosition, drilldownDirection;
+@synthesize activeIndex, rootViewVisible;
+@synthesize showsNavigationBar;
 
 // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
 
@@ -82,7 +83,7 @@
 - (id)initWithRootViewController:(UIViewController *)root {
 	self = [super init];
 	if(self) {
-        rootViewController = [root retain];
+        rootViewController = root;
 		[self _setupDrilldownPanel];
 	}
     return self;
@@ -100,10 +101,12 @@
 	CGRect wb = self.view.bounds;
 	if(wb.size.width > 700) {
 		minimizedMargin = 72;
-		panelWidth = 476;
+		panelWidth = 640;
+        rootWidth = 436;
 	} else {
 		minimizedMargin = 0;
-		panelWidth = wb.size.width - 128;
+		panelWidth = wb.size.width;
+        rootWidth = wb.size.width - 44;
 	}
 	activeIndex = -1;
 	enableViewShadows = YES;
@@ -131,7 +134,6 @@
 
 - (void) _setDropShadows:(BOOL)enable forPanel:(_IQDrilldownPanel*)panel {
 	CALayer* layer = panel.layer;
-    NSLog(@"Layer: %@", layer);
 	if(enable) {
 		layer.shadowOpacity = shadowOpacity;
 		layer.shadowRadius = shadowRadius;
@@ -157,7 +159,7 @@
 
 - (void) pushViewController:(UIViewController*)viewController animated:(BOOL)animated {
     if(viewController == nil) return;
-    _IQDrilldownPanel* panel = [[[_IQDrilldownPanel alloc] initWithViewController:viewController parent:self] autorelease];
+    _IQDrilldownPanel* panel = [[_IQDrilldownPanel alloc] initWithViewController:viewController parent:self];
     if(viewController == rootViewController) {
         [NSException raise:@"InvalidArgument" format:@"Cannot push the root view controller to the controller stack"];
     }
@@ -222,7 +224,8 @@
     self->rootViewPosition = newPos;
 }
 
-- (void) setEnableViewShadows:(BOOL)enable {
+- (void) setEnableViewShadows:(BOOL)enable
+{
 	if(enableViewShadows != enable) {
 		enableViewShadows = enable;
 		for(_IQDrilldownPanel* panel in panels) {
@@ -231,16 +234,32 @@
 	}
 }
 
-- (void) setActiveIndex:(int)index animated:(BOOL)animated {
+- (void) setActiveIndex:(int)index animated:(BOOL)animated
+{
 	if(activeIndex < 0) index = 0;
 	int max = panels.count - 1;
 	if(activeIndex > max) index = max;
 	activeIndex = index;
 	[self doLayout:animated];
+    [NSDictionary dictionaryWithContentsOfFile:[[NSBundle mainBundle] pathForResource:@"CountryData" ofType:@"plist"]];
 }
 
-- (void) setActiveIndex:(int)index {
-	[self setActiveIndex:index animated:NO];
+- (void) setActiveIndex:(int)index
+{
+    [self setActiveIndex:index animated:YES];
+}
+
+- (void) setRootViewVisible:(BOOL)visible animated:(BOOL)animated
+{
+    if(rootViewVisible != visible) {
+        rootViewVisible = visible;
+        [self doLayout:animated];
+    }
+}
+
+- (void) setRootViewVisible:(BOOL)visible
+{
+    [self setRootViewVisible:visible animated:YES];
 }
 
 - (int) activeIndex {
@@ -350,6 +369,7 @@
 		[self doLayout:animated];
 	} else {
 		if(activeIndex == 0) {
+            NSLog(@"goLeftAnimated %d", panels.count);
 			activeViewRightAligned = YES;
 			[self doLayout:animated];
 		} else {
@@ -403,15 +423,6 @@
     [super viewDidUnload];
     // Release any retained subviews of the main view.
     // e.g. self.myOutlet = nil;
-}
-
-
-- (void)dealloc {
-	[panels release];
-	[swipeLeft release];
-	[swipeRight release];
-	[pan release];
-    [super dealloc];
 }
 
 #pragma mark Gestures
@@ -528,12 +539,6 @@
         [self addSubview:viewController.view];
     }
     return self;
-}
-
-- (void) dealloc
-{
-    [hostedViewController release];
-    [super dealloc];
 }
 
 @end

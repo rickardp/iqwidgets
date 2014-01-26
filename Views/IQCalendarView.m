@@ -92,7 +92,7 @@
 {
     CGRect r = self.bounds;
     showCurrentDay = YES;
-    currentDay = [[NSDate date] retain];
+    currentDay = [NSDate date];
     self.calendar = [NSCalendar currentCalendar];
     self.tintColor = [UIColor colorWithRed:204/255.0 green:204/255.0 blue:209/255.0 alpha:1];
     self.headerTextColor = [UIColor colorWithRed:.15 green:.1 blue:0 alpha:1];
@@ -146,28 +146,6 @@
     }
 }
 
-#pragma mark Disposal
-
-- (void)dealloc
-{
-    self.contentDelegate = nil;
-    [self clearSelection];
-    [dayFormatter release];
-    for(int i=0; i<10; i++) {
-        [rows[i] release];
-        rows[i] = nil;
-    }
-    [calendarArea release];
-    [calendar release];
-    [header release];
-    [tintColor release];
-    [selectionColor release];
-    [headerTextColor release];
-    [selectionColor release];
-    [currentDayColor release];
-    [super dealloc];
-}
-
 - (UIView*)headerView
 {
     return header;
@@ -184,21 +162,21 @@
         NSDate* d = [self dateFromPoint:dragStart];
         if(selectionMode == IQCalendarSelectionRangeEnd) {
             if(selectionStart == nil || [d compare:selectionStart] == NSOrderedAscending) {
-                selectionStart = [d retain];
+                selectionStart = d;
             }
-            selectionEnd = [d retain];
+            selectionEnd = d;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionRangeStart) {
             if(selectionEnd == nil || [d compare:selectionEnd] == NSOrderedDescending) {
-                selectionEnd = [d retain];
+                selectionEnd = d;
             }
-            selectionStart = [d retain];
+            selectionStart = d;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionMulti) {
             [self setSelected:![self isDaySelected:d] forDay:d];
         } else {
-            selectionStart = [d retain];
-            selectionEnd = [d retain];
+            selectionStart = d;
+            selectionEnd = d;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
         }
         [self redisplayDays];
@@ -221,28 +199,28 @@
         if(selectionMode == IQCalendarSelectionRange) {
             NSDate* d0 = [self dateFromPoint:dragStart];
             if([d compare:d0] == NSOrderedAscending) {
-                selectionStart = [d retain];
-                selectionEnd = [d0 retain];
+                selectionStart = d;
+                selectionEnd = d0;
             } else {
-                selectionStart = [d0 retain];
-                selectionEnd = [d retain];
+                selectionStart = d0;
+                selectionEnd = d;
             }
             [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionSingle) {
-            selectionStart = [d retain];
-            selectionEnd = [d retain];
+            selectionStart = d;
+            selectionEnd = d;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionRangeEnd) {
             if([d compare:selectionStart] == NSOrderedAscending) {
-                selectionStart = [d retain];
+                selectionStart = d;
             }
-            selectionEnd = [d retain];
+            selectionEnd = d;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
         } else if(selectionMode == IQCalendarSelectionRangeStart) {
             if([d compare:selectionEnd] == NSOrderedDescending) {
-                selectionEnd = [d retain];
+                selectionEnd = d;
             }
-            selectionStart = [d retain];
+            selectionStart = d;
             [self sendActionsForControlEvents:UIControlEventValueChanged];
         }
         [self redisplayDays];
@@ -258,7 +236,7 @@
         int row = pt.y * 5.0 / calendarArea.bounds.size.height;
         int col = pt.x * 7.0 / calendarArea.bounds.size.width;
         if(row < 0 || row > 5 || col < 0 || col > 6) return nil;
-        NSDateComponents* comp = [[[NSDateComponents alloc] init] autorelease];
+        NSDateComponents* comp = [[NSDateComponents alloc] init];
         comp.day = col + 7*row;
         NSDate* date = [calendar dateByAddingComponents:comp toDate:self.firstDisplayedDay options:0];
         
@@ -285,8 +263,7 @@
     for(int i=0; i<9; i++) {
         [rows[i] setSelectionColor:sc];
     }
-    [selectionColor release];
-    selectionColor = [sc retain];
+    selectionColor = sc;
 }
 
 - (void)setTintColor:(UIColor *)tc
@@ -295,8 +272,7 @@
         [(id)header setTintColor:tc];
     }
     [calendarArea setTintColor:tintColor];
-    [tintColor release];
-    tintColor = [tc retain];
+    tintColor = tc;
     [calendarArea setNeedsDisplay];
 }
 
@@ -305,8 +281,7 @@
     for(int i=0; i<9; i++) {
         [rows[i] setTextColor:tc];
     }
-    [textColor release];
-    textColor = [tc retain];
+    textColor = tc;
     [self redisplayDays];
 }
 
@@ -315,8 +290,7 @@
     for(int i=0; i<9; i++) {
         [rows[i] setSelectedTextColor:tc];
     }
-    [selectedTextColor release];
-    selectedTextColor = [tc retain];
+    selectedTextColor = tc;
     [self redisplayDays];
 }
 
@@ -325,8 +299,7 @@
     if([header respondsToSelector:@selector(setTextColor:)]) {
         [(id)header setTextColor:tc];
     }
-    [headerTextColor release];
-    headerTextColor = [tc retain];
+    headerTextColor = tc;
 }
 
 - (void)setHeaderShadowOffset:(CGSize)offset
@@ -376,8 +349,7 @@
 #pragma mark Date navigation
 - (void)setCurrentDay:(NSDate*)date display:(BOOL)display animated:(BOOL)animated
 {
-    [currentDay release];
-    currentDay = [date retain];
+    currentDay = date;
 }
 
 - (void)setCurrentDay:(NSDate *)date
@@ -397,7 +369,7 @@
             CGRect b = rows[i].bounds;
             b.origin.y += dayContentSize;
             b.size.height -= dayContentSize;
-            NSDateComponents* cmpnts = [[[NSDateComponents alloc] init] autorelease];
+            NSDateComponents* cmpnts = [[NSDateComponents alloc] init];
             cmpnts.day = 7*i;
             NSDate* first = [calendar dateByAddingComponents:cmpnts toDate:self.firstDisplayedDay options:0];
             cmpnts.day += 7;
@@ -422,8 +394,7 @@
 {
     NSTimeInterval d = [self.firstDayInDisplayMonth timeIntervalSinceReferenceDate];
     BOOL firstSet = (displayDate == nil);
-    [displayDate release];
-    displayDate = [day retain];
+    displayDate = day;
     NSDate* monthStart = self.firstDayInDisplayMonth;
     NSTimeInterval dn = [monthStart timeIntervalSinceReferenceDate];
     // TODO: This logic needs to be improved to take into account months requiring six weeks!
@@ -493,25 +464,19 @@
         [self clearSelection];
         return;
     }
-    [selectedDays release];
     selectedDays = nil;
-    [selectionStart release];
     if(startDate == nil) startDate = endDate;
-    selectionStart = [startDate retain];
-    [selectionEnd release];
+    selectionStart = startDate;
     if(endDate == nil) endDate = startDate;
-    selectionEnd = [endDate retain];
+    selectionEnd = endDate;
     [self sendActionsForControlEvents:UIControlEventValueChanged];
     [self redisplayDays];
 }
 
 - (void)clearSelection
 {
-    [selectedDays release];
     selectedDays = nil;
-    [selectionStart release];
     selectionStart = nil;
-    [selectionEnd release];
     selectionEnd = nil;
     [self redisplayDays];
 }
@@ -526,20 +491,18 @@
 {
     if(selectedDays == nil) {
         if(!selected && (selectionStart == nil || selectionEnd == nil)) return;
-        selectedDays = [[NSMutableSet set] retain];
+        selectedDays = [NSMutableSet set];
     }
     if(selectionStart != nil && selectionEnd != nil) {
         NSDate* d = [self dayForDate:selectionStart];
-        NSDateComponents* cmpnts = [[[NSDateComponents alloc] init] autorelease];
+        NSDateComponents* cmpnts = [[NSDateComponents alloc] init];
         cmpnts.day = 1;
         while([d compare:selectionEnd] != NSOrderedDescending) {
             [(NSMutableSet*)selectedDays addObject:d];
             d = [calendar dateByAddingComponents:cmpnts toDate:d options:0];
         }
     }
-    [selectionStart release];
     selectionStart = nil;
-    [selectionEnd release];
     selectionEnd = nil;
     if(selected) [(NSMutableSet*)selectedDays addObject:[self dayForDate:day]];
     else [(NSMutableSet*)selectedDays removeObject:[self dayForDate:day]];
@@ -645,9 +608,7 @@
     };
     CGColorRef c1 = CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors);
     CGColorRef c2 = CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors+4);
-    layer.colors = [NSArray arrayWithObjects:(id)c1, (id)c2, nil];
-    CGColorRelease(c1);
-    CGColorRelease(c2);
+    layer.colors = [NSArray arrayWithObjects:(id)CFBridgingRelease(c1), (id)CFBridgingRelease(c2), nil];
     //[layer setNeedsDisplay];
 }
 
@@ -677,15 +638,13 @@
 
 - (void)setSelectionColor:(UIColor *)color
 {
-    [selectionColor release];
-    selectionColor = [color retain];
+    selectionColor = color;
     [self setNeedsDisplay];
 }
 
 - (void)setCurrentDayColor:(UIColor *)color
 {
-    [currentDayColor release];
-    currentDayColor = [color retain];
+    currentDayColor = color;
     [self setNeedsDisplay];
 }
 
@@ -839,7 +798,7 @@
 }
 - (void)setDays:(NSDate*)firstDay delta:(int)dayDelta calendar:(NSCalendar*)cal monthStart:(NSDate*)ms monthEnd:(NSDate*)me selStart:(NSDate*)selStart selEnd:(NSDate*)selEnd selDays:(NSSet*)selDays currentDay:(NSDate*)currentDay selectionMode:(IQCalendarSelectionMode)selectionMode formatter:(NSDateFormatter*)fmt
 {
-    NSDateComponents* cmpnts = [[NSDateComponents alloc] init];
+    NSDateComponents* cmpnts = [NSDateComponents new];
     cmpnts.day = dayDelta;
     NSDate* nextdt = [cal dateByAddingComponents:cmpnts toDate:firstDay options:0];
     for(int i=0; i<7; i++) {
@@ -887,7 +846,6 @@
         }
     }
     [self setNeedsDisplay];
-    [cmpnts release];
 }
 @end
 

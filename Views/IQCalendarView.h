@@ -18,6 +18,8 @@
 
 #import "IQScrollView.h"
 
+#import "IQTheme.h"
+
 typedef enum _IQCalendarSelectionMode {
     IQCalendarSelectionSingle,
     IQCalendarSelectionRange,

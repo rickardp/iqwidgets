@@ -7,17 +7,23 @@
 //
 
 #import "ExampleViewController.h"
+#import "IQWidgets.h"
 
 @implementation ExampleViewController
 
 + (ExampleViewController*) exampleViewController
 {
-    return [[[ExampleViewController alloc] init] autorelease];
+    return [[ExampleViewController alloc] init];
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)orientation
 {
     return YES;
+}
+
+- (void) loadView
+{
+    //self.view = [[IQCalendarView alloc] init];
 }
 
 @end

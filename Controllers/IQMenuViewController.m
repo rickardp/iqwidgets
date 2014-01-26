@@ -1,10 +1,19 @@
 //
-//  IQMenuViewController.m
-//  DrilldownTest
+//  IQDrilldownPanelViewController.h
+//  IQWidgets for iOS
 //
-//  Created by Rickard Petzäll on 2012-09-29.
-//  Copyright (c) 2012 EvolvIQ. All rights reserved.
+//  Copyright 2012 Rickard Petzäll, EvolvIQ
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #import "IQMenuViewController.h"
 
@@ -12,6 +21,7 @@
 
 @class _IQMenuDataSource;
 @interface IQMenuViewController () {
+    BOOL hasNotifications;
     _IQMenuDataSource* dataSource;
     UITableView* tableView;
 }
@@ -71,20 +81,25 @@ typedef void (^_IQActionBlock)();
     self = [super init];
     if(self) {
         dataSource = [[_IQMenuDataSource alloc] initWithMenu:self];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_checkThemeChange:) name:kIQThemeNotificationThemeChanged object:nil];
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_checkThemeChange:) name:kIQThemeNotificationDefaultThemeChanged object:nil];
     }
     return self;
 }
 
 - (void) dealloc
 {
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIQThemeNotificationThemeChanged object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:kIQThemeNotificationDefaultThemeChanged object:nil];
+    if(hasNotifications) {
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:kIQThemeNotificationThemeChanged object:nil];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:kIQThemeNotificationDefaultThemeChanged object:nil];
+    }
 }
 
 - (void) loadView
 {
+    if(!hasNotifications) {
+        hasNotifications = YES;
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_checkThemeChange:) name:kIQThemeNotificationThemeChanged object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_checkThemeChange:) name:kIQThemeNotificationDefaultThemeChanged object:nil];
+    }
     IQTheme* thm = self.theme;
     if(!thm) thm = [IQTheme defaultTheme];
     UITableViewStyle style = [thm tableViewStyleFor:self];
@@ -104,6 +119,7 @@ typedef void (^_IQActionBlock)();
     NSObject<IQThemeable>* noinheritSection = [IQTheme themeableForElement:@"section" ofParent:self defaultInherit:NO];
     NSObject<IQThemeable>* inheritItem = [IQTheme themeableForElement:@"item" ofParent:inheritSection defaultInherit:YES];
     NSObject<IQThemeable>* noinheritItem = [IQTheme themeableForElement:@"item" ofParent:noinheritSection defaultInherit:NO];
+    tableView.separatorColor = [thm borderColorFor:inheritItem];
     dataSource.itemFont = [thm fontFor:inheritItem];
     dataSource.itemTextColor = [thm colorFor:inheritItem];
     UITextAlignment aln = [thm textAlignmentFor:inheritItem];
@@ -119,6 +135,12 @@ typedef void (^_IQActionBlock)();
 - (NSString*) themeElementName
 {
     return @"menu";
+}
+
+- (void) setTheme:(id<IQThemeProvider>)thm
+{
+    self->theme = thm;
+    [self _updateTheme];
 }
 
 - (void) viewDidLoad
@@ -245,11 +267,13 @@ typedef void (^_IQActionBlock)();
         CGRect frame = tableView.frame;
         tableView.dataSource = nil;
         tableView.delegate = nil;
+        NSInteger idx = [tableView.superview.subviews indexOfObject:tableView];
+        
         [tableView removeFromSuperview];
         tableView = nil;
         self.view = nil;
         [self loadView];
-        [superview addSubview:tableView];
+        [superview insertSubview:tableView atIndex:idx];
         tableView.frame = frame;
     }
 }

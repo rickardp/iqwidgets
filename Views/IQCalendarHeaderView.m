@@ -100,24 +100,6 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     return [CAGradientLayer class];
 }
 
-#pragma mark Disposal
-
-- (void)dealloc
-{
-    [startDate release];
-    [itemFormatter release];
-    [titleFormatter release];
-    [cornerFormatter release];
-    [titleLabel release];
-    for(int i = 0; i < 16; i++) {
-        [itemLabels[i] release];
-    }
-    [leftArrow release];
-    [rightArrow release];
-    [border release];
-    [super dealloc];
-}
-
 #pragma mark Layout
 
 - (void)updateLabels
@@ -176,9 +158,7 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     };
     CGColorRef c1 = CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors);
     CGColorRef c2 = CGColorCreate(CGColorGetColorSpace([tintColor CGColor]), colors+4);
-    layer.colors = [NSArray arrayWithObjects:(id)c1, (id)c2, nil];
-    CGColorRelease(c1);
-    CGColorRelease(c2);
+    layer.colors = [NSArray arrayWithObjects:CFBridgingRelease(c1), CFBridgingRelease(c2), nil];
     border.backgroundColor = [UIColor colorWithRed:colors[8] green:colors[9] blue:colors[10] alpha:1];
 }
 
@@ -232,8 +212,7 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     if(count > 16) count = 16;
     memcpy(items, newItems, count * sizeof(IQCalendarHeaderItem));
     numItems = count;
-    [startDate release];
-    startDate = [time copy];
+    startDate = time;
     [self updateLabels];
 }
 
@@ -269,8 +248,7 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
 
 - (void)setTextColor:(UIColor *)value
 {
-    [textColor release];
-    textColor = [value retain];
+    textColor = value;
     titleLabel.textColor = value;
     for(int i = 0; i < 16; i++) {
         itemLabels[i].textColor = value;
@@ -325,11 +303,7 @@ NSString* IQLocalizationFormatWeekNumber(int weekNumber)
     }
     return self;
 }
-- (void)dealloc
-      {
-          self.shadowColor = nil;
-          [super dealloc];
-      }
+
 - (void)drawRect:(CGRect)rect
 {
     CGContextRef ctx = UIGraphicsGetCurrentContext();

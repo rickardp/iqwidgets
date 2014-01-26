@@ -1,12 +1,21 @@
 //
 //  IQTheme.h
-//  DrilldownTest
+//  IQWidgets for iOS
 //
-//  Created by Rickard Petzäll on 2012-09-30.
-//  Copyright (c) 2012 EvolvIQ. All rights reserved.
+//  Copyright 2012 Rickard Petzäll, EvolvIQ
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
-#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 extern NSString* kIQThemeNotificationDefaultThemeChanged;
 extern NSString* kIQThemeNotificationThemeChanged;
@@ -40,11 +49,18 @@ extern NSString* kIQThemeNotificationThemeChanged;
 @end
 
 typedef enum IQThemeViewApplyFlags {
-    IQThemeViewApplyBackgroundStyle = 1,
-    IQThemeViewApplyTextStyle = 2,
-    IQThemeViewApplyLayerStyle = 4,
+    IQThemeViewApplyVisibility = 1,
+    IQThemeViewApplyBackgroundStyle = 2,
+    IQThemeViewApplyTextStyle = 4,
+    IQThemeViewApplyLayerStyle = 8,
     IQThemeViewApplyAllStyles = 0xFFFFFFFF
 } IQThemeViewApplyFlags;
+
+typedef enum IQThemeTristate {
+    IQThemeNo = 0,
+    IQThemeYes = 1,
+    IQThemeNotSet = -1
+} IQThemeTristate;
 
 /**
  A generic theme interface for UI elements. All IQWidgets elements are themeable using the IQTheme class.
@@ -69,11 +85,14 @@ typedef enum IQThemeViewApplyFlags {
  */
 - (BOOL) applyToView:(UIView*)view for:(NSObject<IQThemeable>*)themeable flags:(IQThemeViewApplyFlags)flags;
 
+- (IQThemeTristate) isHidden:(NSObject<IQThemeable>*)themeable;
+
 - (UIFont*) fontFor:(NSObject<IQThemeable>*)themeable;
 - (UITextAlignment) textAlignmentFor:(NSObject<IQThemeable>*)themeable;
 
 - (UIColor*) colorFor:(NSObject<IQThemeable>*)themeable;
 - (UIColor*) backgroundColorFor:(NSObject<IQThemeable>*)themeable;
+- (UIColor*) borderColorFor:(NSObject<IQThemeable>*)themeable;
 - (IQThemeTextShadow*) textShadowFor:(NSObject<IQThemeable>*)themeable;
 
 - (UITableViewStyle) tableViewStyleFor:(NSObject<IQThemeable>*)themeable;
@@ -103,6 +122,7 @@ typedef enum IQThemeViewApplyFlags {
 - (void) setTableViewStyle:(UITableViewStyle)style for:(NSObject*)themeableOrString;
 - (void) setColor:(UIColor*)color for:(NSObject*)themeableOrString;
 - (void) setBackgroundColor:(UIColor*)bgcolor for:(NSObject*)themeableOrString;
+- (void) setBorderColor:(UIColor*)bdcolor for:(NSObject*)themeableOrString;
 
 - (NSString*) CSSText;
 

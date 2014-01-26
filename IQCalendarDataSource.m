@@ -19,39 +19,46 @@
 #import "IQCalendarDataSource.h"
 
 
-@implementation IQCalendarSimpleDataSource
-@synthesize labelText;
+@interface IQCalendarSimpleDataSource () {
+    NSObject<NSFastEnumeration>* data;
+    NSString* labelText;
+}
+@end
 
-+ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name set:(NSSet*)items
+@implementation IQCalendarSimpleDataSource
+@synthesize labelText, themeClassName;
+@synthesize startDateCallback, endDateCallback, valueCallback;
+
++ (IQCalendarSimpleDataSource*) dataSourceWithLabel:(NSString*)label set:(NSSet*)items
 {
     IQCalendarSimpleDataSource* ds = [[IQCalendarSimpleDataSource alloc] initWithSet:items];
-    ds.labelText = name;
-    return [ds autorelease];
+    ds.labelText = label;
+    return ds;
 }
-+ (IQCalendarSimpleDataSource*) dataSourceWithName:(NSString*)name array:(NSArray*)items
++ (IQCalendarSimpleDataSource*) dataSourceWithLabel:(NSString*)label array:(NSArray*)items
 {
     IQCalendarSimpleDataSource* ds = [[IQCalendarSimpleDataSource alloc] initWithArray:items];
-    ds.labelText = name;
-    return [ds autorelease];
+    ds.labelText = label;
+    return ds;
 }
 
 + (IQCalendarSimpleDataSource*) dataSourceWithSet:(NSSet*)items
 {
     IQCalendarSimpleDataSource* ds = [[IQCalendarSimpleDataSource alloc] initWithSet:items];
-    return [ds autorelease];
+    return ds;
 }
 
 + (IQCalendarSimpleDataSource*) dataSourceWithArray:(NSArray*)items
 {
     IQCalendarSimpleDataSource* ds = [[IQCalendarSimpleDataSource alloc] initWithArray:items];
-    return [ds autorelease];
+    return ds;
 }
 
 - (id) initWithSet:(NSSet*)items
 {
     self = [super init];
     if(self != nil) {
-        data = [items retain];
+        self->data = items;
     }
     return self;
 }
@@ -60,94 +67,72 @@
 {
     self = [super init];
     if(self != nil) {
-        data = [items retain];
+        self->data = items;
     }
     return self;
-}
-
-
-#pragma mark Blocks
-
-- (void) setCallbacksForStartDate:(IQCalendarDataSourceTimeExtractor)startDateCallback endDate:(IQCalendarDataSourceTimeExtractor)endDateCallback
-{
-    Block_release(startDateOfItem);
-    Block_release(endDateOfItem);
-    startDateOfItem = Block_copy(startDateCallback);
-    endDateOfItem = Block_copy(endDateCallback);
-}
-- (void) setCallbackForText:(IQCalendarDataSourceTextExtractor)textCallback
-{
-    
-    Block_release(textOfItem);
-    textOfItem = Block_copy(textCallback);
-}
-
-#pragma mark Selectors
-
-- (void) setSelectorsForStartDate:(SEL)startDateSelector endDate:(SEL)endDateSelector
-{
-    [self setCallbacksForStartDate:^(id item) {
-        NSDate* date = [item performSelector:startDateSelector withObject:item];
-        return [date timeIntervalSinceReferenceDate];
-    } endDate:^(id item) {
-        NSDate* date = [item performSelector:endDateSelector withObject:item];
-        return [date timeIntervalSinceReferenceDate];
-    }];
-}
-
-- (void) setSelectorForText:(SEL)textSelector
-{
-    [self setCallbackForText:^(id item) {
-        if([item respondsToSelector:textSelector]) {
-            return (NSString*)[item performSelector:textSelector withObject:item];
-        } else return (NSString*)nil;
-    }];
 }
 
 #pragma mark Key/value coding
 
 - (void) setKeysForStartDate:(NSString*)startDateKey endDate:(NSString*)endDateKey
 {
-    [self setCallbacksForStartDate:^(id item) {
+    self.startDateCallback = ^(id item) {
         NSDate* date = [item valueForKey:startDateKey];
         return [date timeIntervalSinceReferenceDate];
-    } endDate:^(id item) {
+    };
+    self.endDateCallback = ^(id item) {
         NSDate* date = [item valueForKey:endDateKey];
         return [date timeIntervalSinceReferenceDate];
-    }];
+    };
 }
-- (void) setKeyForText:(NSString*)textKey
+- (void) setKeyForValue:(NSString*)valueKey
 {
-    [self setCallbackForText:^(id item) {
-        return [item valueForKey:textKey];
-    }];    
+    self.valueCallback = ^(id item) {
+        return [item valueForKey:valueKey];
+    };
 }
 
 #pragma mark IQCalendarDataSource implementation
 
 - (void) enumerateEntriesUsing:(IQCalendarDataSourceEntryCallback)enumerator from:(NSTimeInterval)startTime to:(NSTimeInterval)endTime
 {
-    if(startDateOfItem == nil || endDateOfItem == nil) {
-        [self setSelectorsForStartDate:@selector(startDate) endDate:@selector(endDate)];
+    IQCalendarDataSourceTimeExtractor start = self.startDateCallback;
+    IQCalendarDataSourceTimeExtractor end = self.endDateCallback;
+    IQCalendarDataSourceValueExtractor value = self.valueCallback;
+    
+    if(!value && (start || end)) {
+        value = ^(id item) {
+            if([item respondsToSelector:@selector(text)]) {
+                return (NSObject<IQCalendarActivity>*)[(id<IQCalendarSimpleDataItem>)item value];
+            } else {
+                return (NSObject<IQCalendarActivity>*)nil;
+            }
+        };
+    }
+    if(!start) {
+        start = ^(id item) {
+            NSDate* date = [(id<IQCalendarSimpleDataItem>)item startDate];
+            return [date timeIntervalSinceReferenceDate];
+        };
+    }
+    if(!end) {
+        end = ^(id item) {
+            NSDate* date = [(id<IQCalendarSimpleDataItem>)item endDate];
+            return [date timeIntervalSinceReferenceDate];
+        };
     }
     
     for(id item in (id<NSFastEnumeration>)data) {
-        NSTimeInterval tstart = startDateOfItem(item);
+        NSTimeInterval tstart = startDateCallback(item);
         if(tstart < endTime) {
-            NSTimeInterval tend = endDateOfItem(item);
+            NSTimeInterval tend = endDateCallback(item);
             if(tend > startTime) {
-                enumerator(item, tstart, tend);
+                NSObject<IQCalendarActivity>* activityValue = nil;
+                if(value != nil) activityValue = value(item);
+                enumerator(tstart, tend, activityValue);
             }
         }
     }
-}
-
-- (NSString*) textForItem:(id)item
-{
-    if(textOfItem == nil) {
-        [self setSelectorForText:@selector(text)];
-    }
-    return textOfItem(item);
 }
 
 @end

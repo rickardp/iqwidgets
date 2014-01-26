@@ -39,7 +39,6 @@ typedef struct _IQGanttViewTimeWindow {
     NSMutableArray* rowViews;
     IQGanttViewTimeWindow scaleWindow;
     NSCalendarUnit displayCalendarUnits;
-    IQGanttBlockViewCreationCallback createBlock;
     IQGanttRowHeightCallback rowHeight;
     NSCalendar* calendar;
 }
@@ -58,19 +57,12 @@ typedef struct _IQGanttViewTimeWindow {
 - (UIView<IQGanttHeaderDelegate>*) timeHeaderViewWithFrame:(CGRect)frame; // default implementation returns a IQGanttHeaderView
 - (UIView*) rowHeaderViewWithFrame:(CGRect)frame; // default implementation returns nil
 
-- (UIView<IQGanttRowDelegate>*) viewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame; // default implementation returns a IQGanttRowView 
+- (UIView<IQGanttRowDelegate>*) viewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame; // default implementation returns a IQGanttRowView
+
+// Override this method to define a custom view creation. Detfault is to create a themeable simple view.
+- (UIView*) createViewForActivityWithFrame:(CGRect)frame text:(NSString*)text;
 
 @end
-
-// This category uses blocks for defining a call-back interface. This
-// option performs better with large data sets and allows for more
-// customization than the simple interface.
-
-@interface IQGanttView (CallbackInterface)
-- (void) setBlockCreationCallback:(IQGanttBlockViewCreationCallback)callback;
-- (void) setRowHeightCallback:(IQGanttRowHeightCallback)callback;
-@end
-
 
 @protocol IQGanttHeaderDelegate
 @optional

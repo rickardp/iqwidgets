@@ -54,7 +54,7 @@
 
 - (void)setupGanttView
 {
-    calendar = [[NSCalendar currentCalendar] retain];
+    calendar = [NSCalendar currentCalendar];
     defaultRowHeight = 72;
     displayCalendarUnits = NSDayCalendarUnit | NSWeekCalendarUnit | NSMonthCalendarUnit | NSYearCalendarUnit;
     NSDateComponents* cmpnts = [[NSCalendar currentCalendar] components:NSYearCalendarUnit|NSMonthCalendarUnit|NSDayCalendarUnit fromDate:[NSDate date]];
@@ -136,13 +136,6 @@
     }
 }
 
-#pragma mark Disposal
-
-- (void)dealloc
-{
-    [super dealloc];
-}
-
 #pragma mark Properties
 
 - (NSCalendarUnit)displayCalendarUnits
@@ -183,8 +176,7 @@
 - (void)setBackgroundColor:(UIColor *)bg
 {
     [contentPanel setBackgroundColor:bg];
-    [backgroundColor release];
-    backgroundColor = [bg retain];
+    backgroundColor = bg;
 }
 
 - (NSCalendar*)calendar
@@ -194,8 +186,7 @@
 
 - (void)setCalendar:(NSCalendar *)cal
 {
-    [calendar release];
-    calendar = [cal retain];
+    calendar = cal;
     
     if([columnHeaderView respondsToSelector:@selector(ganttView:didChangeCalendar:)]) {
         [(id<IQGanttHeaderDelegate>)columnHeaderView ganttView:self didChangeCalendar:calendar];
@@ -233,6 +224,7 @@
     [rowViews removeAllObjects];
     [self layoutOnRowsChange];
 }
+
 - (void)addRow:(id<IQCalendarDataSource>)row
 {
     UIView<IQGanttRowDelegate>* view = [self viewForRow:row withFrame:CGRectMake(0, 0, self.contentSize.width, self.bounds.size.height * 0.25)];
@@ -249,7 +241,6 @@
         [view ganttView:self didChangeCalendar:calendar];
     }
     [view setNeedsDisplay];
-    NSLog(@"Added row: %@", view);
     [self layoutOnRowsChange];
 }
 
@@ -262,7 +253,7 @@
 
 - (UIView<IQGanttHeaderDelegate>*) timeHeaderViewWithFrame:(CGRect)frame
 {
-    return [[[IQGanttHeaderView alloc] initWithFrame:frame] autorelease];
+    return [[IQGanttHeaderView alloc] initWithFrame:frame];
 }
 
 - (UIView*) rowHeaderViewWithFrame:(CGRect)frame
@@ -271,32 +262,15 @@
 }
 - (UIView<IQGanttRowDelegate>*) viewForRow:(id<IQCalendarDataSource>)row withFrame:(CGRect)frame
 {
-    return [[[IQGanttRowView alloc] initWithFrame:frame] autorelease];
+    return [[IQGanttRowView alloc] initWithFrame:frame];
 }
 
-- (UIView*) blockViewForRow:(UIView*)rowView item:(id)item frame:(CGRect)frame
+- (UIView*) createViewForActivityWithFrame:(CGRect)frame text:(NSString*)text
 {
-    if(createBlock == nil) {
-        IQScheduleBlockView* lbl = [[[IQScheduleBlockView alloc] initWithFrame:frame] autorelease];
-        lbl.contentMode = UIViewContentModeCenter;
-        lbl.backgroundColor = [UIColor redColor];
-        return lbl;
-    }
-    return createBlock(self, rowView, item, frame);
-}
-
-@end
-
-@implementation IQGanttView (CallbackInterface)
-
-- (void)setBlockCreationCallback:(IQGanttBlockViewCreationCallback)callback
-{
-    createBlock = callback;
-}
-- (void) setRowHeightCallback:(IQGanttRowHeightCallback)callback
-{
-    Block_release(rowHeight);
-    rowHeight = Block_copy(callback);
+    IQScheduleBlockView* lbl = [[IQScheduleBlockView alloc] initWithFrame:frame];
+    lbl.contentMode = UIViewContentModeCenter;
+    lbl.backgroundColor = [UIColor redColor];
+    return lbl;
 }
 
 @end
@@ -318,17 +292,6 @@
         }
     }
     return self;
-}
-
-- (void)dealloc
-{
-    if(grad != nil) CGGradientRelease(grad);
-    if(border != nil) CGColorRelease(border);
-    [tintColor release];
-    [cal release];
-    [floatingLabels release];
-    [monthNameFormatter release];
-    [super dealloc];
 }
 
 + (Class) layerClass
@@ -356,7 +319,7 @@
     NSTimeInterval t0 = scaleWindow.windowStart + scl * r0;
     NSTimeInterval t1 = scaleWindow.windowStart + scl * r1;
     UIFont* textFont = [UIFont systemFontOfSize:8];
-    NSCalendar* calendar = [[cal copy] autorelease];
+    NSCalendar* calendar = [cal copy];
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {
         int fwd = [calendar firstWeekday];
         NSDate* d = [NSDate dateWithTimeIntervalSinceReferenceDate:t0];
@@ -433,7 +396,7 @@
     }
     
     while(index >= floatingLabels.count) {
-        UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 16)] autorelease];
+        UILabel* label = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 200, 16)];
         label.font = [UIFont boldSystemFontOfSize:12];
         label.backgroundColor = [UIColor clearColor];
         label.textColor = [UIColor colorWithRed:.15 green:.1 blue:0 alpha:1];
@@ -451,7 +414,7 @@
     NSTimeInterval t0 = scaleWindow.viewStart;
     NSTimeInterval t1 = scaleWindow.viewStart + scaleWindow.viewSize;
     
-    NSCalendar* calendar = [[cal copy] autorelease];
+    NSCalendar* calendar = [cal copy];
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {
         NSDate* d = [NSDate dateWithTimeIntervalSinceReferenceDate:t0];
         NSDateComponents* cmpnts = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:d];
@@ -517,16 +480,13 @@
 
 - (void)ganttView:(IQGanttView *)view didChangeCalendar:(NSCalendar*)calendar
 {
-    NSCalendar* oldCal = cal;
-    cal = [calendar retain];
-    [oldCal release];
+    cal = calendar;
     [self setNeedsDisplay];
 }
 
 - (void)setTintColor:(UIColor *)tc
 {
-    [tintColor release];
-    tintColor = [tc retain];
+    tintColor = tc;
     CGColorRef tint = [tc CGColor];
     const CGFloat* cmpnts = CGColorGetComponents(tint);
     CGFloat colors[] = {
@@ -560,9 +520,9 @@
 {
     self = [super initWithFrame:frame];
     if(self) {
-        primaryGridColor = [[UIColor grayColor] retain];
-        secondaryGridColor = [[UIColor grayColor] retain];
-        tertaryGridColor = [[UIColor colorWithWhite:0.8 alpha:1] retain];
+        primaryGridColor = [UIColor grayColor];
+        secondaryGridColor = [UIColor grayColor];
+        tertaryGridColor = [UIColor colorWithWhite:0.8 alpha:1];
         primaryLineUnits = NSMonthCalendarUnit;
         secondaryLineUnits = NSWeekCalendarUnit;
         tertaryLineUnits = NSDayCalendarUnit;
@@ -570,15 +530,6 @@
         self.backgroundColor = [UIColor whiteColor];
     }
     return self;
-}
-
-- (void)dealloc
-{
-    [cal release];
-    [primaryGridColor release];
-    [secondaryGridColor release];
-    [tertaryGridColor release];
-    [super dealloc];
 }
 
 + (Class) layerClass
@@ -595,22 +546,16 @@
     NSTimeInterval t1 = scaleWindow.windowEnd;
     CGSize sz = self.bounds.size;
     CGFloat tscl = sz.width / (t1 - t0);
-    [self.dataSource enumerateEntriesUsing:^(id item, NSTimeInterval startDate, NSTimeInterval endDate) {
+    [self.dataSource enumerateEntriesUsing:^(NSTimeInterval startDate, NSTimeInterval endDate, NSObject<IQCalendarActivity>* value) {
         CGRect frame = CGRectMake((startDate-t0)*tscl, 0, (endDate-startDate)*tscl, sz.height);
-        //UIButton* btn = [[[UIButton alloc] initWithFrame:frame] autorelease];
-        /*UIButton* btn = [UIButton buttonWithType:UIButtonTypeRoundedRect];
-         btn.frame = frame;
-         btn.titleLabel.text = @"Apan";*/
-        //btn.buttonType = UIButtonTypeRoundedRect;
-        UIView* blk = [gantt blockViewForRow:self item:item frame:frame];
-        if([blk respondsToSelector:@selector(setText:)] && [self.dataSource respondsToSelector:@selector(textForItem:)]) {
-            NSString* txt = [self.dataSource textForItem:item];
-            if(txt != nil) {
-                [(id)blk setText:txt];
-            }
+        
+        NSString* text = nil;
+        if([value respondsToSelector:@selector(characterAtIndex:)]) {
+            text = (NSString*)value;
         }
-        [self addSubview:blk];
-        //[self addSubview:btn];
+        
+        UIView* view = [gantt createViewForActivityWithFrame:frame text:text];
+        [self addSubview:view];
     } from:scaleWindow.windowStart to:scaleWindow.windowEnd];
 }
 
@@ -625,8 +570,7 @@
 - (void)ganttView:(IQGanttView *)view didChangeCalendar:(NSCalendar*)calendar
 {
     NSCalendar* oldCal = cal;
-    cal = [calendar retain];
-    [oldCal release];
+    cal = calendar;
     [self setNeedsDisplay];
 }
 
@@ -634,25 +578,19 @@
 
 - (void)setPrimaryGridColor:(UIColor *)gcl
 {
-    UIColor* oldGridColor = primaryGridColor;
-    primaryGridColor = [gcl retain];
-    [oldGridColor release];
+    primaryGridColor = gcl;
     [self setNeedsDisplay];
 }
 
 - (void)setSecondaryGridColor:(UIColor *)gcl
 {
-    UIColor* oldGridColor = secondaryGridColor;
-    secondaryGridColor = [gcl retain];
-    [oldGridColor release];
+    secondaryGridColor = gcl;
     [self setNeedsDisplay];
 }
 
 - (void)setTertaryGridColor:(UIColor *)gcl
 {
-    UIColor* oldGridColor = tertaryGridColor;
-    tertaryGridColor = [gcl retain];
-    [oldGridColor release];
+    tertaryGridColor = gcl;
     [self setNeedsDisplay];
 }
 
@@ -697,7 +635,7 @@
     //CGContextSetFontSize(ctx, 10);
     //CGContextSetTextDrawingMode(ctx, kCGTextFill);
     //CGContextSetFillColorWithColor(ctx, [[UIColor blackColor] CGColor]);
-    NSCalendar* calendar = [[cal copy] autorelease];
+    NSCalendar* calendar = [cal copy];
     IQGridDash prevGridDash = IQMakeGridDash(0, 0);
     UIColor* prevGridColor = nil;
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {

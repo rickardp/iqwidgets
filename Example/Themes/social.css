@@ -1,0 +1,24 @@
+nav navbar {
+    background-color: #c0c0c0;
+}
+
+navbar sidebarbutton {
+    icon: resource("NavBarIconLauncher.png");
+}
+
+menu {
+    background-color: #404555;
+}
+
+menu section {
+    font-size: 140pt;
+    color: white;
+}
+
+menu * item {
+    border-color: #606575;
+    font-family: Helvetica;
+    font-size: 14pt;
+    color: white;
+    text-align: right;
+}

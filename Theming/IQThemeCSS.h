@@ -1,14 +1,28 @@
 //
 //  IQThemeCSS.h
-//  DrilldownTest
+//  IQWidgets for iOS
 //
-//  Created by Rickard Petzäll on 2012-09-30.
-//  Copyright (c) 2012 EvolvIQ. All rights reserved.
+//  Copyright 2012 Rickard Petzäll, EvolvIQ
+//  Licensed under the Apache License, Version 2.0 (the "License");
+//  you may not use this file except in compliance with the License.
+//  You may obtain a copy of the License at
 //
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//  Unless required by applicable law or agreed to in writing, software
+//  distributed under the License is distributed on an "AS IS" BASIS,
+//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//  See the License for the specific language governing permissions and
+//  limitations under the License.
 
 #import <Foundation/Foundation.h>
 #import "IQTheme.h"
 
+/**
+ The CSSParsing category adds parsing of CSS files to the IQMutableTheme class. This 
+ allows app designers to tweak the look and feel of IQWidgets (and other UI elements that
+ implements `IQThemeable`) to be defined in CSS files.
+ */
 @interface IQMutableTheme (CSSParsing)
 + (IQMutableTheme*) themeFromCSS:(NSString*)css;
 + (IQMutableTheme*) themeFromCSSResource:(NSString*)cssResourcePath;
