@@ -96,6 +96,7 @@
     [sview addSubview:rootOverlayView];
     rootOverlayView.backgroundColor = [UIColor colorWithWhite:0 alpha:0.4f];
     rootOverlayView.hidden = YES;
+    rootOverlayView.autoresizingMask = UIViewAutoresizingFlexibleHeight | UIViewAutoresizingFlexibleWidth;
     [rootOverlayView addGestureRecognizer:closeSidebarTap];
     [rootOverlayView addGestureRecognizer:closeSidebarPan];
     
@@ -110,6 +111,7 @@
     shadowLayer.shadowOffset = CGSizeMake(-1, 0);
     shadowLayer.shadowRadius = SHADOW_SIZE;
     shadowLayer.shadowOpacity = SHADOW_INTENSITY;
+    [self _adjustSidebarPosition:0];
     [self _updateTheme];
 }
 
@@ -172,10 +174,12 @@
 
 - (void) setSidebarVisible:(BOOL)visible animated:(BOOL)animated
 {
+    // Do not allow sidebar to be revealed if not the top view controller
+    if(self.viewControllers.count > 1 && visible) return;
     CGRect frm = super.view.frame;
     if(visible) {
         frm.origin.x = super.view.frame.size.width-rootOverlayOffset;
-        [self _adjustSidebarRect];
+        [self _adjustSidebarSize];
     } else {
         frm.origin.x = 0;
     }
@@ -201,6 +205,7 @@
             rootOverlayView.alpha = visible ? 1.0f : 0.0f;
             shadowLayer.shadowRadius = visible ? 0 : SHADOW_SIZE;
             shadowLayer.shadowOpacity = visible ? 0 : SHADOW_INTENSITY;
+            [self _adjustSidebarPosition:visible?1:0];
         } completion:^(BOOL finished) {
             if(!visible) {
                 rootOverlayView.hidden = YES;
@@ -211,11 +216,14 @@
                 } else if(!visible && [self.delegate respondsToSelector:@selector(navigationController:didHideSidebar:animated:)]) {
                     [(id)self.delegate navigationController:self didHideSidebar:sidebarViewController animated:animated];
                 }
+                // Reset sidebar if app pushed a view controller during our animation
+                if(self.viewControllers.count > 1 && visible) self.sidebarVisible = NO;
             }
         }];
     } else {
         super.view.frame = frm;
         rootOverlayView.hidden = !visible;
+        [self _adjustSidebarPosition:visible?1:0];
         if(isChange) {
             if(visible && [self.delegate respondsToSelector:@selector(navigationController:didShowSidebar:animated:)]) {
                 [(id)self.delegate navigationController:self didShowSidebar:sidebarViewController animated:animated];
@@ -234,17 +242,6 @@
 - (void) _toggleSidebar
 {
     [self setSidebarVisible:!sidebarVisible];
-}
-
-- (void) _adjustSidebarRect
-{
-    if(self.sidebarViewMode == IQNavigationSidebarViewModeResize) {
-        CGFloat width = super.view.frame.size.width-rootOverlayOffset;
-        CGRect r = sidebarViewController.view.frame;
-        //if(r.size.width > width)
-        r.size.width = width;
-        sidebarViewController.view.frame = r;
-    }
 }
 
 - (void) _setLeftNavbarButton:(UIBarButtonItem*)button {
@@ -369,6 +366,36 @@
     return NO;
 }
 
+// Move the sidebar view as the revelation progresses
+- (void) _adjustSidebarPosition:(CGFloat)progress
+{
+    CGRect sidebarRect = sidebarViewController.view.frame;
+    sidebarRect.origin.x = 0;
+    switch(self.revealType) {
+        case IQNavigationSidebarRevealTypeSlideUnder:
+            sidebarRect.origin.x = -0.5 * (1-progress) * sidebarRect.size.width;
+            break;
+        case IQNavigationSidebarRevealTypeScroll:
+            sidebarRect.origin.x = - (1-progress) * sidebarRect.size.width;
+            break;
+        default:
+            break;
+    }
+    sidebarViewController.view.frame = sidebarRect;
+}
+
+// Pre-adjust the sidebar size according to view settings
+- (void) _adjustSidebarSize
+{
+    if(self.sidebarViewMode == IQNavigationSidebarViewModeResize) {
+        CGFloat width = super.view.frame.size.width-rootOverlayOffset;
+        CGRect r = sidebarViewController.view.frame;
+        //if(r.size.width > width)
+        r.size.width = width;
+        sidebarViewController.view.frame = r;
+    }
+}
+
 - (void) _animatePan:(CGFloat)nx
 {
     CGRect frm = super.view.frame;
@@ -385,13 +412,14 @@
     rootOverlayView.alpha = factor;
     shadowLayer.shadowRadius = (1-factor) * SHADOW_SIZE;
     shadowLayer.shadowOpacity = (1-factor) * SHADOW_INTENSITY;
+    [self _adjustSidebarPosition:factor];
 }
 
 - (void) _finishPanningWithGestureRecognizer:(UIPanGestureRecognizer*)gestureRecognizer
 {
     CGFloat width = super.view.frame.size.width-rootOverlayOffset;
-    CGPoint loca = [gestureRecognizer locationInView:self.view.window];
-    CGPoint vel = [gestureRecognizer velocityInView:self.view.window];
+    CGPoint loca = [gestureRecognizer locationInView:super.view];
+    CGPoint vel = [gestureRecognizer velocityInView:super.view];
     CGFloat distance = 2 * fabs(vel.x) * vel.x / FRICTION_RETARDATION;;
     CGRect frm = super.view.frame;
     CGFloat nx = distance + loca.x - panStartX;
@@ -402,7 +430,6 @@
     }
     BOOL vis;
     if(gestureRecognizer == closeSidebarPan) {
-        NSLog(@"nx=%f, w=%f", nx, width);
         vis = nx > width - 200.0f;
     } else {
         vis = nx > 200.0f;
@@ -410,13 +437,16 @@
     CGFloat retardationTime = 10 * fabs((nx - frm.origin.x) / vel.x);
     if(retardationTime > 0.5) retardationTime = 0.5;
     if(retardationTime < 0.1) retardationTime = 0.1;
-    //NSLog(@"Panning %f (%f) --- %f (%f)", distance, (nx - frm.origin.x), retardationTime, vel.x);
     frm.origin.x = nx;
-    [UIView animateWithDuration:retardationTime animations:^{
-        [self _animatePan:nx];
-    } completion:^(BOOL finished) {
+    if(vis != self.sidebarVisible) {
         self.sidebarVisible = vis;
-    }];
+    } else {
+        [UIView animateWithDuration:retardationTime animations:^{
+            [self _animatePan:nx];
+        } completion:^(BOOL finished) {
+            self.sidebarVisible = vis;
+        }];
+    }
 }
 
 - (void) _openPan
@@ -424,10 +454,10 @@
     if(openSidebarPan.state == UIGestureRecognizerStateEnded) {
         [self _finishPanningWithGestureRecognizer:openSidebarPan];
     } else if(openSidebarPan.state == UIGestureRecognizerStateBegan) {
-        panStartX = [openSidebarPan locationInView:self.view.window].x;
-        [self _adjustSidebarRect];
+        panStartX = [openSidebarPan locationInView:super.view.superview].x;
+        [self _adjustSidebarSize];
     } else if(openSidebarPan.state == UIGestureRecognizerStateChanged) {
-        CGPoint loca = [openSidebarPan locationInView:self.view.window];
+        CGPoint loca = [openSidebarPan locationInView:super.view.superview];
         [self _animatePan:loca.x - panStartX];
     }
 }
@@ -438,10 +468,10 @@
         [self _finishPanningWithGestureRecognizer:closeSidebarPan];
     } else if(closeSidebarPan.state == UIGestureRecognizerStateBegan) {
         CGFloat width = super.view.frame.size.width-rootOverlayOffset;
-        panStartX = [closeSidebarPan locationInView:self.view.window].x - width;
-        [self _adjustSidebarRect];
+        panStartX = [closeSidebarPan locationInView:super.view.superview].x - width;
+        [self _adjustSidebarSize];
     } else if(closeSidebarPan.state == UIGestureRecognizerStateChanged) {
-        CGPoint loca = [closeSidebarPan locationInView:self.view.window];
+        CGPoint loca = [closeSidebarPan locationInView:super.view.superview];
         [self _animatePan:loca.x - panStartX];
     }
 }

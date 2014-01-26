@@ -21,15 +21,25 @@
 #import "IQTheme.h"
 
 typedef enum IQNavigationPanType {
+    /**
+     Allow the user to show the sidebar by swiping the finger from the far side of the screen towards the center.
+     */
     IQNavigationPanTypeDefault = 0,
+    /**
+     Do not allow the user to show the sidebar by swiping.
+     */
     IQNavigationPanTypeNone = 1,
+    /**
+     Allow the user to show the sidebar by swiping anywhere on the screen.
+     */
     IQNavigationPanTypeAll = 2
 } IQNavigationPanType;
 
-typedef enum IQNavigationSidebarAnimationType {
-    IQNavigationPanTypeSlideUnder = 0,
-    IQNavigationPanTypeStatic = 1
-} IQNavigationSidebarAnimationType;
+typedef enum IQNavigationSidebarRevealType {
+    IQNavigationSidebarRevealTypeSlideUnder = 0,
+    IQNavigationSidebarRevealTypeStaticUnder = 1,
+    IQNavigationSidebarRevealTypeScroll = 2
+} IQNavigationSidebarRevealType;
 
 typedef enum IQNavigationSidebarViewMode {
     IQNavigationSidebarViewModeResize = 0,
@@ -87,7 +97,7 @@ typedef enum IQNavigationSidebarViewMode {
 @property (nonatomic, retain) NSString* themeUniqueIdentifier;
 @property (nonatomic, retain) NSSet* themeClasses;
 @property (nonatomic) IQNavigationPanType panType;
-@property (nonatomic) IQNavigationSidebarAnimationType sidebarAnimationType;
+@property (nonatomic) IQNavigationSidebarRevealType revealType;
 @property (nonatomic) IQNavigationSidebarViewMode sidebarViewMode;
 
 @end
