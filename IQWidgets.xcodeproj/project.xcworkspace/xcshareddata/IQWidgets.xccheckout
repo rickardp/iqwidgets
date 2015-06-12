@@ -10,29 +10,29 @@
 	<string>IQWidgets</string>
 	<key>IDESourceControlProjectOriginsDictionary</key>
 	<dict>
-		<key>CE7897B3-DE2C-4816-B1C4-6E4EF97E9473</key>
-		<string>ssh://github.com/evolvIQ/iqwidgets.git</string>
+		<key>CFFAB4387BA1905C70B372BFCF1608FCF3A76E84</key>
+		<string>github.com:evolvIQ/iqwidgets.git</string>
 	</dict>
 	<key>IDESourceControlProjectPath</key>
-	<string>IQWidgets.xcodeproj/project.xcworkspace</string>
+	<string>IQWidgets.xcodeproj</string>
 	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
 	<dict>
-		<key>CE7897B3-DE2C-4816-B1C4-6E4EF97E9473</key>
+		<key>CFFAB4387BA1905C70B372BFCF1608FCF3A76E84</key>
 		<string>../..</string>
 	</dict>
 	<key>IDESourceControlProjectURL</key>
-	<string>ssh://github.com/evolvIQ/iqwidgets.git</string>
+	<string>github.com:evolvIQ/iqwidgets.git</string>
 	<key>IDESourceControlProjectVersion</key>
-	<integer>110</integer>
+	<integer>111</integer>
 	<key>IDESourceControlProjectWCCIdentifier</key>
-	<string>CE7897B3-DE2C-4816-B1C4-6E4EF97E9473</string>
+	<string>CFFAB4387BA1905C70B372BFCF1608FCF3A76E84</string>
 	<key>IDESourceControlProjectWCConfigurations</key>
 	<array>
 		<dict>
 			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
 			<string>public.vcs.git</string>
 			<key>IDESourceControlWCCIdentifierKey</key>
-			<string>CE7897B3-DE2C-4816-B1C4-6E4EF97E9473</string>
+			<string>CFFAB4387BA1905C70B372BFCF1608FCF3A76E84</string>
 			<key>IDESourceControlWCCName</key>
 			<string>iqwidgets</string>
 		</dict>

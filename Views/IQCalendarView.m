@@ -134,6 +134,7 @@
     dayFormatter = [[NSDateFormatter alloc] init];
     [dayFormatter setDateFormat:@"d"];
     [self displayDay:currentDay animated:NO];
+    displayDate = nil;
 }
 
 - (void)layoutSubviews

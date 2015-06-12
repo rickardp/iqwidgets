@@ -15,40 +15,45 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 //
+#import <XCTest/XCTest.h>
+#import <UIKit/UIKit.h>
+#import "TestUtil.h"
+#import "IQWidgets.h"
 
-#import "CalendarTests.h"
+@interface CalendarTests : XCTestCase {
+
+}
+@end
 
 @implementation CalendarTests
 
 - (void)testMonthLogic
 {
-    NEED_UI
-    IQCalendarView* cv = [[[IQCalendarView alloc] initWithFrame:CGRectMake(0,0,0,0)] autorelease];
+    IQCalendarView* cv = [[IQCalendarView alloc] initWithFrame:CGRectMake(0,0,0,0)];
     [cv setCurrentDay:D(@"2011-03-06 00:00") display:YES animated:NO];
     
     BOOL isSwedish = [[[NSLocale currentLocale] localeIdentifier] isEqualToString:@"SV_se"];
     
-    STAssertEqualObjects(cv.firstDayInDisplayMonth, D(@"2011-03-01 00:00"), @"Invalid start date");
-    STAssertEqualObjects(cv.firstDisplayedDay, isSwedish ? D(@"2011-02-28 00:00") : D(@"2011-02-27 00:00"), @"Invalid start date");
-    STAssertEqualObjects(cv.lastDayInDisplayMonth, D(@"2011-03-31 00:00"), @"Invalid start date");
-    STAssertEqualObjects(cv.lastDisplayedDay, isSwedish ? D(@"2011-04-03 00:00") : D(@"2011-04-02 00:00"), @"Invalid start date");
+    XCTAssertEqualObjects(cv.firstDayInDisplayMonth, D(@"2011-03-01 00:00"), @"Invalid start date");
+    XCTAssertEqualObjects(cv.firstDisplayedDay, isSwedish ? D(@"2011-02-28 00:00") : D(@"2011-02-27 00:00"), @"Invalid start date");
+    XCTAssertEqualObjects(cv.lastDayInDisplayMonth, D(@"2011-03-31 00:00"), @"Invalid start date");
+    XCTAssertEqualObjects(cv.lastDisplayedDay, isSwedish ? D(@"2011-04-03 00:00") : D(@"2011-04-02 00:00"), @"Invalid start date");
 }
 
 - (void)testBasicDateLogic
 {
-    NEED_UI
-    IQCalendarView* cv = [[[IQCalendarView alloc] initWithFrame:CGRectMake(0,0,0,0)] autorelease];
-    STAssertEqualObjects([cv dayForDate:D(@"2011-03-06 13:24")], D(@"2011-03-06 00:00"), @"Failed start-of-day");
+    IQCalendarView* cv = [[IQCalendarView alloc] initWithFrame:CGRectMake(0,0,0,0)];
+    XCTAssertEqualObjects([cv dayForDate:D(@"2011-03-06 13:24")], D(@"2011-03-06 00:00"), @"Failed start-of-day");
     NSMutableSet* s = [NSMutableSet set];
     [s addObject:[cv dayForDate:D(@"2011-03-06 13:24")]];
-    STAssertTrue([s containsObject:D(@"2011-03-06 00:00")], @"Date not suitable in set");
+    XCTAssertTrue([s containsObject:D(@"2011-03-06 00:00")], @"Date not suitable in set");
 }
 
 @end
 
 
 
-NSDate* __D(SenTestCase* self, NSString* str)
+NSDate* __D(XCTestCase* self, NSString* str)
 {
     static NSDateFormatter* df = nil;
     if(df == nil) {
@@ -56,7 +61,7 @@ NSDate* __D(SenTestCase* self, NSString* str)
         [df setDateFormat:@"yyyy-MM-dd HH:mm"];
     }
     NSDate* date = [df dateFromString:str];
-    STAssertNotNil(date, @"Bad date format");
+    XCTAssertNotNil(date, @"Bad date format");
     return date;
 }
 

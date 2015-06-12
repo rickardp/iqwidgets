@@ -321,7 +321,7 @@
     UIFont* textFont = [UIFont systemFontOfSize:8];
     NSCalendar* calendar = [cal copy];
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {
-        int fwd = [calendar firstWeekday];
+        NSUInteger fwd = [calendar firstWeekday];
         NSDate* d = [NSDate dateWithTimeIntervalSinceReferenceDate:t0];
         // Days
         NSDateComponents* cmpnts = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:d];
@@ -333,9 +333,9 @@
         CGContextSetTextDrawingMode(ctx, kCGTextFill);
         while (t <= t1) {
             NSDateComponents* c2 = [calendar components:NSWeekdayCalendarUnit|NSDayCalendarUnit|NSWeekCalendarUnit fromDate:d];
-            int wd = c2.weekday;
-            int md = c2.day;
-            int wk = c2.week;
+            NSInteger wd = c2.weekday;
+            NSInteger md = c2.day;
+            NSInteger wk = c2.week;
             CGFloat scale = 0.6;
             if(wd == fwd && displayCalendarUnits & NSWeekCalendarUnit) {
                 scale = 0.4;

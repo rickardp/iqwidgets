@@ -28,18 +28,16 @@
 		FF540AEF12A95EF400C2C7A5 /* ExampleApp.m in Sources */ = {isa = PBXBuildFile; fileRef = FF540AEE12A95EF400C2C7A5 /* ExampleApp.m */; };
 		FF540AF512A95F1D00C2C7A5 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF540AF412A95F1D00C2C7A5 /* UIKit.framework */; };
 		FF540D6912A9913F00C2C7A5 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF540D6812A9913F00C2C7A5 /* QuartzCore.framework */; };
-		FF60485E133CD49500BB74F6 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF60485D133CD49500BB74F6 /* QuartzCore.framework */; };
+		FF5716F71B2B035C008408D4 /* libIQWidgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC07E0554694100DB518D /* libIQWidgets.a */; };
+		FF5716FD1B2B0372008408D4 /* Tests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FF8C322C130B175700A10CF0 /* Tests-Info.plist */; };
+		FF5716FE1B2B0372008408D4 /* CalendarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31F8130B111400A10CF0 /* CalendarTests.m */; };
+		FF5716FF1B2B0372008408D4 /* ScheduleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD6CF35130C69D10040F26E /* ScheduleTests.m */; };
+		FF5717001B2B040F008408D4 /* test.plist in Resources */ = {isa = PBXBuildFile; fileRef = FF9D9DD416275E3A002A9272 /* test.plist */; };
 		FF67B0721621EFBA00F20BA3 /* IQTheme.m in Sources */ = {isa = PBXBuildFile; fileRef = FF67B06E1621EFBA00F20BA3 /* IQTheme.m */; };
 		FF67B0731621EFBA00F20BA3 /* IQThemeCSS.m in Sources */ = {isa = PBXBuildFile; fileRef = FF67B06F1621EFBA00F20BA3 /* IQThemeCSS.m */; };
 		FF67B0741621EFBA00F20BA3 /* IQTheme.h in Headers */ = {isa = PBXBuildFile; fileRef = FF67B0701621EFBA00F20BA3 /* IQTheme.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF67B0751621EFBA00F20BA3 /* IQThemeCSS.h in Headers */ = {isa = PBXBuildFile; fileRef = FF67B0711621EFBA00F20BA3 /* IQThemeCSS.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF86DC56136CA25A0077805F /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF86DC55136CA25A0077805F /* OpenGLES.framework */; };
-		FF8C31F9130B111400A10CF0 /* CalendarTests.h in Headers */ = {isa = PBXBuildFile; fileRef = FF8C31F7130B111400A10CF0 /* CalendarTests.h */; settings = {ATTRIBUTES = (); }; };
-		FF8C3211130B136E00A10CF0 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF540AF412A95F1D00C2C7A5 /* UIKit.framework */; };
-		FF8C3212130B136E00A10CF0 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AACBBE490F95108600F1A2B1 /* Foundation.framework */; };
-		FF8C3214130B136E00A10CF0 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FF8C3213130B136E00A10CF0 /* CoreGraphics.framework */; };
-		FF8C3226130B138800A10CF0 /* CalendarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31F8130B111400A10CF0 /* CalendarTests.m */; };
-		FF8C3227130B150B00A10CF0 /* libIQWidgets.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2AAC07E0554694100DB518D /* libIQWidgets.a */; };
 		FF9D9DD716277A81002A9272 /* IQNavigationController.h in Headers */ = {isa = PBXBuildFile; fileRef = FF9D9DD516277A81002A9272 /* IQNavigationController.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FF9D9DD816277A81002A9272 /* IQNavigationController.m in Sources */ = {isa = PBXBuildFile; fileRef = FF9D9DD616277A81002A9272 /* IQNavigationController.m */; };
 		FF9D9DD916277DFC002A9272 /* about.html in Resources */ = {isa = PBXBuildFile; fileRef = FF9D9DD31624B692002A9272 /* about.html */; };
@@ -51,8 +49,6 @@
 		FFA26835132E8F29007B7FBD /* test.png in Resources */ = {isa = PBXBuildFile; fileRef = FFA26834132E8F23007B7FBD /* test.png */; };
 		FFC9646A1327DB4200B2EBA6 /* IQCalendarDataSource.h in Headers */ = {isa = PBXBuildFile; fileRef = FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFC9646B1327DB4200B2EBA6 /* IQCalendarDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */; };
-		FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF34130C69D10040F26E /* ScheduleTests.h */; settings = {ATTRIBUTES = (); }; };
-		FFD6CF38130C816A0040F26E /* ScheduleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD6CF35130C69D10040F26E /* ScheduleTests.m */; };
 		FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */ = {isa = PBXBuildFile; fileRef = FFD6CF39130C828B0040F26E /* TestUtil.h */; settings = {ATTRIBUTES = (); }; };
 		FFEEF05412BACC59003CA394 /* IQWidgets.h in Headers */ = {isa = PBXBuildFile; fileRef = FF540B3712A960B800C2C7A5 /* IQWidgets.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		FFF23727161ABF40009F64CF /* IQDrilldownController.h in Headers */ = {isa = PBXBuildFile; fileRef = FFF23725161ABF40009F64CF /* IQDrilldownController.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -81,7 +77,7 @@
 			remoteGlobalIDString = D2AAC07D0554694100DB518D;
 			remoteInfo = IQTiledScrollView;
 		};
-		FF8C3228130B150F00A10CF0 /* PBXContainerItemProxy */ = {
+		FF5716F81B2B035C008408D4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
@@ -103,15 +99,14 @@
 		FF540B0D12A95FB200C2C7A5 /* Example-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Example-Info.plist"; path = "Example/Example-Info.plist"; sourceTree = "<group>"; };
 		FF540B3712A960B800C2C7A5 /* IQWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQWidgets.h; sourceTree = "<group>"; };
 		FF540D6812A9913F00C2C7A5 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		FF5716F11B2B035C008408D4 /* IQWidgets Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "IQWidgets Tests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF60485D133CD49500BB74F6 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		FF67B06E1621EFBA00F20BA3 /* IQTheme.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQTheme.m; path = Theming/IQTheme.m; sourceTree = "<group>"; };
 		FF67B06F1621EFBA00F20BA3 /* IQThemeCSS.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = IQThemeCSS.m; path = Theming/IQThemeCSS.m; sourceTree = "<group>"; };
 		FF67B0701621EFBA00F20BA3 /* IQTheme.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQTheme.h; path = Theming/IQTheme.h; sourceTree = "<group>"; };
 		FF67B0711621EFBA00F20BA3 /* IQThemeCSS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQThemeCSS.h; path = Theming/IQThemeCSS.h; sourceTree = "<group>"; };
 		FF86DC55136CA25A0077805F /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
-		FF8C31F7130B111400A10CF0 /* CalendarTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = CalendarTests.h; path = Tests/CalendarTests.h; sourceTree = "<group>"; };
 		FF8C31F8130B111400A10CF0 /* CalendarTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = CalendarTests.m; path = Tests/CalendarTests.m; sourceTree = "<group>"; };
-		FF8C3210130B136D00A10CF0 /* BasicTests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BasicTests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF8C3213130B136E00A10CF0 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		FF8C322C130B175700A10CF0 /* Tests-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "Tests-Info.plist"; path = "Tests/Tests-Info.plist"; sourceTree = "<group>"; };
 		FF9D9DD11624B408002A9272 /* basic.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; name = basic.css; path = Example/Themes/basic.css; sourceTree = "<group>"; };
@@ -127,7 +122,6 @@
 		FFA26834132E8F23007B7FBD /* test.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = test.png; path = Example/test.png; sourceTree = "<group>"; };
 		FFC964681327DB4200B2EBA6 /* IQCalendarDataSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IQCalendarDataSource.h; sourceTree = "<group>"; };
 		FFC964691327DB4200B2EBA6 /* IQCalendarDataSource.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IQCalendarDataSource.m; sourceTree = "<group>"; };
-		FFD6CF34130C69D10040F26E /* ScheduleTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScheduleTests.h; path = Tests/ScheduleTests.h; sourceTree = "<group>"; };
 		FFD6CF35130C69D10040F26E /* ScheduleTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ScheduleTests.m; path = Tests/ScheduleTests.m; sourceTree = "<group>"; };
 		FFD6CF39130C828B0040F26E /* TestUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TestUtil.h; path = Tests/TestUtil.h; sourceTree = "<group>"; };
 		FFF23725161ABF40009F64CF /* IQDrilldownController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = IQDrilldownController.h; path = Controllers/IQDrilldownController.h; sourceTree = "<group>"; };
@@ -163,15 +157,11 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF8C320C130B136D00A10CF0 /* Frameworks */ = {
+		FF5716EE1B2B035C008408D4 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF60485E133CD49500BB74F6 /* QuartzCore.framework in Frameworks */,
-				FF8C3227130B150B00A10CF0 /* libIQWidgets.a in Frameworks */,
-				FF8C3211130B136E00A10CF0 /* UIKit.framework in Frameworks */,
-				FF8C3212130B136E00A10CF0 /* Foundation.framework in Frameworks */,
-				FF8C3214130B136E00A10CF0 /* CoreGraphics.framework in Frameworks */,
+				FF5716F71B2B035C008408D4 /* libIQWidgets.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -182,8 +172,8 @@
 			isa = PBXGroup;
 			children = (
 				FF540AD312A95EC200C2C7A5 /* IQTSVExample.app */,
-				FF8C3210130B136D00A10CF0 /* BasicTests.octest */,
 				D2AAC07E0554694100DB518D /* libIQWidgets.a */,
+				FF5716F11B2B035C008408D4 /* IQWidgets Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -263,9 +253,7 @@
 			isa = PBXGroup;
 			children = (
 				FF8C322C130B175700A10CF0 /* Tests-Info.plist */,
-				FF8C31F7130B111400A10CF0 /* CalendarTests.h */,
 				FF8C31F8130B111400A10CF0 /* CalendarTests.m */,
-				FFD6CF34130C69D10040F26E /* ScheduleTests.h */,
 				FFD6CF35130C69D10040F26E /* ScheduleTests.m */,
 				FFD6CF39130C828B0040F26E /* TestUtil.h */,
 			);
@@ -345,8 +333,6 @@
 			files = (
 				FFEEF05412BACC59003CA394 /* IQWidgets.h in Headers */,
 				FFC9646A1327DB4200B2EBA6 /* IQCalendarDataSource.h in Headers */,
-				FF8C31F9130B111400A10CF0 /* CalendarTests.h in Headers */,
-				FFD6CF36130C69D20040F26E /* ScheduleTests.h in Headers */,
 				FFD6CF3A130C828B0040F26E /* TestUtil.h in Headers */,
 				FFF23727161ABF40009F64CF /* IQDrilldownController.h in Headers */,
 				FFF23735161ABF7D009F64CF /* IQCalendarHeaderView.h in Headers */,
@@ -399,24 +385,23 @@
 			productReference = FF540AD312A95EC200C2C7A5 /* IQTSVExample.app */;
 			productType = "com.apple.product-type.application";
 		};
-		FF8C320F130B136D00A10CF0 /* BasicTests */ = {
+		FF5716F01B2B035C008408D4 /* IQWidgets Tests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = FF8C3220130B136E00A10CF0 /* Build configuration list for PBXNativeTarget "BasicTests" */;
+			buildConfigurationList = FF5716FA1B2B035C008408D4 /* Build configuration list for PBXNativeTarget "IQWidgets Tests" */;
 			buildPhases = (
-				FF8C320B130B136D00A10CF0 /* Sources */,
-				FF8C320C130B136D00A10CF0 /* Frameworks */,
-				FF8C320D130B136D00A10CF0 /* Resources */,
-				FF8C320E130B136D00A10CF0 /* ShellScript */,
+				FF5716ED1B2B035C008408D4 /* Sources */,
+				FF5716EE1B2B035C008408D4 /* Frameworks */,
+				FF5716EF1B2B035C008408D4 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				FF8C3229130B150F00A10CF0 /* PBXTargetDependency */,
+				FF5716F91B2B035C008408D4 /* PBXTargetDependency */,
 			);
-			name = BasicTests;
-			productName = BasicTests;
-			productReference = FF8C3210130B136D00A10CF0 /* BasicTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			name = "IQWidgets Tests";
+			productName = "IQWidgets Tests";
+			productReference = FF5716F11B2B035C008408D4 /* IQWidgets Tests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -425,6 +410,11 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0450;
+				TargetAttributes = {
+					FF5716F01B2B035C008408D4 = {
+						CreatedOnToolsVersion = 6.3.2;
+					};
+				};
 			};
 			buildConfigurationList = 1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "IQWidgets" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -444,8 +434,8 @@
 			targets = (
 				D2AAC07D0554694100DB518D /* IQWidgets */,
 				FF540AD212A95EC200C2C7A5 /* IQWidgetsExample */,
-				FF8C320F130B136D00A10CF0 /* BasicTests */,
 				FF2E31721881C5D200B34F1C /* IQWidgets - universal */,
+				FF5716F01B2B035C008408D4 /* IQWidgets Tests */,
 			);
 		};
 /* End PBXProject section */
@@ -464,10 +454,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF8C320D130B136D00A10CF0 /* Resources */ = {
+		FF5716EF1B2B035C008408D4 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF5717001B2B040F008408D4 /* test.plist in Resources */,
+				FF5716FD1B2B0372008408D4 /* Tests-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -485,20 +477,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Sets the target folders and the final framework product.\nFMK_NAME=IQWidgets\nTARGET_NAME=\"IQWidgets\"\n\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\nINSTALL_DIR=${BUILD_ROOT}/${CONFIGURATION}-universal/${FMK_NAME}.framework\n\n# Working dir will be deleted after the framework creation.\nDEVICE_DIR=${CONFIGURATION_BUILD_DIR}/iphoneos\nSIMULATOR_DIR=${CONFIGURATION_BUILD_DIR}/iphonesimulator\nLIBRARY_NAME=lib${FMK_NAME}.a\n\n# Building both architectures.\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphoneos CONFIGURATION_BUILD_DIR=${DEVICE_DIR}\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${SIMULATOR_DIR}\n\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]; then\nrm -rf \"${INSTALL_DIR}\"\nfi\n\n# Creates and renews the final product folder.\nmkdir -p \"${INSTALL_DIR}\"\nmkdir -p \"${INSTALL_DIR}/Versions\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Headers\"\n\n# Creates the internal links.\n# It MUST uses relative path, otherwise will not work when the folder is copied/moved.\nln -s \"${FRAMEWORK_VERSION}\" \"${INSTALL_DIR}/Versions/Current\"\nln -s \"Versions/Current/Headers\" \"${INSTALL_DIR}/Headers\"\nln -s \"Versions/Current/Resources\" \"${INSTALL_DIR}/Resources\"\nln -s \"Versions/Current/${FMK_NAME}\" \"${INSTALL_DIR}/${FMK_NAME}\"\n\n# Copies the headers and resources files to the final product folder.\ncp -R \"${DEVICE_DIR}/IQWidgets/\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Headers/\"\n#cp -R \"${DEVICE_DIR}/\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/\"\n\n# Removes the binary and header from the resources folder.\n#rm -r \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/Headers\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/${FMK_NAME}\"\n\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${LIBRARY_NAME}\" \"${SIMULATOR_DIR}/${LIBRARY_NAME}\" -output \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/${FMK_NAME}\"\n";
-		};
-		FF8C320E130B136D00A10CF0 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+			shellScript = "# Sets the target folders and the final framework product.\nFMK_NAME=IQWidgets\nTARGET_NAME=\"IQWidgets\"\n\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\n_TARGET_DIR=${BUILD_ROOT}/${CONFIGURATION}-universal\n_TARGET_DIR=${BUILT_PRODUCTS_DIR}\nINSTALL_DIR=${_TARGET_DIR}/${FMK_NAME}.framework\n\n# Working dir will be deleted after the framework creation.\nDEVICE_DIR=${CONFIGURATION_BUILD_DIR}/iphoneos\nSIMULATOR_DIR=${CONFIGURATION_BUILD_DIR}/iphonesimulator\nLIBRARY_NAME=lib${FMK_NAME}.a\n\n# Building both architectures.\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphoneos CONFIGURATION_BUILD_DIR=${DEVICE_DIR}\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${SIMULATOR_DIR}\n\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]; then\nrm -rf \"${INSTALL_DIR}\"\nfi\n\n# Creates and renews the final product folder.\nmkdir -p \"${INSTALL_DIR}\"\nmkdir -p \"${INSTALL_DIR}/Versions\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources\"\nmkdir -p \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Headers\"\n\n# Creates the internal links.\n# It MUST uses relative path, otherwise will not work when the folder is copied/moved.\nln -s \"${FRAMEWORK_VERSION}\" \"${INSTALL_DIR}/Versions/Current\"\nln -s \"Versions/Current/Headers\" \"${INSTALL_DIR}/Headers\"\nln -s \"Versions/Current/Resources\" \"${INSTALL_DIR}/Resources\"\nln -s \"Versions/Current/${FMK_NAME}\" \"${INSTALL_DIR}/${FMK_NAME}\"\n\n# Copies the headers and resources files to the final product folder.\ncp -R \"${DEVICE_DIR}/IQWidgets/\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Headers/\"\n#cp -R \"${DEVICE_DIR}/\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/\"\n\n# Removes the binary and header from the resources folder.\n#rm -r \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/Headers\" \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/Resources/${FMK_NAME}\"\n\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${LIBRARY_NAME}\" \"${SIMULATOR_DIR}/${LIBRARY_NAME}\" -output \"${INSTALL_DIR}/Versions/${FRAMEWORK_VERSION}/${FMK_NAME}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -531,12 +510,12 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		FF8C320B130B136D00A10CF0 /* Sources */ = {
+		FF5716ED1B2B035C008408D4 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FF8C3226130B138800A10CF0 /* CalendarTests.m in Sources */,
-				FFD6CF38130C816A0040F26E /* ScheduleTests.m in Sources */,
+				FF5716FF1B2B0372008408D4 /* ScheduleTests.m in Sources */,
+				FF5716FE1B2B0372008408D4 /* CalendarTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -548,10 +527,10 @@
 			target = D2AAC07D0554694100DB518D /* IQWidgets */;
 			targetProxy = FF540AD912A95EC700C2C7A5 /* PBXContainerItemProxy */;
 		};
-		FF8C3229130B150F00A10CF0 /* PBXTargetDependency */ = {
+		FF5716F91B2B035C008408D4 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = D2AAC07D0554694100DB518D /* IQWidgets */;
-			targetProxy = FF8C3228130B150F00A10CF0 /* PBXContainerItemProxy */;
+			targetProxy = FF5716F81B2B035C008408D4 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -694,48 +673,88 @@
 			};
 			name = Release;
 		};
-		FF8C3221130B136E00A10CF0 /* Debug */ = {
+		FF5716FB1B2B035C008408D4 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(inherited)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
-				INFOPLIST_FILE = "Tests/Tests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SenTestingKit,
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
 				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				INFOPLIST_FILE = "Tests/Tests-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_AFTER_BUILD = YES;
-				WRAPPER_EXTENSION = octest;
 			};
 			name = Debug;
 		};
-		FF8C3222130B136E00A10CF0 /* Release */ = {
+		FF5716FC1B2B035C008408D4 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(DEVELOPER_LIBRARY_DIR)/Frameworks",
+					"$(inherited)",
 				);
 				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				INFOPLIST_FILE = "Tests/Tests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
-				OTHER_LDFLAGS = (
-					"-framework",
-					SenTestingKit,
-				);
+				IPHONEOS_DEPLOYMENT_TARGET = 8.3;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_AFTER_BUILD = YES;
-				WRAPPER_EXTENSION = octest;
+				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
 		};
@@ -767,6 +786,7 @@
 				FF2E31741881C5D200B34F1C /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FF540AD812A95EC300C2C7A5 /* Build configuration list for PBXNativeTarget "IQWidgetsExample" */ = {
 			isa = XCConfigurationList;
@@ -777,14 +797,13 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		FF8C3220130B136E00A10CF0 /* Build configuration list for PBXNativeTarget "BasicTests" */ = {
+		FF5716FA1B2B035C008408D4 /* Build configuration list for PBXNativeTarget "IQWidgets Tests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				FF8C3221130B136E00A10CF0 /* Debug */,
-				FF8C3222130B136E00A10CF0 /* Release */,
+				FF5716FB1B2B035C008408D4 /* Debug */,
+				FF5716FC1B2B035C008408D4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

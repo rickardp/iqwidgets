@@ -16,11 +16,7 @@
 //  limitations under the License.
 //
 
-@class SenTestCase;
-
-extern NSDate* __D(SenTestCase* self, NSString* str);
+extern NSDate* __D(XCTestCase* self, NSString* str);
 extern void __NEED_UI();
 
 #define D(x) __D(self, x)
-
-#define NEED_UI __NEED_UI();
