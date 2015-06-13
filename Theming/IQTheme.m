@@ -128,7 +128,7 @@ static IQTheme* _default = nil;
         if([view respondsToSelector:@selector(setTextAlignment:)]) {
             UITextAlignment align = [self textAlignmentFor:themeable];
             if(align >= 0) {
-                [(id)view setTextAlignment:align];
+                [(id)view setTextAlignment:(NSTextAlignment)align];
                 didSet = YES;
             }
         }
@@ -409,7 +409,7 @@ static IQTheme* _default = nil;
             alignString = @"right";
             break;
         default:
-            [NSException raise:@"InvalidEnum" format:@"Invalid UITextAlignment value %d", textAlignment];
+            [NSException raise:@"InvalidEnum" format:@"Invalid UITextAlignment value %ld", (long)textAlignment];
             return;
     }
     [self _setThemeValue:alignString property:@"text-align" for:themeableOrString];
@@ -426,7 +426,7 @@ static IQTheme* _default = nil;
             styleString = @"plain";
             break;
         default:
-            [NSException raise:@"InvalidEnum" format:@"Invalid UITableViewStyle value %d", style];
+            [NSException raise:@"InvalidEnum" format:@"Invalid UITableViewStyle value %ld", (long)style];
             return;
     }
     [self _setThemeValue:styleString property:@"table-style" for:themeableOrString];

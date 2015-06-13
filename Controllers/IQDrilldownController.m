@@ -171,7 +171,7 @@
     } else {
         [self.view addSubview:panel];
     }
-	activeIndex = panels.count - 1;
+	activeIndex = (int)panels.count - 1;
 	
 	CGRect bounds = self.view.bounds;
 	CGFloat width = panelWidth;

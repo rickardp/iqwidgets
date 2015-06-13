@@ -156,7 +156,7 @@ const CGFloat kDayViewPadding = 0.0;
     if(dc.day <= 0) {
         [self setStartDate:s numberOfDays:1 animated:animated];
     } else {
-        int d = dc.day;
+        int d = (int)dc.day;
         if(dc.hour > 0 || dc.minute > 0 || dc.second > 0) d++;
         [self setStartDate:s numberOfDays:d animated:animated];
     }
@@ -171,7 +171,7 @@ const CGFloat kDayViewPadding = 0.0;
         diff = 2;
         num = 5;
     } else {
-        diff = calendar.firstWeekday;
+        diff = (int)calendar.firstWeekday;
         num = 7;
     }
     dc.day -= dc.weekday-diff;

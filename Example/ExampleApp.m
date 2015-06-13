@@ -72,6 +72,60 @@
         [self navigateTo:[[MonthCalendarExample alloc] init]];
     }] animated:NO];
     [menu addSection:dateTimeSection animated:NO];
+    IQMenuSection* utilitySection = [IQMenuSection sectionWithTitle:@"Utilities"];
+    [utilitySection addItem:[IQMenuItem itemWithTitle:@"Icon fonts" action:^{
+        UITabBarController* vc = [UITabBarController new];
+        UIViewController* tab1 = [UIViewController new];
+        tab1.tabBarItem.title = @"Tab 1";
+        tab1.tabBarItem.iconFontResource = @"LigatureSymbols";
+        tab1.tabBarItem.iconSymbol = @"app";
+        UIViewController* tab2 = [UIViewController new];
+        tab2.tabBarItem.title = @"Tab 2";
+        tab2.tabBarItem.iconFontResource = @"FontAwesome";
+        tab2.tabBarItem.iconSymbol = @"0xf1ea";
+
+        tab1.view.backgroundColor = tab2.view.backgroundColor = [UIColor whiteColor];
+        vc.viewControllers = @[tab1, tab2];
+
+        UILabel* lbl = [[UILabel alloc] initWithFrame:CGRectMake(10, 60, 200, 30)];
+        lbl.text = @"Static icon (UIImageView):";
+        lbl.font = [UIFont systemFontOfSize:10];
+        lbl.tintColor = [UIColor darkGrayColor];
+        [tab1.view addSubview:lbl];
+
+        UIImageView* l = [[UIImageView alloc] initWithFrame:CGRectMake(10, 90, 90, 40)];
+        l.contentMode = UIViewContentModeScaleAspectFit;
+        l.iconFontResource = @"LigatureSymbols";
+        l.iconSymbol = @"tag";
+        [tab1.view addSubview:l];
+        l = [[UIImageView alloc] initWithFrame:CGRectMake(100, 90, 90, 40)];
+        l.contentMode = UIViewContentModeScaleAspectFit;
+        l.iconFontResource = @"FontAwesome";
+        l.iconSymbol = @"0xf1e3";
+        [tab1.view addSubview:l];
+
+        lbl = [[UILabel alloc] initWithFrame:CGRectMake(10, 130, 200, 30)];
+        lbl.text = @"Push button (UIButton):";
+        lbl.font = [UIFont systemFontOfSize:10];
+        lbl.tintColor = [UIColor darkGrayColor];
+        [tab1.view addSubview:lbl];
+        UIButton* btn = [UIButton buttonWithType:UIButtonTypeCustom];
+        btn.frame = CGRectMake(10, 160, 90, 90);
+        [btn setTitle:@"Hej" forState:UIControlStateNormal];
+        [tab1.view addSubview:btn];
+
+        lbl = [[UILabel alloc] initWithFrame:CGRectMake(10, 230, 200, 30)];
+        lbl.text = @"Segmented (UISegmentedControl):";
+        lbl.font = [UIFont systemFontOfSize:10];
+        lbl.tintColor = [UIColor darkGrayColor];
+        [tab1.view addSubview:lbl];
+        UISegmentedControl* sc = [[UISegmentedControl alloc] initWithItems:@[@"A", @"B", @"C"]];
+        sc.frame = CGRectMake(10, 260, 90, 26);
+        [tab1.view addSubview:sc];
+
+        [self navigateTo:vc];
+    }] animated:NO];
+    [menu addSection:utilitySection animated:NO];
     
     IQMenuSection* themeSection = [IQMenuSection sectionWithTitle:@"Themes"];
     [themeSection addItem:[IQMenuItem itemWithTitle:@"Default" action:^{

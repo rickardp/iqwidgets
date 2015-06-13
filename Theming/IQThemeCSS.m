@@ -25,7 +25,7 @@
 // http://www.w3.org/TR/CSS2/selector.html
 NSArray* _IQMutableTheme_TokenizeCSS(NSString* cssSelector, int* ioPos) {
     NSMutableArray* tokens = [NSMutableArray array];
-    int len = cssSelector.length;
+    NSUInteger len = cssSelector.length;
     int i = 0;
     if(ioPos) i = (*ioPos);
     int lastPos = i;
@@ -73,7 +73,7 @@ NSArray* _IQMutableTheme_TokenizeCSS(NSString* cssSelector, int* ioPos) {
                         i = -1;
                         stop = YES;
                     } else {
-                        i = rng.location + rng.length;
+                        i = (int)(rng.location + rng.length);
                         for(;i<len && !stop;i++) {
                             c = [cssSelector characterAtIndex:i];
                             BOOL isWs = NO;
@@ -148,7 +148,7 @@ NSDictionary* _IQMutableTheme_ParseCSSValues(NSString* css, int* ioPos) {
         }
     }
     int lastPos = i;
-    int len = css.length;
+    NSUInteger len = css.length;
     BOOL stop = NO;
     NSString* key = nil;
     for(; i<len && !stop; i++) {
@@ -232,7 +232,7 @@ UIColor* _IQMutableTheme_ParseCssColor(NSString* cssColorSpec) {
     if([cssColorSpec characterAtIndex:0] == '#') {
         NSScanner *scanner = [NSScanner scannerWithString:cssColorSpec];
         [scanner setScanLocation:1];
-        NSUInteger result = 0;
+        unsigned int result = 0;
         if([scanner scanHexInt:&result]) {
             result &= 0xFFFFFF;
             return [UIColor colorWithRed:((result>>16)&0xFF)/255.0f green:((result>>8)&0xFF)/255.0f blue:((result>>0)&0xFF)/255.0f alpha:1.0f];
@@ -319,7 +319,7 @@ UIColor* _IQMutableTheme_ParseCssColor(NSString* cssColorSpec) {
 
 - (void) parseCSS:(NSString*)css
 {
-    int idx = 0, len = css.length;
+    int idx = 0, len = (int)css.length;
     NSMutableArray* selectors = nil;
     while(idx < len) {
         NSArray* sel = _IQMutableTheme_TokenizeCSS(css, &idx);

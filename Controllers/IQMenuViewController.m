@@ -59,7 +59,7 @@
 - (void) _setParent:(IQMenuViewController*)menu;
 - (BOOL) _displaying;
 - (NSArray*) _items;
-- (int) _displayIndexForItem:(IQMenuItem*)item;
+- (NSInteger) _displayIndexForItem:(IQMenuItem*)item;
 @end
 
 typedef void (^_IQActionBlock)();
@@ -334,7 +334,7 @@ typedef void (^_IQActionBlock)();
     return parent;
 }
 
-- (int) _displayIndexForItem:(IQMenuItem*)item
+- (NSInteger) _displayIndexForItem:(IQMenuItem*)item
 {
     NSInteger index = 0;
     for(IQMenuItem* i in items) {
@@ -509,7 +509,7 @@ typedef void (^_IQActionBlock)();
         self->hidden = newHiddenState;
         BOOL isDisplaying = parent._displaying;
         if(wasDisplaying && isDisplaying) {
-            int index = [parent._items indexOfObject:self];
+            NSUInteger index = [parent._items indexOfObject:self];
             if(index == NSNotFound) [NSException raise:@"ItemNotFound" format:@"Item %@ not in parent section", self];
             if(!newHiddenState) {
                 [self.menuViewController _itemAdded:index inSection:parent shouldAnimate:animated];
@@ -565,7 +565,7 @@ typedef void (^_IQActionBlock)();
             count++;
         }
     }
-    [NSException raise:@"SectionIndexOutOfBounds" format:@"Section index %d out of bounds", index];
+    [NSException raise:@"SectionIndexOutOfBounds" format:@"Section index %ld out of bounds", (long)index];
     return nil;
 }
 
@@ -590,7 +590,7 @@ typedef void (^_IQActionBlock)();
             if(count++ == index) return item;
         }
     }
-    [NSException raise:@"ItemIndexOutOfBounds" format:@"Item index %d out of bounds", index];
+    [NSException raise:@"ItemIndexOutOfBounds" format:@"Item index %ld out of bounds", (long)index];
     return nil;
 }
 

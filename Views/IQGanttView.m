@@ -353,13 +353,13 @@
             char str[12] = "";
             if(displayCalendarUnits & NSWeekdayCalendarUnit) {
                 if(displayCalendarUnits & NSDayCalendarUnit) {
-                    snprintf(str, sizeof(str), "%c %d", weekdayLetters[wd-1], md);
+                    snprintf(str, sizeof(str), "%c %ld", weekdayLetters[wd-1], (long)md);
                 } else {
                     snprintf(str, sizeof(str), "%c", weekdayLetters[wd-1]);
                 }
             } else {
                 if(displayCalendarUnits & NSDayCalendarUnit) {
-                    snprintf(str, sizeof(str), "%d", md);
+                    snprintf(str, sizeof(str), "%ld", (long)md);
                 }
             }
             if(str[0] != 0) {
@@ -569,7 +569,6 @@
 
 - (void)ganttView:(IQGanttView *)view didChangeCalendar:(NSCalendar*)calendar
 {
-    NSCalendar* oldCal = cal;
     cal = calendar;
     [self setNeedsDisplay];
 }
@@ -639,7 +638,7 @@
     IQGridDash prevGridDash = IQMakeGridDash(0, 0);
     UIColor* prevGridColor = nil;
     if(scaleWindow.windowEnd > scaleWindow.windowStart) {
-        int fwd = [calendar firstWeekday];
+        int fwd = (int)[calendar firstWeekday];
         NSDate* d = [NSDate dateWithTimeIntervalSinceReferenceDate:t0];
         // Days
         NSDateComponents* cmpnts = [calendar components:NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:d];
@@ -647,8 +646,8 @@
         //int text = 0;
         while (t <= t1) {
             NSDateComponents* c2 = [calendar components:NSWeekdayCalendarUnit|NSDayCalendarUnit fromDate:d];
-            int wd = c2.weekday;
-            int md = c2.day;
+            int wd = (int)c2.weekday;
+            int md = (int)c2.day;
             CGFloat x = round(r0 + (t-t0) / scl)+.5;
             
             BOOL l1 = NO, l2 = NO, l3 = NO;

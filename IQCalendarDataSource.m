@@ -102,7 +102,7 @@
     
     if(!value && (start || end)) {
         value = ^(id item) {
-            if([item respondsToSelector:@selector(text)]) {
+            if([item respondsToSelector:@selector(value)]) {
                 return (NSObject<IQCalendarActivity>*)[(id<IQCalendarSimpleDataItem>)item value];
             } else {
                 return (NSObject<IQCalendarActivity>*)nil;

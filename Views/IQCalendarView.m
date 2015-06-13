@@ -549,7 +549,7 @@
 -(NSDate*)firstDisplayedDay
 {
     NSDateComponents* cmpnts = [calendar components:NSWeekdayCalendarUnit|NSDayCalendarUnit|NSMonthCalendarUnit|NSYearCalendarUnit fromDate:self.firstDayInDisplayMonth];
-    int daysSinceWeekStart = cmpnts.weekday - [calendar firstWeekday];
+    int daysSinceWeekStart = (int)cmpnts.weekday - (int)[calendar firstWeekday];
     cmpnts.day -= daysSinceWeekStart;
     return [calendar dateFromComponents:cmpnts];
 }

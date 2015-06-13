@@ -26,6 +26,7 @@
 #import "IQGanttView.h"
 #import "IQCalendarDataSource.h"
 #import "IQDrawerView.h"
+#import "IQIconFont.h"
 #import "IQTheme.h"
 #import "IQThemeCSS.h"
 
