@@ -23,6 +23,7 @@
 
 /* Begin PBXBuildFile section */
 		FF11C2A71B2C36F000556651 /* LigatureSymbols.otf in Resources */ = {isa = PBXBuildFile; fileRef = FF11C2A61B2C36F000556651 /* LigatureSymbols.otf */; };
+		FF466E251B30423D00B5740E /* IQWidgets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FFDDA0AB1B2CD766003D9CEA /* IQWidgets.framework */; };
 		FF5716FD1B2B0372008408D4 /* Tests-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = FF8C322C130B175700A10CF0 /* Tests-Info.plist */; };
 		FF5716FE1B2B0372008408D4 /* CalendarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FF8C31F8130B111400A10CF0 /* CalendarTests.m */; };
 		FF5716FF1B2B0372008408D4 /* ScheduleTests.m in Sources */ = {isa = PBXBuildFile; fileRef = FFD6CF35130C69D10040F26E /* ScheduleTests.m */; };
@@ -144,6 +145,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF466E251B30423D00B5740E /* IQWidgets.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -500,7 +502,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "# Sets the target folders and the final framework product.\nFMK_NAME=IQWidgets\nTARGET_NAME=\"IQWidgets\"\n\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\n_TARGET_DIR=${BUILD_ROOT}/${CONFIGURATION}-universal\nINSTALL_DIR=${_TARGET_DIR}/${FMK_NAME}.framework\n\n# Working dir will be deleted after the framework creation.\nDEVICE_DIR=${CONFIGURATION_BUILD_DIR}/../${CONFIGURATION}-iphoneos\nSIMULATOR_DIR=${CONFIGURATION_BUILD_DIR}/../${CONFIGURATION}-iphonesimulator\n\n# Building both architectures.\necho Building device\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphoneos CONFIGURATION_BUILD_DIR=${DEVICE_DIR}\necho Building sim\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${SIMULATOR_DIR}\n\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]; then\nrm -rf \"${INSTALL_DIR}\"\nfi\n\n# Creates and renews the final product folder.\nmkdir -p \"${INSTALL_DIR}\"\n\n# Copies the headers and resources files to the final product folder.\ncp -R \"${DEVICE_DIR}/${TARGET_NAME}.framework/Headers\" \"${INSTALL_DIR}/\"\n\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${TARGET_NAME}.framework/${TARGET_NAME}\" \"${SIMULATOR_DIR}/${TARGET_NAME}.framework/${TARGET_NAME}\" -output \"${INSTALL_DIR}/${FMK_NAME}\"\n\n";
+			shellScript = "# Sets the target folders and the final framework product.\nFMK_NAME=IQWidgets\nTARGET_NAME=\"IQWidgets\"\n\n# Install dir will be the final output to the framework.\n# The following line create it in the root folder of the current project.\n_TARGET_DIR=${BUILD_ROOT}/${CONFIGURATION}-universal\nINSTALL_DIR=${_TARGET_DIR}/${FMK_NAME}.framework\n\n# Working dir will be deleted after the framework creation.\nDEVICE_DIR=${CONFIGURATION_BUILD_DIR}/../${CONFIGURATION}-iphoneos\nSIMULATOR_DIR=${CONFIGURATION_BUILD_DIR}/../${CONFIGURATION}-iphonesimulator\n\n# Building both architectures.\necho Building device\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphoneos CONFIGURATION_BUILD_DIR=${DEVICE_DIR}\necho Building sim\nxcodebuild -configuration \"${CONFIGURATION}\" -target \"${TARGET_NAME}\" -sdk iphonesimulator CONFIGURATION_BUILD_DIR=${SIMULATOR_DIR}\n\n# Cleaning the oldest.\nif [ -d \"${INSTALL_DIR}\" ]; then\nrm -rf \"${INSTALL_DIR}\"\nfi\n\n# Creates and renews the final product folder.\nmkdir -p \"${INSTALL_DIR}\"\n\n# Copies the headers and resources files to the final product folder.\ncp -R \"${DEVICE_DIR}/${FMK_NAME}.framework/Headers\" \"${INSTALL_DIR}/\"\n\n# Uses the Lipo Tool to merge both binary files (i386 + armv6/armv7) into one Universal final product.\nlipo -create \"${DEVICE_DIR}/${FMK_NAME}.framework/${FMK_NAME}\" \"${SIMULATOR_DIR}/${FMK_NAME}.framework/${FMK_NAME}\" -output \"${INSTALL_DIR}/${FMK_NAME}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -916,6 +918,7 @@
 				FFDDA0C01B2CD766003D9CEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		FFDDA0C71B2CD9DE003D9CEA /* Build configuration list for PBXAggregateTarget "IQWidgets - Universal" */ = {
 			isa = XCConfigurationList;
@@ -924,6 +927,7 @@
 				FFDDA0C91B2CD9DE003D9CEA /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
