@@ -20,7 +20,7 @@ The `master` branch is currently considered unstable and may introduce breaking 
 How to build
 ------------
 
-To use IQWidgets in your project, just add the .xcodeproj file to your existing project as a dependency. Edit the 
+To use IQWidgets in your project, just add the .xcodeproj file to your existing project as a dependency. 
 
-IQWidgets was created for XCode 4. It has not been tested with earlier versions of XCode. If your project uses XCode 3, there may be some migration work for the project file itself.
+The master branch will always be kept buildable on the latest stable (i.e. non-beta) version of Xcode.
 
